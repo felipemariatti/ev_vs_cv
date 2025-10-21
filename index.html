@@ -1,159 +1,165 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Veículos Elétricos x Combustão</title>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      color: #333;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #0077b6;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    main {
-      max-width: 900px;
-      margin: 40px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      margin-top: 0;
-    }
-    .inputs {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: bold;
-    }
-    input {
-      margin-left: 10px;
-      padding: 5px;
-      width: 100px;
-    }
-    button {
-      background: #0077b6;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #023e8a;
-    }
-    #grafico {
-      margin-top: 20px;
-    }
-    #resultado {
-      text-align: center;
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 18px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Veículos</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .vehicle-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 50%;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+        }
+        .info-display p {
+            margin: 5px 0;
+        }
+        .info-display span {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>⚡ Comparativo Econômico: Veículos Elétricos x Combustão</h1>
-  </header>
 
-  <main>
-    <div class="inputs">
-      <label>Anos de uso:
-        <input type="number" id="anos" value="5" min="1" max="15">
-      </label>
-      <label>Km por ano:
-        <input type="number" id="km_ano" value="15000" step="1000">
-      </label>
-      <button id="atualizar">Atualizar</button>
+<div class="container">
+    <div class="vehicle-section">
+        <h2>Veículos Elétricos</h2>
+        <select id="electric-models" onchange="displayInfo('electric')">
+            <option value="">Selecione um modelo</option>
+        </select>
+        <div id="electric-info" class="info-display"></div>
     </div>
 
-    <div id="grafico"></div>
-    <div id="resultado"></div>
-  </main>
+    <div class="vehicle-section">
+        <h2>Veículos a Combustão</h2>
+        <select id="combustion-models" onchange="displayInfo('combustion')">
+            <option value="">Selecione um modelo</option>
+        </select>
+        <div id="combustion-info" class="info-display"></div>
+    </div>
+</div>
 
-  <script>
-    // 🔗 Substitua pelo link CSV da sua planilha Google Sheets publicada
-    const urlPlanilha = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?output=csv";
+<script>
+    // *******************************************************************
+    // COLE OS DADOS DA SUA PLANILHA AQUI DENTRO DA VARIÁVEL vehicleData
+    // Mantenha o formato de array de objetos, como no exemplo abaixo.
+    // Certifique-se que a coluna "Tipo" tenha os valores "Elétrico" ou "Combustão"
+    // *******************************************************************
+    const vehicleData = [
+        {
+            "Modelo": "Tesla Model 3",
+            "Tipo": "Elétrico",
+            "Preço Inicial (R$)": 250000,
+            "Consumo (km/kWh ou km/L)": 6.5,
+            "Custo Energia/Combustível (R$/kWh ou R$/L)": 0.9,
+            "Custo Manutenção Anual (R$)": 1500,
+            "Autonomia (km)": 500,
+            "Vida Útil (anos)": 10
+        },
+        {
+            "Modelo": "Nissan Leaf",
+            "Tipo": "Elétrico",
+            "Preço Inicial (R$)": 200000,
+            "Consumo (km/kWh ou km/L)": 7,
+            "Custo Energia/Combustível (R$/kWh ou R$/L)": 0.9,
+            "Custo Manutenção Anual (R$)": 1200,
+            "Autonomia (km)": 350,
+            "Vida Útil (anos)": 8
+        },
+        {
+            "Modelo": "Toyota Corolla",
+            "Tipo": "Combustão",
+            "Preço Inicial (R$)": 150000,
+            "Consumo (km/kWh ou km/L)": 14,
+            "Custo Energia/Combustível (R$/kWh ou R$/L)": 5.8,
+            "Custo Manutenção Anual (R$)": 2500,
+            "Autonomia (km)": 600,
+            "Vida Útil (anos)": 12
+        },
+        {
+            "Modelo": "Honda Civic",
+            "Tipo": "Combustão",
+            "Preço Inicial (R$)": 160000,
+            "Consumo (km/kWh ou km/L)": 13.5,
+            "Custo Energia/Combustível (R$/kWh ou R$/L)": 5.8,
+            "Custo Manutenção Anual (R$)": 2800,
+            "Autonomia (km)": 550,
+            "Vida Útil (anos)": 12
+        }
+        // Adicione mais objetos aqui conforme sua planilha
+    ];
+    // *******************************************************************
+    // FIM DA ÁREA DE DADOS
+    // *******************************************************************
 
-    async function carregarDados() {
-      const resp = await fetch(urlPlanilha);
-      const texto = await resp.text();
-      const linhas = texto.trim().split("\n").map(l => l.split(","));
-      const cabecalho = linhas[0];
-      const dados = linhas.slice(1).map(l => Object.fromEntries(l.map((v, i) => [cabecalho[i].trim(), v.trim()])));
-      return dados;
+
+    const electricModelsSelect = document.getElementById('electric-models');
+    const combustionModelsSelect = document.getElementById('combustion-models');
+
+    // Popula as listas suspensas com base no tipo de veículo
+    vehicleData.forEach(vehicle => {
+        const option = document.createElement('option');
+        option.value = vehicle.Modelo;
+        option.textContent = vehicle.Modelo;
+        if (vehicle.Tipo === 'Elétrico') {
+            electricModelsSelect.appendChild(option);
+        } else if (vehicle.Tipo === 'Combustão') {
+            combustionModelsSelect.appendChild(option);
+        }
+    });
+
+    function displayInfo(type) {
+        let selectedModelName;
+        let infoDiv;
+        if (type === 'electric') {
+            selectedModelName = electricModelsSelect.value;
+            infoDiv = document.getElementById('electric-info');
+        } else {
+            selectedModelName = combustionModelsSelect.value;
+            infoDiv = document.getElementById('combustion-info');
+        }
+
+        const selectedVehicle = vehicleData.find(v => v.Modelo === selectedModelName);
+
+        if (selectedVehicle) {
+            infoDiv.innerHTML = `
+                <p><span>Preço Inicial (R$):</span> ${selectedVehicle['Preço Inicial (R$)']}</p>
+                <p><span>Consumo (km/kWh ou km/L):</span> ${selectedVehicle['Consumo (km/kWh ou km/L)']}</p>
+                <p><span>Custo Energia/Combustível (R$/kWh ou R$/L):</span> ${selectedVehicle['Custo Energia/Combustível (R$/kWh ou R$/L)']}</p>
+                <p><span>Custo Manutenção Anual (R$):</span> ${selectedVehicle['Custo Manutenção Anual (R$)']}</p>
+                <p><span>Autonomia (km):</span> ${selectedVehicle['Autonomia (km)']}</p>
+                <p><span>Vida Útil (anos):</span> ${selectedVehicle['Vida Útil (anos)']}</p>
+            `;
+        } else {
+            infoDiv.innerHTML = '';
+        }
     }
+</script>
 
-    function calcularCustoTotal(d, kmAno, anos) {
-      const consumo = parseFloat(d["Consumo (km/kWh ou km/L)"]);
-      const precoEnergia = parseFloat(d["Custo Energia/Combustível (R$/kWh ou R$/L)"]);
-      const manut = parseFloat(d["Custo Manutenção Anual (R$)"]);
-      const preco = parseFloat(d["Preço Inicial (R$)"]);
-
-      const custoEnergia = (kmAno / consumo) * precoEnergia * anos;
-      const custoManut = manut * anos;
-      return preco + custoEnergia + custoManut;
-    }
-
-    async function atualizar() {
-      const anos = parseInt(document.getElementById("anos").value);
-      const kmAno = parseInt(document.getElementById("km_ano").value);
-      const dados = await carregarDados();
-
-      const custos = dados.map(d => ({
-        modelo: d["Modelo"],
-        tipo: d["Tipo"],
-        custo: calcularCustoTotal(d, kmAno, anos)
-      }));
-
-      const trace = {
-        x: custos.map(c => c.modelo),
-        y: custos.map(c => c.custo),
-        type: "bar",
-        text: custos.map(c => c.tipo),
-        textposition: "auto",
-        marker: { color: custos.map(c => c.tipo === "Elétrico" ? "#00b050" : "#f39c12") }
-      };
-
-      const layout = {
-        title: "Custo Total Estimado por Modelo",
-        yaxis: { title: "Custo Total (R$)" },
-        xaxis: { title: "Modelos" }
-      };
-
-      Plotly.newPlot("grafico", [trace], layout);
-
-      const eletrico = custos.find(c => c.tipo === "Elétrico");
-      const combustao = custos.find(c => c.tipo === "Combustão");
-
-      if (eletrico && combustao) {
-        const diff = combustao.custo - eletrico.custo;
-        const economia = diff > 0
-          ? `Economia com o elétrico: R$ ${diff.toFixed(2)}`
-          : `Combustão é mais barata por R$ ${Math.abs(diff).toFixed(2)}`;
-        document.getElementById("resultado").innerHTML =
-          `<h3>${economia} em ${anos} anos.</h3>`;
-      }
-    }
-
-    document.getElementById("atualizar").addEventListener("click", atualizar);
-    window.onload = atualizar;
-  </script>
 </body>
 </html>
