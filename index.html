@@ -17,12 +17,12 @@
             min-height: 100vh;
             background-color: #e0e0f2;
             margin: 0;
-            padding: 30px 20px;
+            padding: 25px 20px; /* Reduzido padding superior */
             box-sizing: border-box;
         }
         .container {
             display: flex;
-            gap: 30px;
+            gap: 20px; /* Reduzido o espaço entre os cards */
             width: 100%;
             max-width: 1000px;
             flex-wrap: wrap;
@@ -30,11 +30,11 @@
         }
         .vehicle-section {
             background-color: white;
-            padding: 25px;
+            padding: 20px; /* Reduzido o padding interno */
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(100, 50, 200, 0.2);
             width: 45%;
-            min-width: 380px;
+            min-width: 340px; /* Reduzida a largura mínima */
             box-sizing: border-box;
             border: 1px solid #d0d0e0;
             background-image: linear-gradient(to bottom, #ffffff, #fcfcff);
@@ -46,15 +46,15 @@
         }
 
         h2 {
-            font-size: 1.5em;
+            font-size: 1.3em; /* Reduzido o tamanho da fonte */
             color: #4a4a4a;
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 20px; /* Reduzida a margem */
             display: flex;
             align-items: center;
             gap: 10px;
             border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
+            padding-bottom: 12px; /* Reduzido o padding */
         }
         h2 i {
             font-size: 1.2em;
@@ -63,12 +63,12 @@
 
         .image-container {
             width: 100%;
-            height: 220px; /* Altura fixa para a imagem */
+            height: 190px; /* Reduzida a altura da imagem */
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 18px; /* Reduzida a margem */
             background-color: #f0f0f0;
-            display: none; /* Começa escondido */
+            display: none;
         }
         .image-container img {
             width: 100%;
@@ -78,23 +78,23 @@
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 15px; /* Reduzido o espaço entre campos */
         }
         .form-group label {
             display: block;
-            font-size: 0.9em;
+            font-size: 0.85em; /* Reduzida a fonte do rótulo */
             color: #6a6a6a;
             margin-bottom: 5px;
             font-weight: 600;
         }
         select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 8px 10px; /* Reduzido o padding (altura) */
             border: 1px solid #ccc;
             border-radius: 6px;
-            margin-bottom: 20px;
+            margin-bottom: 18px; /* Reduzida a margem */
             background-color: #f8f8f8;
-            font-size: 1em;
+            font-size: 0.95em; /* Reduzida a fonte */
             color: #333;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -117,11 +117,11 @@
         }
         .input-group input[type="text"] {
             flex-grow: 1;
-            padding: 10px 12px;
+            padding: 8px 10px; /* Reduzido o padding (altura) */
             border: 1px solid #ccc;
             border-radius: 6px;
             background-color: #f8f8f8;
-            font-size: 1em;
+            font-size: 0.95em; /* Reduzida a fonte */
             color: #333;
             box-sizing: border-box;
             opacity: 0.9;
@@ -140,7 +140,7 @@
         }
 
         .edit-button {
-            padding: 8px 12px;
+            padding: 6px 10px; /* Reduzido o padding (altura) */
             background-color: #e6ffe6;
             color: #28a745;
             border: 1px solid #28a745;
@@ -165,7 +165,7 @@
             font-weight: bold;
         }
     </style>
-</head>
+    </head>
 <body>
 
 <div class="container">
@@ -359,7 +359,6 @@
         return String(value);
     }
 
-
     function displayInfo(type) {
         let selectedModelName;
         let priceInput, consumptionInput, costEnergyFuelInput, maintenanceInput, autonomyInput, lifespanInput;
@@ -388,11 +387,6 @@
         }
 
         const selectedVehicle = vehicleData.find(v => v.Modelo === selectedModelName);
-        
-        // =========================================================
-        // ===== ESTA É A NOVA LINHA PARA DEPURAR O PROBLEMA =====
-        console.log("Veículo selecionado:", selectedVehicle); 
-        // =========================================================
 
         if (selectedVehicle) {
             priceInput.value = formatNumber(selectedVehicle['Preço Inicial (R$)'], true);
@@ -402,8 +396,6 @@
             autonomyInput.value = formatNumber(selectedVehicle['Autonomia (km)']);
             lifespanInput.value = formatNumber(selectedVehicle['Vida Útil (anos)']);
 
-            // Lógica para exibir a imagem
-            // IMPORTANTE: Verifica se a coluna se chama "imagem" (minúsculo)
             if (selectedVehicle.imagem && selectedVehicle.imagem.trim() !== '') {
                 imageElement.src = selectedVehicle.imagem; 
                 imageContainer.style.display = 'block'; 
@@ -413,7 +405,6 @@
             }
 
         } else {
-            // Limpa todos os campos
             priceInput.value = '0.00';
             consumptionInput.value = '-';
             costEnergyFuelInput.value = '0.00';
