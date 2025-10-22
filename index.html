@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Veículos - Elétricos vs Combustão</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card.eletrico h2 {
+            border-bottom-color: #10b981;
+        }
+
+        .card.combustao h2 {
+            border-bottom-color: #f59e0b;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #667eea;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .info-group {
+            margin-top: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+        }
+
+        .info-item label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .info-item input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            background: #f9fafb;
+            transition: all 0.3s;
+        }
+
+        .info-item input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .info-item input[readonly] {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        .info-item input.editable {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .info-item input.editable:focus {
+            border-color: #059669;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #10b981;
+            color: white;
+            font-size: 0.75em;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Comparador de Veículos</h1>
+        
+        <div id="loadingMessage" class="loading">
+            <p>🔄 Carregando dados da planilha...</p>
+            <small>Aguarde alguns instantes</small>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="grid-container">
+                <!-- Veículos Elétricos -->
+                <div class="card eletrico">
+                    <h2>🔋 Veículos Elétricos</h2>
+                    <select id="selectEletrico" onchange="carregarDados('eletrico')">
+                        <option value="">Selecione um modelo...</option>
+                    </select>
+
+                    <div class="info-group">
+                        <div class="info-item">
+                            <label>Preço Inicial (R$) <span class="badge">Editável</span></label>
+                            <input type="number" id="precoEletrico" class="editable" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="info-item">
+                            <label>Consumo (km/kWh)</label>
+                            <input type="text" id="consumoEletrico" readonly placeholder="-">
+                        </div>
+                        <div class="info-item">
+                            <label>Custo Energia (R$/kWh) <span class="badge">Editável</span></label>
+                            <input type="number" id="custoEnergiaEletrico" class="editable" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="info-item">
+                            <label>Custo Manutenção Anual (R$)</label>
+                            <input type="text" id="manutencaoEletrico" readonly placeholder="-">
+                        </div>
+                        <div class="info-item">
+                            <label>Autonomia (km)</label>
+                            <input type="text" id="autonomiaEletrico" readonly placeholder="-">
+                        </div>
+                        <div class="info-item">
+                            <label>Vida Útil (anos)</label>
+                            <input type="text" id="vidaUtilEletrico" readonly placeholder="-">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Veículos a Combustão -->
+                <div class="card combustao">
+                    <h2>⛽ Veículos a Combustão</h2>
+                    <select id="selectCombustao" onchange="carregarDados('combustao')">
+                        <option value="">Selecione um modelo...</option>
+                    </select>
+
+                    <div class="info-group">
+                        <div class="info-item">
+                            <label>Preço Inicial (R$) <span class="badge">Editável</span></label>
+                            <input type="number" id="precoCombustao" class="editable" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="info-item">
+                            <label>Consumo (km/L)</label>
+                            <input type="text" id="consumoCombustao" readonly placeholder="-">
+                        </div>
+                        <div class="info-item">
+                            <label>Custo Combustível (R$/L) <span class="badge">Editável</span></label>
+                            <input type="number" id="custoCombustivelCombustao" class="editable" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="info-item">
+                            <label>Custo Manutenção Anual (R$)</label>
+                            <input type="text" id="manutencaoCombustao" readonly placeholder="-">
+                        </div>
+                        <div class="info-item">
+                            <label>Autonomia (km)</label>
+                            <input type="text" id="autonomiaCombustao" readonly placeholder="-">
+                        </div>
+                        <div class="info-item">
+                            <label>Vida Útil (anos)</label>
+                            <input type="text" id="vidaUtilCombustao" readonly placeholder="-">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Dados carregados automaticamente da planilha Google Sheets</p>
+            <p>Atualize a página para carregar novos dados</p>
+        </div>
+    </div>
+
+    <script>
+        let veiculosData = [];
+        const csvURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?output=csv';
+
+        function carregarCSV() {
+            console.log('🔄 Carregando dados da planilha...');
+            console.log('URL:', csvURL);
+            
+            Papa.parse(csvURL, {
+                download: true,
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    console.log('✅ Dados carregados com sucesso!');
+                    console.log('Total de registros:', results.data.length);
+                    console.log('Colunas:', results.meta.fields);
+                    console.log('Dados:', results.data);
+                    
+                    veiculosData = results.data;
+                    
+                    if (veiculosData.length === 0) {
+                        mostrarErro('Nenhum dado encontrado na planilha');
+                        return;
+                    }
+                    
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    
+                    preencherSelects();
+                },
+                error: function(error) {
+                    console.error('❌ Erro ao carregar CSV:', error);
+                    mostrarErro('Erro ao carregar dados: ' + (error.message || 'Erro desconhecido'));
+                }
+            });
+        }
+
+        function mostrarErro(mensagem) {
+            document.getElementById('loadingMessage').innerHTML = `
+                <div class="error-message">
+                    <strong>⚠️ Erro ao carregar dados</strong><br><br>
+                    ${mensagem}<br><br>
+                    <small>Verifique se a planilha está publicada e acessível</small>
+                </div>
+            `;
+        }
+
+        function preencherSelects() {
+            const selectEletrico = document.getElementById('selectEletrico');
+            const selectCombustao = document.getElementById('selectCombustao');
+
+            let countEletrico = 0;
+            let countCombustao = 0;
+
+            veiculosData.forEach((veiculo, index) => {
+                const modelo = veiculo.Modelo;
+                const tipo = veiculo.Tipo;
+                
+                if (!modelo || !tipo) return;
+
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = modelo;
+
+                if (tipo === 'Elétrico') {
+                    selectEletrico.appendChild(option);
+                    countEletrico++;
+                } else if (tipo === 'Combustão') {
+                    selectCombustao.appendChild(option);
+                    countCombustao++;
+                }
+            });
+
+            console.log(`✅ ${countEletrico} veículos elétricos carregados`);
+            console.log(`✅ ${countCombustao} veículos a combustão carregados`);
+        }
+
+        function carregarDados(tipo) {
+            const selectId = tipo === 'eletrico' ? 'selectEletrico' : 'selectCombustao';
+            const select = document.getElementById(selectId);
+            const index = select.value;
+
+            if (!index) {
+                limparCampos(tipo);
+                return;
+            }
+
+            const veiculo = veiculosData[index];
+            const prefixo = tipo === 'eletrico' ? 'Eletrico' : 'Combustao';
+
+            document.getElementById(`preco${prefixo}`).value = veiculo['Preço Inicial (R$)'] || '';
+            document.getElementById(`consumo${prefixo}`).value = veiculo['Consumo (km/kWh ou km/L)'] || '';
+            
+            const custoCampo = tipo === 'eletrico' ? 'custoEnergiaEletrico' : 'custoCombustivelCombustao';
+            document.getElementById(custoCampo).value = veiculo['Custo Energia/Combustível (R$/kWh ou R$/L)'] || '';
+            
+            document.getElementById(`manutencao${prefixo}`).value = veiculo['Custo Manutenção Anual (R$)'] || '';
+            document.getElementById(`autonomia${prefixo}`).value = veiculo['Autonomia (km)'] || '';
+            document.getElementById(`vidaUtil${prefixo}`).value = veiculo['Vida Útil (anos)'] || '';
+        }
+
+        function limparCampos(tipo) {
+            const prefixo = tipo === 'eletrico' ? 'Eletrico' : 'Combustao';
+            document.getElementById(`preco${prefixo}`).value = '';
+            document.getElementById(`consumo${prefixo}`).value = '';
+            
+            const custoCampo = tipo === 'eletrico' ? 'custoEnergiaEletrico' : 'custoCombustivelCombustao';
+            document.getElementById(custoCampo).value = '';
+            
+            document.getElementById(`manutencao${prefixo}`).value = '';
+            document.getElementById(`autonomia${prefixo}`).value = '';
+            document.getElementById(`vidaUtil${prefixo}`).value = '';
+        }
+
+        // Event listeners para campos editáveis
+        document.getElementById('precoEletrico').addEventListener('input', function() {
+            atualizarDado('eletrico', 'Preço Inicial (R$)', this.value);
+        });
+
+        document.getElementById('custoEnergiaEletrico').addEventListener('input', function() {
+            atualizarDado('eletrico', 'Custo Energia/Combustível (R$/kWh ou R$/L)', this.value);
+        });
+
+        document.getElementById('precoCombustao').addEventListener('input', function() {
+            atualizarDado('combustao', 'Preço Inicial (R$)', this.value);
+        });
+
+        document.getElementById('custoCombustivelCombustao').addEventListener('input', function() {
+            atualizarDado('combustao', 'Custo Energia/Combustível (R$/kWh ou R$/L)', this.value);
+        });
+
+        function atualizarDado(tipo, campo, valor) {
+            const selectId = tipo === 'eletrico' ? 'selectEletrico' : 'selectCombustao';
+            const select = document.getElementById(selectId);
+            const index = select.value;
+
+            if (index && veiculosData[index]) {
+                veiculosData[index][campo] = valor;
+                console.log('📝 Valor atualizado:', campo, '=', valor);
+            }
+        }
+
+        // Carregar dados ao iniciar
+        window.addEventListener('load', carregarCSV);
+    </script>
+</body>
+</html>
