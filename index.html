@@ -2,11 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>Comparador de Veículos</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -14,33 +13,33 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Alinha no topo */
+            align-items: flex-start;
             min-height: 100vh;
-            background-color: #e0e0f2; /* Cor de fundo mais clara */
+            background-color: #e0e0f2;
             margin: 0;
-            padding: 30px 20px; /* Mais padding para o topo */
+            padding: 30px 20px;
             box-sizing: border-box;
         }
         .container {
             display: flex;
-            gap: 30px; /* Aumenta o espaçamento entre os cards */
+            gap: 30px;
             width: 100%;
-            max-width: 1000px; /* Ajusta a largura máxima */
-            flex-wrap: wrap; /* Permite que os cards quebrem em telas menores */
-            justify-content: center; /* Centraliza os cards */
+            max-width: 1000px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .vehicle-section {
             background-color: white;
             padding: 25px;
-            border-radius: 12px; /* Borda mais arredondada */
-            box-shadow: 0 8px 20px rgba(100, 50, 200, 0.2); /* Sombra roxa mais pronunciada */
-            width: 45%; /* Ajusta a largura para caber dois */
-            min-width: 380px; /* Largura mínima para evitar quebras muito cedo */
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(100, 50, 200, 0.2);
+            width: 45%;
+            min-width: 380px;
             box-sizing: border-box;
-            border: 1px solid #d0d0e0; /* Borda sutil */
-            background-image: linear-gradient(to bottom, #ffffff, #fcfcff); /* Gradiente suave */
+            border: 1px solid #d0d0e0;
+            background-image: linear-gradient(to bottom, #ffffff, #fcfcff);
         }
-        @media (max-width: 800px) { /* Para telas menores, os cards ficam em coluna */
+        @media (max-width: 800px) {
             .vehicle-section {
                 width: 90%;
             }
@@ -50,20 +49,38 @@
             font-size: 1.5em;
             color: #4a4a4a;
             margin-top: 0;
-            margin-bottom: 25px; /* Espaço maior abaixo do título */
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
             gap: 10px;
-            border-bottom: 1px solid #eee; /* Linha divisória abaixo do título */
+            border-bottom: 1px solid #eee;
             padding-bottom: 15px;
         }
         h2 i {
             font-size: 1.2em;
-            color: #6a0dad; /* Cor roxa para os ícones */
+            color: #6a0dad;
         }
 
+        /* */
+        .image-container {
+            width: 100%;
+            height: 220px; /* Altura fixa para a imagem */
+            border-radius: 8px;
+            overflow: hidden; /* Garante que a imagem se ajuste às bordas */
+            margin-bottom: 20px; /* Espaço entre a imagem e os campos */
+            background-color: #f0f0f0; /* Cor de fundo enquanto carrega */
+            display: none; /* Começa escondido */
+        }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Faz a imagem cobrir o container, cortando se necessário */
+            display: block;
+        }
+        /* */
+
         .form-group {
-            margin-bottom: 18px; /* Espaçamento entre grupos de campos */
+            margin-bottom: 18px;
         }
         .form-group label {
             display: block;
@@ -77,14 +94,14 @@
             padding: 10px 12px;
             border: 1px solid #ccc;
             border-radius: 6px;
-            margin-bottom: 20px; /* Espaço após o select */
+            margin-bottom: 20px;
             background-color: #f8f8f8;
             font-size: 1em;
             color: #333;
-            -webkit-appearance: none; /* Remove seta padrão do Chrome/Safari */
-            -moz-appearance: none;    /* Remove seta padrão do Firefox */
-            appearance: none;         /* Remove seta padrão */
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.6%202-13.6%206.4-4%204.4-6.4%209.6-6.4%2016.2s2.4%2011.8%206.4%2016.2l127.8%20127.9c4%204.4%209.2%206.4%2014.2%206.4s10.2-2%2014.2-6.4L287%20101.8c4-4.4%206.4-9.6%206.4-16.2-.1-6.6-2.5-11.8-6.5-16.2z%22%2F%3E%3C%2Fsvg%3E'); /* Seta customizada */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.6%202-13.6%206.4-4%204.4-6.4%209.6-6.4%2016.2s2.4%2011.8%206.4%2016.2l127.8%20127.9c4%204.4%209.2%206.4%2014.2%206.4s10.2-2%2014.2-6.4L287%20101.8c4-4.4%206.4-9.6%206.4-16.2-.1-6.6-2.5-11.8-6.5-16.2z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat;
             background-position: right 10px top 50%;
             background-size: 12px auto;
@@ -98,10 +115,10 @@
         .input-group {
             display: flex;
             align-items: center;
-            gap: 8px; /* Espaçamento entre o input e o botão */
+            gap: 8px;
         }
         .input-group input[type="text"] {
-            flex-grow: 1; /* O input ocupa o espaço restante */
+            flex-grow: 1;
             padding: 10px 12px;
             border: 1px solid #ccc;
             border-radius: 6px;
@@ -109,10 +126,10 @@
             font-size: 1em;
             color: #333;
             box-sizing: border-box;
-            opacity: 0.9; /* Deixa um pouco mais claro quando desabilitado */
+            opacity: 0.9;
         }
         .input-group input[type="text"]:disabled {
-            background-color: #f8f8f8; /* Fundo mais claro para desabilitado */
+            background-color: #f8f8f8;
             color: #666;
             cursor: not-allowed;
         }
@@ -120,35 +137,33 @@
             border-color: #6a0dad;
             outline: none;
             box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
-            background-color: #fff; /* Fundo branco quando editável e focado */
+            background-color: #fff;
             opacity: 1;
         }
 
         .edit-button {
             padding: 8px 12px;
-            background-color: #e6ffe6; /* Verde claro */
-            color: #28a745; /* Texto verde escuro */
-            border: 1px solid #28a745; /* Borda verde */
+            background-color: #e6ffe6;
+            color: #28a745;
+            border: 1px solid #28a745;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85em;
             font-weight: 600;
             transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-            white-space: nowrap; /* Evita que o texto "Editável" quebre */
+            white-space: nowrap;
         }
         .edit-button:hover {
             background-color: #d4fcd4;
             border-color: #218838;
         }
-        .edit-button.active { /* Estilo para quando o botão está ativo (editando) */
-            background-color: #e0e0f2; /* Azul claro/roxo */
-            color: #6a0dad; /* Roxo principal */
+        .edit-button.active {
+            background-color: #e0e0f2;
+            color: #6a0dad;
             border-color: #6a0dad;
         }
-
-        /* Cores específicas para as caixas de texto com o valor inicial 0.00 */
         .initial-value-input {
-            color: #008000; /* Verde para valores iniciais */
+            color: #008000;
             font-weight: bold;
         }
     </style>
@@ -156,7 +171,8 @@
 <body>
 
 <div class="container">
-    <div class="vehicle-section">
+    
+<div class="vehicle-section">
         <h2><i class="fas fa-battery-full"></i> Veículos Elétricos</h2>
         
         <div class="form-group">
@@ -164,6 +180,10 @@
             <select id="electric-models" onchange="displayInfo('electric')">
                 <option value="">Carregando modelos...</option>
             </select>
+        </div>
+
+        <div class="image-container" id="electric-image-container">
+            <img id="electric-image" src="" alt="Veículo Elétrico">
         </div>
 
         <div id="electric-info">
@@ -205,7 +225,8 @@
         </div>
     </div>
 
-    <div class="vehicle-section">
+    
+<div class="vehicle-section">
         <h2><i class="fas fa-gas-pump"></i> Veículos a Combustão</h2>
         
         <div class="form-group">
@@ -213,6 +234,10 @@
             <select id="combustion-models" onchange="displayInfo('combustion')">
                 <option value="">Carregando modelos...</option>
             </select>
+        </div>
+
+        <div class="image-container" id="combustion-image-container">
+            <img id="combustion-image" src="" alt="Veículo a Combustão">
         </div>
 
         <div id="combustion-info">
@@ -262,6 +287,11 @@
     const electricModelsSelect = document.getElementById('electric-models');
     const combustionModelsSelect = document.getElementById('combustion-models');
 
+    // const electricImageContainer = document.getElementById('electric-image-container');
+    const electricImage = document.getElementById('electric-image');
+    const combustionImageContainer = document.getElementById('combustion-image-container');
+    const combustionImage = document.getElementById('combustion-image');
+
     const electricPriceInput = document.getElementById('electric-price');
     const electricConsumptionInput = document.getElementById('electric-consumption');
     const electricCostEnergyInput = document.getElementById('electric-cost-energy');
@@ -283,6 +313,8 @@
             dynamicTyping: true,
             skipEmptyLines: true,
             complete: function(results) {
+                // // NOVO: Log para verificar se a coluna "imagem" foi carregada
+                // console.log("Dados carregados:", results.data); 
                 vehicleData = results.data;
                 populateSelects(vehicleData);
             },
@@ -303,6 +335,7 @@
             option.value = vehicle.Modelo;
             option.textContent = vehicle.Modelo;
 
+            // IMPORTANTE: Sua planilha precisa ter a coluna "Tipo"
             if (vehicle.Tipo === 'Elétrico') {
                 electricModelsSelect.appendChild(option);
             } else if (vehicle.Tipo === 'Combustão') {
@@ -311,7 +344,6 @@
         });
     }
 
-    // Função para formatar números para exibição
     function formatNumber(value, currency = false) {
         if (value === null || value === undefined || value === '') {
             return '-';
@@ -322,7 +354,6 @@
             }
             return value.toString().replace('.', ',');
         }
-        // Tenta converter se for string e contém números
         const num = parseFloat(String(value).replace(',', '.'));
         if (!isNaN(num)) {
             if (currency) {
@@ -330,65 +361,82 @@
             }
             return num.toString().replace('.', ',');
         }
-        return String(value); // Retorna como string se não for número
+        return String(value);
     }
 
 
     function displayInfo(type) {
         let selectedModelName;
         let priceInput, consumptionInput, costEnergyFuelInput, maintenanceInput, autonomyInput, lifespanInput;
+        let imageContainer, imageElement; // NOVO: Variáveis para a imagem
 
         if (type === 'electric') {
             selectedModelName = electricModelsSelect.value;
+            // Inputs
             priceInput = electricPriceInput;
             consumptionInput = electricConsumptionInput;
             costEnergyFuelInput = electricCostEnergyInput;
             maintenanceInput = electricMaintenanceInput;
             autonomyInput = electricAutonomyInput;
             lifespanInput = electricLifespanInput;
+            // NOVO: Imagem
+            imageContainer = electricImageContainer;
+            imageElement = electricImage;
         } else {
             selectedModelName = combustionModelsSelect.value;
+            // Inputs
             priceInput = combustionPriceInput;
             consumptionInput = combustionConsumptionInput;
             costEnergyFuelInput = combustionCostFuelInput;
             maintenanceInput = combustionMaintenanceInput;
             autonomyInput = combustionAutonomyInput;
             lifespanInput = combustionLifespanInput;
+            // NOVO: Imagem
+            imageContainer = combustionImageContainer;
+            imageElement = combustionImage;
         }
 
         const selectedVehicle = vehicleData.find(v => v.Modelo === selectedModelName);
 
         if (selectedVehicle) {
+            // Preenche os inputs de texto
             priceInput.value = formatNumber(selectedVehicle['Preço Inicial (R$)'], true);
-            
-            // Assegura o texto correto para consumo
-            if (type === 'electric') {
-                consumptionInput.value = formatNumber(selectedVehicle['Consumo (km/kWh ou km/L)']);
-                costEnergyFuelInput.value = formatNumber(selectedVehicle['Custo Energia/Combustível (R$/kWh ou R$/L)'], true);
-            } else {
-                consumptionInput.value = formatNumber(selectedVehicle['Consumo (km/kWh ou km/L)']); // O cabeçalho na planilha é o mesmo, mas a label no HTML é diferente
-                costEnergyFuelInput.value = formatNumber(selectedVehicle['Custo Energia/Combustível (R$/kWh ou R$/L)'], true); // O cabeçalho na planilha é o mesmo, mas a label no HTML é diferente
-            }
-            
+            consumptionInput.value = formatNumber(selectedVehicle['Consumo (km/kWh ou km/L)']);
+            costEnergyFuelInput.value = formatNumber(selectedVehicle['Custo Energia/Combustível (R$/kWh ou R$/L)'], true);
             maintenanceInput.value = formatNumber(selectedVehicle['Custo Manutenção Anual (R$)'], true);
             autonomyInput.value = formatNumber(selectedVehicle['Autonomia (km)']);
             lifespanInput.value = formatNumber(selectedVehicle['Vida Útil (anos)']);
+
+            // NOVO: Lógica para exibir a imagem
+            // Verifica se a coluna "imagem" existe e não está vazia
+            if (selectedVehicle.imagem && selectedVehicle.imagem.trim() !== '') {
+                imageElement.src = selectedVehicle.imagem; // Define o link da imagem
+                imageContainer.style.display = 'block'; // Mostra o container da imagem
+            } else {
+                // Se não houver link de imagem, esconde o container
+                imageElement.src = '';
+                imageContainer.style.display = 'none';
+            }
+
         } else {
-            // Limpa todos os campos se nenhum modelo for selecionado
+            // Limpa todos os campos se "Selecione um modelo" for escolhido
             priceInput.value = '0.00';
             consumptionInput.value = '-';
             costEnergyFuelInput.value = '0.00';
             maintenanceInput.value = '-';
             autonomyInput.value = '-';
             lifespanInput.value = '-';
+            
+            // NOVO: Esconde a imagem também
+            imageElement.src = '';
+            imageContainer.style.display = 'none';
 
-            // Garante que os campos editáveis voltem para disabled e o botão para "Editável"
+            // Garante que os campos editáveis voltem para disabled
             toggleEdit(priceInput.id, priceInput.nextElementSibling, false);
             toggleEdit(costEnergyFuelInput.id, costEnergyFuelInput.nextElementSibling, false);
         }
     }
 
-    // Função para alternar o estado de edição
     function toggleEdit(inputId, buttonElement, forceState = undefined) {
         const input = document.getElementById(inputId);
         
@@ -396,21 +444,19 @@
         if (forceState !== undefined) {
             shouldBeEditable = forceState;
         } else {
-            shouldBeEditable = input.disabled; // Se estiver disabled, queremos habilitar
+            shouldBeEditable = input.disabled;
         }
 
-        input.disabled = !shouldBeEditable; // Inverte o estado
+        input.disabled = !shouldBeEditable;
         
         if (shouldBeEditable) {
-            buttonElement.textContent = 'Salvar'; // Ou outro texto, como "OK"
+            buttonElement.textContent = 'Salvar';
             buttonElement.classList.add('active');
-            input.focus(); // Coloca o foco no input
-            // Remove a classe de estilo inicial quando o campo se torna editável
+            input.focus();
             input.classList.remove('initial-value-input');
         } else {
             buttonElement.textContent = 'Editável';
             buttonElement.classList.remove('active');
-            // Re-adiciona a classe de estilo inicial se o valor for 0.00
             if (input.value === '0.00') {
                  input.classList.add('initial-value-input');
             }
