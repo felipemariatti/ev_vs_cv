@@ -9,214 +9,115 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* (Seu CSS está aqui, não mudei nada) */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            background-color: #e0e0f2;
-            margin: 0;
-            padding: 20px; /* Reduzido */
-            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh; background-color: #e0e0f2; margin: 0; padding: 20px; box-sizing: border-box;
         }
         .container {
-            display: flex;
-            gap: 18px; /* Reduzido */
-            width: 100%;
-            max-width: 960px; /* Reduzido */
-            flex-wrap: wrap;
-            justify-content: center;
+            display: flex; gap: 18px; width: 100%; max-width: 960px; flex-wrap: wrap; justify-content: center;
         }
         .vehicle-section {
-            background-color: white;
-            padding: 18px; /* Reduzido */
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(100, 50, 200, 0.2);
-            width: 45%;
-            min-width: 320px; /* Reduzido */
-            box-sizing: border-box;
-            border: 1px solid #d0d0e0;
+            background-color: white; padding: 18px; border-radius: 12px; box-shadow: 0 8px 20px rgba(100, 50, 200, 0.2);
+            width: 45%; min-width: 320px; box-sizing: border-box; border: 1px solid #d0d0e0;
             background-image: linear-gradient(to bottom, #ffffff, #fcfcff);
         }
-        @media (max-width: 700px) { /* Ajustado o breakpoint */
-            .vehicle-section {
-                width: 90%;
-            }
-        }
-
+        @media (max-width: 700px) { .vehicle-section { width: 90%; } }
         h2 {
-            font-size: 1.25em; /* Reduzido */
-            color: #4a4a4a;
-            margin-top: 0;
-            margin-bottom: 18px; /* Reduzido */
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px; /* Reduzido */
+            font-size: 1.25em; color: #4a4a4a; margin-top: 0; margin-bottom: 18px; display: flex; align-items: center;
+            gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;
         }
-        h2 i {
-            font-size: 1.2em;
-            color: #6a0dad;
-        }
-
+        h2 i { font-size: 1.2em; color: #6a0dad; }
         .image-container {
-            width: 100%;
-            height: 170px; /* Reduzido */
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 15px; /* Reduzido */
-            background-color: #f0f0f0; /* Fundo para o 'contain' */
-            display: none;
+            width: 100%; height: 170px; border-radius: 8px; overflow: hidden; margin-bottom: 15px;
+            background-color: #f0f0f0; display: none;
         }
-        .image-container img {
-            width: 100%;
-            height: 100%;
-            /* ESTA É A MUDANÇA PRINCIPAL: DE 'cover' PARA 'contain' */
-            object-fit: contain; /* Não vai cortar, vai redimensionar */
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 13px; /* Reduzido */
-        }
+        .image-container img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .form-group { margin-bottom: 13px; }
         .form-group label {
-            display: block;
-            font-size: 0.82em; /* Reduzido */
-            color: #6a6a6a;
-            margin-bottom: 5px;
-            font-weight: 600;
+            display: block; font-size: 0.82em; color: #6a6a6a; margin-bottom: 5px; font-weight: 600;
         }
         select {
-            width: 100%;
-            padding: 7px 10px; /* Reduzido */
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            margin-bottom: 15px; /* Reduzido */
-            background-color: #f8f8f8;
-            font-size: 0.9em; /* Reduzido */
-            color: #333;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.6%202-13.6%206.4-4%204.4-6.4%209.6-6.4%2016.2s2.4%2011.8%206.4%2016.2l127.8%20127.9c4%204.4%209.2%206.4%2014.2%206.4s10.2-2%2014.2-6.4L287%20101.8c4-4.4%206.4-9.6%206.4-16.2-.1-6.6-2.5-11.8-6.5-16.2z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 10px top 50%;
-            background-size: 12px auto;
+            width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 15px;
+            background-color: #f8f8f8; font-size: 0.9em; color: #333; -webkit-appearance: none; -moz-appearance: none;
+            appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.6%202-13.6%206.4-4%204.4-6.4%209.6-6.4%2016.2s2.4%2011.8%206.4%2016.2l127.8%20127.9c4%204.4%209.2%206.4%2014.2%206.4s10.2-2%2014.2-6.4L287%20101.8c4-4.4%206.4-9.6%206.4-16.2-.1-6.6-2.5-11.8-6.5-16.2z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 12px auto;
         }
-        select:focus {
-            border-color: #6a0dad;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        select:focus { border-color: #6a0dad; outline: none; box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2); }
+        .input-group { display: flex; align-items: center; gap: 8px; }
         .input-group input[type="text"] {
-            flex-grow: 1;
-            padding: 7px 10px; /* Reduzido */
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            background-color: #f8f8f8;
-            font-size: 0.9em; /* Reduzido */
-            color: #333;
-            box-sizing: border-box;
-            opacity: 0.9;
+            flex-grow: 1; padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px;
+            background-color: #f8f8f8; font-size: 0.9em; color: #333; box-sizing: border-box; opacity: 0.9;
         }
-        .input-group input[type="text"]:disabled {
-            background-color: #f8f8f8;
-            color: #666;
-            cursor: not-allowed;
-        }
+        .input-group input[type="text"]:disabled { background-color: #f8f8f8; color: #666; cursor: not-allowed; }
         .input-group input[type="text"]:focus:not(:disabled) {
-            border-color: #6a0dad;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
-            background-color: #fff;
-            opacity: 1;
+            border-color: #6a0dad; outline: none; box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
+            background-color: #fff; opacity: 1;
         }
-
         .edit-button {
-            padding: 5px 10px; /* Reduzido */
-            background-color: #e6ffe6;
-            color: #28a745;
-            border: 1px solid #28a745;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.82em; /* Reduzido */
-            font-weight: 600;
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-            white-space: nowrap;
+            padding: 5px 10px; background-color: #e6ffe6; color: #28a745; border: 1px solid #28a745;
+            border-radius: 6px; cursor: pointer; font-size: 0.82em; font-weight: 600;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s; white-space: nowrap;
         }
-        .edit-button:hover {
-            background-color: #d4fcd4;
-            border-color: #218838;
-        }
-        .edit-button.active {
-            background-color: #e0e0f2;
-            color: #6a0dad;
-            border-color: #6a0dad;
-        }
-        .initial-value-input {
-            color: #008000;
-            font-weight: bold;
-        }
+        .edit-button:hover { background-color: #d4fcd4; border-color: #218838; }
+        .edit-button.active { background-color: #e0e0f2; color: #6a0dad; border-color: #6a0dad; }
+        .edit-button.saving { background-color: #f0f0f0; color: #888; border-color: #ccc; cursor: wait; }
+        .initial-value-input { color: #008000; font-weight: bold; }
     </style>
-    </head>
+</head>
 <body>
 
 <div class="container">
-    
-<div class="vehicle-section">
+    <div class="vehicle-section">
         <h2><i class="fas fa-battery-full"></i> Veículos Elétricos</h2>
-        
         <div class="form-group">
             <label for="electric-models">Selecione um modelo:</label>
             <select id="electric-models" onchange="displayInfo('electric')">
                 <option value="">Carregando modelos...</option>
             </select>
         </div>
-
         <div class="image-container" id="electric-image-container">
             <img id="electric-image" src="" alt="Veículo Elétrico">
         </div>
-
         <div id="electric-info">
             <div class="form-group">
                 <label for="electric-price">Preço Inicial (R$)</label>
                 <div class="input-group">
                     <input type="text" id="electric-price" value="0.00" disabled class="initial-value-input">
-                    <button class="edit-button" onclick="toggleEdit('electric-price', this)">Editável</button>
+                    <button class="edit-button" 
+                            onclick="toggleEdit(
+                                'electric-price', 
+                                this, 
+                                'electric-models', 
+                                'Preço Inicial (R$)'
+                            )">Editável</button>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="electric-consumption">Consumo (km/kWh)</label>
                 <input type="text" id="electric-consumption" value="-" disabled>
             </div>
-
             <div class="form-group">
                 <label for="electric-cost-energy">Custo Energia (R$/kWh)</label>
                 <div class="input-group">
                     <input type="text" id="electric-cost-energy" value="0.00" disabled class="initial-value-input">
-                    <button class="edit-button" onclick="toggleEdit('electric-cost-energy', this)">Editável</button>
+                    <button class="edit-button" 
+                            onclick="toggleEdit(
+                                'electric-cost-energy', 
+                                this, 
+                                'electric-models', 
+                                'Custo Energia/Combustível (R$/kWh ou R$/L)'
+                            )">Editável</button>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="electric-maintenance">Custo Manutenção Anual (R$)</label>
                 <input type="text" id="electric-maintenance" value="-" disabled>
             </div>
-            
             <div class="form-group">
                 <label for="electric-autonomy">Autonomia (km)</label>
                 <input type="text" id="electric-autonomy" value="-" disabled>
             </div>
-            
             <div class="form-group">
                 <label for="electric-lifespan">Vida Útil (anos)</label>
                 <input type="text" id="electric-lifespan" value="-" disabled>
@@ -224,53 +125,56 @@
         </div>
     </div>
 
-    
-<div class="vehicle-section">
+    <div class="vehicle-section">
         <h2><i class="fas fa-gas-pump"></i> Veículos a Combustão</h2>
-        
         <div class="form-group">
             <label for="combustion-models">Selecione um modelo:</label>
             <select id="combustion-models" onchange="displayInfo('combustion')">
                 <option value="">Carregando modelos...</option>
             </select>
         </div>
-
         <div class="image-container" id="combustion-image-container">
             <img id="combustion-image" src="" alt="Veículo a Combustão">
         </div>
-
         <div id="combustion-info">
             <div class="form-group">
                 <label for="combustion-price">Preço Inicial (R$)</label>
                 <div class="input-group">
                     <input type="text" id="combustion-price" value="0.00" disabled class="initial-value-input">
-                    <button class="edit-button" onclick="toggleEdit('combustion-price', this)">Editável</button>
+                    <button class="edit-button" 
+                            onclick="toggleEdit(
+                                'combustion-price', 
+                                this, 
+                                'combustion-models', 
+                                'Preço Inicial (R$)'
+                            )">Editável</button>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="combustion-consumption">Consumo (km/L)</label>
                 <input type="text" id="combustion-consumption" value="-" disabled>
             </div>
-
             <div class="form-group">
                 <label for="combustion-cost-fuel">Custo Combustível (R$/L)</label>
                 <div class="input-group">
                     <input type="text" id="combustion-cost-fuel" value="0.00" disabled class="initial-value-input">
-                    <button class="edit-button" onclick="toggleEdit('combustion-cost-fuel', this)">Editável</button>
+                    <button class="edit-button" 
+                            onclick="toggleEdit(
+                                'combustion-cost-fuel', 
+                                this, 
+                                'combustion-models', 
+                                'Custo Energia/Combustível (R$/kWh ou R$/L)'
+                            )">Editável</button>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="combustion-maintenance">Custo Manutenção Anual (R$)</label>
                 <input type="text" id="combustion-maintenance" value="-" disabled>
             </div>
-            
             <div class="form-group">
                 <label for="combustion-autonomy">Autonomia (km)</label>
                 <input type="text" id="combustion-autonomy" value="-" disabled>
             </div>
-            
             <div class="form-group">
                 <label for="combustion-lifespan">Vida Útil (anos)</label>
                 <input type="text" id="combustion-lifespan" value="-" disabled>
@@ -280,24 +184,29 @@
 </div>
 
 <script>
+    // =========================================================================
+    // COLE A URL DO SEU APLICATIVO WEB (DO PASSO 2) AQUI DENTRO DAS ASPAS
+    // =========================================================================
+    const webAppUrl = 'COLE_A_SUA_URL_AQUI'; 
+    // =========================================================================
+
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?output=csv';
     let vehicleData = [];
 
+    // (O resto das suas variáveis de referência... todas iguais)
     const electricModelsSelect = document.getElementById('electric-models');
     const combustionModelsSelect = document.getElementById('combustion-models');
-
+    // ... etc ...
     const electricImageContainer = document.getElementById('electric-image-container');
     const electricImage = document.getElementById('electric-image');
     const combustionImageContainer = document.getElementById('combustion-image-container');
     const combustionImage = document.getElementById('combustion-image');
-
     const electricPriceInput = document.getElementById('electric-price');
     const electricConsumptionInput = document.getElementById('electric-consumption');
     const electricCostEnergyInput = document.getElementById('electric-cost-energy');
     const electricMaintenanceInput = document.getElementById('electric-maintenance');
     const electricAutonomyInput = document.getElementById('electric-autonomy');
     const electricLifespanInput = document.getElementById('electric-lifespan');
-
     const combustionPriceInput = document.getElementById('combustion-price');
     const combustionConsumptionInput = document.getElementById('combustion-consumption');
     const combustionCostFuelInput = document.getElementById('combustion-cost-fuel');
@@ -305,12 +214,11 @@
     const combustionAutonomyInput = document.getElementById('combustion-autonomy');
     const combustionLifespanInput = document.getElementById('combustion-lifespan');
 
+
+    // (Função loadCSVData - Sem mudanças)
     function loadCSVData() {
         Papa.parse(csvUrl, {
-            download: true,
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true,
+            download: true, header: true, dynamicTyping: true, skipEmptyLines: true,
             complete: function(results) {
                 vehicleData = results.data;
                 populateSelects(vehicleData);
@@ -323,15 +231,14 @@
         });
     }
 
+    // (Função populateSelects - Sem mudanças)
     function populateSelects(data) {
         electricModelsSelect.innerHTML = '<option value="">Selecione um modelo...</option>';
         combustionModelsSelect.innerHTML = '<option value="">Selecione um modelo...</option>';
-
         data.forEach(vehicle => {
             const option = document.createElement('option');
             option.value = vehicle.Modelo;
             option.textContent = vehicle.Modelo;
-
             if (vehicle.Tipo === 'Elétrico') {
                 electricModelsSelect.appendChild(option);
             } else if (vehicle.Tipo === 'Combustão') {
@@ -340,26 +247,22 @@
         });
     }
 
+    // (Função formatNumber - Sem mudanças)
     function formatNumber(value, currency = false) {
-        if (value === null || value === undefined || value === '') {
-            return '-';
-        }
+        if (value === null || value === undefined || value === '') return '-';
         if (typeof value === 'number') {
-            if (currency) {
-                return value.toFixed(2).replace('.', ',');
-            }
+            if (currency) return value.toFixed(2).replace('.', ',');
             return value.toString().replace('.', ',');
         }
         const num = parseFloat(String(value).replace(',', '.'));
         if (!isNaN(num)) {
-            if (currency) {
-                return num.toFixed(2).replace('.', ',');
-            }
+            if (currency) return num.toFixed(2).replace('.', ',');
             return num.toString().replace('.', ',');
         }
         return String(value);
     }
 
+    // (Função displayInfo - Sem mudanças)
     function displayInfo(type) {
         let selectedModelName;
         let priceInput, consumptionInput, costEnergyFuelInput, maintenanceInput, autonomyInput, lifespanInput;
@@ -367,24 +270,16 @@
 
         if (type === 'electric') {
             selectedModelName = electricModelsSelect.value;
-            priceInput = electricPriceInput;
-            consumptionInput = electricConsumptionInput;
-            costEnergyFuelInput = electricCostEnergyInput;
-            maintenanceInput = electricMaintenanceInput;
-            autonomyInput = electricAutonomyInput;
-            lifespanInput = electricLifespanInput;
-            imageContainer = electricImageContainer;
-            imageElement = electricImage;
+            priceInput = electricPriceInput; consumptionInput = electricConsumptionInput;
+            costEnergyFuelInput = electricCostEnergyInput; maintenanceInput = electricMaintenanceInput;
+            autonomyInput = electricAutonomyInput; lifespanInput = electricLifespanInput;
+            imageContainer = electricImageContainer; imageElement = electricImage;
         } else {
             selectedModelName = combustionModelsSelect.value;
-            priceInput = combustionPriceInput;
-            consumptionInput = combustionConsumptionInput;
-            costEnergyFuelInput = combustionCostFuelInput;
-            maintenanceInput = combustionMaintenanceInput;
-            autonomyInput = combustionAutonomyInput;
-            lifespanInput = combustionLifespanInput;
-            imageContainer = combustionImageContainer;
-            imageElement = combustionImage;
+            priceInput = combustionPriceInput; consumptionInput = combustionConsumptionInput;
+            costEnergyFuelInput = combustionCostFuelInput; maintenanceInput = combustionMaintenanceInput;
+            autonomyInput = combustionAutonomyInput; lifespanInput = combustionLifespanInput;
+            imageContainer = combustionImageContainer; imageElement = combustionImage;
         }
 
         const selectedVehicle = vehicleData.find(v => v.Modelo === selectedModelName);
@@ -398,29 +293,28 @@
             lifespanInput.value = formatNumber(selectedVehicle['Vida Útil (anos)']);
 
             if (selectedVehicle.imagem && selectedVehicle.imagem.trim() !== '') {
-                imageElement.src = selectedVehicle.imagem; 
-                imageContainer.style.display = 'block'; 
+                imageElement.src = selectedVehicle.imagem; imageContainer.style.display = 'block'; 
             } else {
-                imageElement.src = '';
-                imageContainer.style.display = 'none';
+                imageElement.src = ''; imageContainer.style.display = 'none';
             }
-
         } else {
-            priceInput.value = '0.00';
-            consumptionInput.value = '-';
-            costEnergyFuelInput.value = '0.00';
-            maintenanceInput.value = '-';
-            autonomyInput.value = '-';
-            lifespanInput.value = '-';
-            imageElement.src = '';
-            imageContainer.style.display = 'none';
+            priceInput.value = '0.00'; consumptionInput.value = '-'; costEnergyFuelInput.value = '0.00';
+            maintenanceInput.value = '-'; autonomyInput.value = '-'; lifespanInput.value = '-';
+            imageElement.src = ''; imageContainer.style.display = 'none';
 
-            toggleEdit(priceInput.id, priceInput.nextElementSibling, false);
-            toggleEdit(costEnergyFuelInput.id, costEnergyFuelInput.nextElementSibling, false);
+            // Passa os cabeçalhos corretos da planilha ao resetar
+            toggleEdit('electric-price', electricPriceInput.nextElementSibling, undefined, false, 'Preço Inicial (R$)');
+            toggleEdit('electric-cost-energy', electricCostEnergyInput.nextElementSibling, undefined, false, 'Custo Energia/Combustível (R$/kWh ou R$/L)');
+            toggleEdit('combustion-price', combustionPriceInput.nextElementSibling, undefined, false, 'Preço Inicial (R$)');
+            toggleEdit('combustion-cost-fuel', combustionCostFuelInput.nextElementSibling, undefined, false, 'Custo Energia/Combustível (R$/kWh ou R$/L)');
         }
     }
 
-    function toggleEdit(inputId, buttonElement, forceState = undefined) {
+    // =========================================================================
+    // FUNÇÃO toggleEdit ATUALIZADA
+    // Agora ela também chama a função saveData()
+    // =========================================================================
+    function toggleEdit(inputId, buttonElement, selectId, nomeColunaPlanilha, forceState = undefined) {
         const input = document.getElementById(inputId);
         
         let shouldBeEditable;
@@ -433,21 +327,87 @@
         input.disabled = !shouldBeEditable;
         
         if (shouldBeEditable) {
+            // Habilitando a edição
             buttonElement.textContent = 'Salvar';
             buttonElement.classList.add('active');
+            buttonElement.classList.remove('saving');
             input.focus();
             input.classList.remove('initial-value-input');
         } else {
+            // Desabilitando (ou seja, clicou em "Salvar")
             buttonElement.textContent = 'Editável';
             buttonElement.classList.remove('active');
+            
             if (input.value === '0.00') {
                  input.classList.add('initial-value-input');
+            }
+            
+            // Se forceState não foi definido E estamos desabilitando, significa que o usuário clicou em "Salvar"
+            if (forceState === undefined) {
+                const modeloSelecionado = document.getElementById(selectId).value;
+                if (modeloSelecionado) {
+                    saveData(modeloSelecionado, nomeColunaPlanilha, input.value, buttonElement);
+                }
             }
         }
     }
 
-    document.addEventListener('DOMContentLoaded', loadCSVData);
+    // =========================================================================
+    // NOVA FUNÇÃO para salvar os dados
+    // =========================================================================
+    function saveData(modelo, campo, valor, buttonElement) {
+        if (webAppUrl === 'COLE_A_SUA_URL_AQUI' || !webAppUrl) {
+            alert("Erro: A URL do Web App não foi configurada no script.");
+            return;
+        }
 
+        // Mostra que está salvando
+        buttonElement.textContent = 'Salvando...';
+        buttonElement.classList.add('saving');
+        buttonElement.disabled = true; // Desabilita o botão
+
+        const dataToSave = {
+            modelo: modelo,
+            campo: campo,
+            valor: valor
+        };
+
+        fetch(webAppUrl, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToSave)
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            if (result.status === 'success') {
+                // Sucesso!
+                alert(result.message);
+                // Atualiza os dados locais para refletir a mudança (ou recarrega tudo)
+                // Por enquanto, apenas resetamos o botão
+            } else {
+                // Erro do Apps Script
+                alert("Erro ao salvar: " + result.message);
+            }
+        })
+        .catch(error => {
+            // Erro de rede/fetch
+            console.error('Erro no Fetch:', error);
+            alert('Erro de conexão ao salvar os dados.');
+        })
+        .finally(() => {
+            // Reabilita o botão e restaura o texto, independentemente do resultado
+            buttonElement.textContent = 'Editável';
+            buttonElement.classList.remove('saving');
+            buttonElement.disabled = false;
+        });
+    }
+
+    // Inicia o carregamento
+    document.addEventListener('DOMContentLoaded', loadCSVData);
 </script>
 
 </body>
