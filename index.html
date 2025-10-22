@@ -17,44 +17,44 @@
             min-height: 100vh;
             background-color: #e0e0f2;
             margin: 0;
-            padding: 25px 20px; /* Reduzido padding superior */
+            padding: 20px; /* Reduzido */
             box-sizing: border-box;
         }
         .container {
             display: flex;
-            gap: 20px; /* Reduzido o espaço entre os cards */
+            gap: 18px; /* Reduzido */
             width: 100%;
-            max-width: 1000px;
+            max-width: 960px; /* Reduzido */
             flex-wrap: wrap;
             justify-content: center;
         }
         .vehicle-section {
             background-color: white;
-            padding: 20px; /* Reduzido o padding interno */
+            padding: 18px; /* Reduzido */
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(100, 50, 200, 0.2);
             width: 45%;
-            min-width: 340px; /* Reduzida a largura mínima */
+            min-width: 320px; /* Reduzido */
             box-sizing: border-box;
             border: 1px solid #d0d0e0;
             background-image: linear-gradient(to bottom, #ffffff, #fcfcff);
         }
-        @media (max-width: 800px) {
+        @media (max-width: 700px) { /* Ajustado o breakpoint */
             .vehicle-section {
                 width: 90%;
             }
         }
 
         h2 {
-            font-size: 1.3em; /* Reduzido o tamanho da fonte */
+            font-size: 1.25em; /* Reduzido */
             color: #4a4a4a;
             margin-top: 0;
-            margin-bottom: 20px; /* Reduzida a margem */
+            margin-bottom: 18px; /* Reduzido */
             display: flex;
             align-items: center;
             gap: 10px;
             border-bottom: 1px solid #eee;
-            padding-bottom: 12px; /* Reduzido o padding */
+            padding-bottom: 10px; /* Reduzido */
         }
         h2 i {
             font-size: 1.2em;
@@ -63,38 +63,39 @@
 
         .image-container {
             width: 100%;
-            height: 190px; /* Reduzida a altura da imagem */
+            height: 170px; /* Reduzido */
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 18px; /* Reduzida a margem */
-            background-color: #f0f0f0;
+            margin-bottom: 15px; /* Reduzido */
+            background-color: #f0f0f0; /* Fundo para o 'contain' */
             display: none;
         }
         .image-container img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            /* ESTA É A MUDANÇA PRINCIPAL: DE 'cover' PARA 'contain' */
+            object-fit: contain; /* Não vai cortar, vai redimensionar */
             display: block;
         }
 
         .form-group {
-            margin-bottom: 15px; /* Reduzido o espaço entre campos */
+            margin-bottom: 13px; /* Reduzido */
         }
         .form-group label {
             display: block;
-            font-size: 0.85em; /* Reduzida a fonte do rótulo */
+            font-size: 0.82em; /* Reduzido */
             color: #6a6a6a;
             margin-bottom: 5px;
             font-weight: 600;
         }
         select {
             width: 100%;
-            padding: 8px 10px; /* Reduzido o padding (altura) */
+            padding: 7px 10px; /* Reduzido */
             border: 1px solid #ccc;
             border-radius: 6px;
-            margin-bottom: 18px; /* Reduzida a margem */
+            margin-bottom: 15px; /* Reduzido */
             background-color: #f8f8f8;
-            font-size: 0.95em; /* Reduzida a fonte */
+            font-size: 0.9em; /* Reduzido */
             color: #333;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -117,11 +118,11 @@
         }
         .input-group input[type="text"] {
             flex-grow: 1;
-            padding: 8px 10px; /* Reduzido o padding (altura) */
+            padding: 7px 10px; /* Reduzido */
             border: 1px solid #ccc;
             border-radius: 6px;
             background-color: #f8f8f8;
-            font-size: 0.95em; /* Reduzida a fonte */
+            font-size: 0.9em; /* Reduzido */
             color: #333;
             box-sizing: border-box;
             opacity: 0.9;
@@ -140,13 +141,13 @@
         }
 
         .edit-button {
-            padding: 6px 10px; /* Reduzido o padding (altura) */
+            padding: 5px 10px; /* Reduzido */
             background-color: #e6ffe6;
             color: #28a745;
             border: 1px solid #28a745;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85em;
+            font-size: 0.82em; /* Reduzido */
             font-weight: 600;
             transition: background-color 0.2s, color 0.2s, border-color 0.2s;
             white-space: nowrap;
