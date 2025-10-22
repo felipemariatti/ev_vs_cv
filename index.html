@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparador de Veículos</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -61,23 +61,21 @@
             color: #6a0dad;
         }
 
-        /* */
         .image-container {
             width: 100%;
             height: 220px; /* Altura fixa para a imagem */
             border-radius: 8px;
-            overflow: hidden; /* Garante que a imagem se ajuste às bordas */
-            margin-bottom: 20px; /* Espaço entre a imagem e os campos */
-            background-color: #f0f0f0; /* Cor de fundo enquanto carrega */
+            overflow: hidden;
+            margin-bottom: 20px;
+            background-color: #f0f0f0;
             display: none; /* Começa escondido */
         }
         .image-container img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Faz a imagem cobrir o container, cortando se necessário */
+            object-fit: cover;
             display: block;
         }
-        /* */
 
         .form-group {
             margin-bottom: 18px;
@@ -287,7 +285,7 @@
     const electricModelsSelect = document.getElementById('electric-models');
     const combustionModelsSelect = document.getElementById('combustion-models');
 
-    // const electricImageContainer = document.getElementById('electric-image-container');
+    const electricImageContainer = document.getElementById('electric-image-container');
     const electricImage = document.getElementById('electric-image');
     const combustionImageContainer = document.getElementById('combustion-image-container');
     const combustionImage = document.getElementById('combustion-image');
@@ -313,8 +311,6 @@
             dynamicTyping: true,
             skipEmptyLines: true,
             complete: function(results) {
-                // // NOVO: Log para verificar se a coluna "imagem" foi carregada
-                // console.log("Dados carregados:", results.data); 
                 vehicleData = results.data;
                 populateSelects(vehicleData);
             },
@@ -335,7 +331,6 @@
             option.value = vehicle.Modelo;
             option.textContent = vehicle.Modelo;
 
-            // IMPORTANTE: Sua planilha precisa ter a coluna "Tipo"
             if (vehicle.Tipo === 'Elétrico') {
                 electricModelsSelect.appendChild(option);
             } else if (vehicle.Tipo === 'Combustão') {
@@ -368,38 +363,38 @@
     function displayInfo(type) {
         let selectedModelName;
         let priceInput, consumptionInput, costEnergyFuelInput, maintenanceInput, autonomyInput, lifespanInput;
-        let imageContainer, imageElement; // NOVO: Variáveis para a imagem
+        let imageContainer, imageElement;
 
         if (type === 'electric') {
             selectedModelName = electricModelsSelect.value;
-            // Inputs
             priceInput = electricPriceInput;
             consumptionInput = electricConsumptionInput;
             costEnergyFuelInput = electricCostEnergyInput;
             maintenanceInput = electricMaintenanceInput;
             autonomyInput = electricAutonomyInput;
             lifespanInput = electricLifespanInput;
-            // NOVO: Imagem
             imageContainer = electricImageContainer;
             imageElement = electricImage;
         } else {
             selectedModelName = combustionModelsSelect.value;
-            // Inputs
             priceInput = combustionPriceInput;
             consumptionInput = combustionConsumptionInput;
             costEnergyFuelInput = combustionCostFuelInput;
             maintenanceInput = combustionMaintenanceInput;
             autonomyInput = combustionAutonomyInput;
             lifespanInput = combustionLifespanInput;
-            // NOVO: Imagem
             imageContainer = combustionImageContainer;
             imageElement = combustionImage;
         }
 
         const selectedVehicle = vehicleData.find(v => v.Modelo === selectedModelName);
+        
+        // =========================================================
+        // ===== ESTA É A NOVA LINHA PARA DEPURAR O PROBLEMA =====
+        console.log("Veículo selecionado:", selectedVehicle); 
+        // =========================================================
 
         if (selectedVehicle) {
-            // Preenche os inputs de texto
             priceInput.value = formatNumber(selectedVehicle['Preço Inicial (R$)'], true);
             consumptionInput.value = formatNumber(selectedVehicle['Consumo (km/kWh ou km/L)']);
             costEnergyFuelInput.value = formatNumber(selectedVehicle['Custo Energia/Combustível (R$/kWh ou R$/L)'], true);
@@ -407,31 +402,27 @@
             autonomyInput.value = formatNumber(selectedVehicle['Autonomia (km)']);
             lifespanInput.value = formatNumber(selectedVehicle['Vida Útil (anos)']);
 
-            // NOVO: Lógica para exibir a imagem
-            // Verifica se a coluna "imagem" existe e não está vazia
+            // Lógica para exibir a imagem
+            // IMPORTANTE: Verifica se a coluna se chama "imagem" (minúsculo)
             if (selectedVehicle.imagem && selectedVehicle.imagem.trim() !== '') {
-                imageElement.src = selectedVehicle.imagem; // Define o link da imagem
-                imageContainer.style.display = 'block'; // Mostra o container da imagem
+                imageElement.src = selectedVehicle.imagem; 
+                imageContainer.style.display = 'block'; 
             } else {
-                // Se não houver link de imagem, esconde o container
                 imageElement.src = '';
                 imageContainer.style.display = 'none';
             }
 
         } else {
-            // Limpa todos os campos se "Selecione um modelo" for escolhido
+            // Limpa todos os campos
             priceInput.value = '0.00';
             consumptionInput.value = '-';
             costEnergyFuelInput.value = '0.00';
             maintenanceInput.value = '-';
             autonomyInput.value = '-';
             lifespanInput.value = '-';
-            
-            // NOVO: Esconde a imagem também
             imageElement.src = '';
             imageContainer.style.display = 'none';
 
-            // Garante que os campos editáveis voltem para disabled
             toggleEdit(priceInput.id, priceInput.nextElementSibling, false);
             toggleEdit(costEnergyFuelInput.id, costEnergyFuelInput.nextElementSibling, false);
         }
