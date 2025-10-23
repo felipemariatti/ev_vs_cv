@@ -582,7 +582,10 @@
         let currentICE = null;
         let charts = {};
         
-        async function fetchSheetData(aba) {
+        // ================================================================
+        // RENOMEADO PARA 'fetchSheetData_v2' para quebrar o cache
+        // ================================================================
+        async function fetchSheetData_v2(aba) {
             try {
                 const url = getSheetURL(aba);
                 console.log(`📥 Tentando carregar: ${aba}`);
@@ -594,17 +597,10 @@
                 }
                 
                 const text = await response.text();
-                
-                // ================================================================
-                // MUDANÇA PARA DEBUG:
-                // Vamos imprimir os primeiros 1000 caracteres da resposta DE QUALQUER FORMA
-                // para ver o que o Google está enviando para VEICULOS_ICE
-                // ================================================================
-                console.log(`📄 Resposta de ${aba}:`, text.substring(0, 1000));
-                
                 const jsonText = text.match(/google\.visualization\.Query\.setResponse\((.*)\);?$/s);
                 
                 if (!jsonText) {
+                    console.error(`❌ Resposta de ${aba} não é JSON:`, text.substring(0, 500));
                     throw new Error('Formato de resposta inválido');
                 }
                 
@@ -654,13 +650,16 @@
             }
         }
         
-        async function inicializarDashboard() {
+        // ================================================================
+        // RENOMEADO PARA 'inicializarDashboard_v2' para quebrar o cache
+        // ================================================================
+        async function inicializarDashboard_v2() {
             document.getElementById('connectionStatus').textContent = '🔄 Conectando...';
-            console.log('=== INICIANDO DASHBOARD (NOVA LÓGICA) ===');
+            console.log('=== INICIANDO DASHBOARD (versão 2) ===');
             
             try {
                 // 1. Carrega EV
-                const evData = await fetchSheetData(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_EV);
+                const evData = await fetchSheetData_v2(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_EV);
                 if (!evData || !Array.isArray(evData)) {
                     throw new Error('Falha ao carregar dados de VEICULOS_EV');
                 }
@@ -687,7 +686,7 @@
                 }
 
                 // 2. Carrega ICE
-                const iceData = await fetchSheetData(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_ICE);
+                const iceData = await fetchSheetData_v2(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_ICE);
                 if (!iceData || !Array.isArray(iceData)) {
                     throw new Error('Falha ao carregar dados de VEICULOS_ICE');
                 }
@@ -714,7 +713,7 @@
                 }
                 
                 // 3. Carrega Perfis
-                const perfilData = await fetchSheetData(GOOGLE_SHEETS_CONFIG.ABAS.PERFIS);
+                const perfilData = await fetchSheetData_v2(GOOGLE_SHEETS_CONFIG.ABAS.PERFIS);
                 if (!perfilData || !Array.isArray(perfilData)) {
                     throw new Error('Falha ao carregar dados de PERFIS');
                 }
@@ -735,7 +734,7 @@
                 }
 
                 // 4. Carrega Cenários
-                const cenarioData = await fetchSheetData(GOOGLE_SHEETS_CONFIG.ABAS.CENARIOS);
+                const cenarioData = await fetchSheetData_v2(GOOGLE_SHEETS_CONFIG.ABAS.CENARIOS);
                 if (!cenarioData || !Array.isArray(cenarioData)) {
                     throw new Error('Falha ao carregar dados de CENARIOS');
                 }
@@ -1096,8 +1095,8 @@
             });
         }
         
-        // Inicializar ao carregar
-        window.addEventListener('load', inicializarDashboard);
+        // Inicializar ao carregar, chamando a nova função
+        window.addEventListener('load', inicializarDashboard_v2);
     </script>
 </body>
 </html>
