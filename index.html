@@ -419,19 +419,19 @@
                 <div class="input-card">
                     <h3>👤 Perfil & 💰 Custos</h3>
                     <div class="profile-grid">
-                        <div class="profile-btn active" onclick="selectProfile('leve')">
+                        <div class="profile-btn active" onclick="selectProfile(event, 'leve')">
                             <div>🏠 Leve</div>
                             <small>6k km/ano</small>
                         </div>
-                        <div class="profile-btn" onclick="selectProfile('pesado')">
+                        <div class="profile-btn" onclick="selectProfile(event, 'pesado')">
                             <div>🚙 Pesado</div>
                             <small>15k km/ano</small>
                         </div>
-                        <div class="profile-btn" onclick="selectProfile('app')">
+                        <div class="profile-btn" onclick="selectProfile(event, 'app')">
                             <div>📱 App</div>
                             <small>60k km/ano</small>
                         </div>
-                        <div class="profile-btn" onclick="selectProfile('viajante')">
+                        <div class="profile-btn" onclick="selectProfile(event, 'viajante')">
                             <div>✈️ Viajante</div>
                             <small>28k km/ano</small>
                         </div>
@@ -456,9 +456,9 @@
                 <div class="input-card">
                     <h3>🎯 Cenário</h3>
                     <div class="scenario-grid">
-                        <button class="scenario-btn" onclick="selectScenario('otimista')">📈 Otim</button>
-                        <button class="scenario-btn active" onclick="selectScenario('base')">📊 Base</button>
-                        <button class="scenario-btn" onclick="selectScenario('pessimista')">📉 Pess</button>
+                        <button class="scenario-btn" onclick="selectScenario(event, 'otimista')">📈 Otim</button>
+                        <button class="scenario-btn active" onclick="selectScenario(event, 'base')">📊 Base</button>
+                        <button class="scenario-btn" onclick="selectScenario(event, 'pessimista')">📉 Pess</button>
                     </div>
                     
                     <div class="input-row">
@@ -561,7 +561,6 @@
         const GOOGLE_SHEETS_CONFIG = {
             SHEET_ID: '1WbsZp2pRYLh6AzEz12xmKdAw2doKRA_9A_DipgbGG2A',
             ABAS: {
-                // CORREÇÃO: Nomes das abas conforme sua última imagem (sem acentos, com underline)
                 VEICULOS_EV: 'VEICULOS_EV',
                 VEICULOS_ICE: 'VEICULOS_ICE',
                 PERFIS: 'PERFIS',
@@ -570,7 +569,6 @@
         };
         
         const getSheetURL = (aba) => {
-            // A função encodeURIComponent é mantida por segurança, mas não é estritamente necessária para estes nomes
             return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}`;
         };
         
@@ -785,20 +783,24 @@
             currentICE = vehiclesDB.ice[id];
             document.getElementById('ice_preco').value = currentICE.preco;
             document.getElementById('ice_info').innerHTML = `
-                ⛽ ${currentICE.consumoUB} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>
+                ⛽ ${currentICE.consumoUrb} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>
                 💰 Seg: R$ ${currentICE.seguro} | Man: R$ ${currentICE.manutencao}/ano
             `;
         }
         
-        function selectProfile(profile) {
+        // CORREÇÃO DE JS: Adicionado 'event' como primeiro parâmetro
+        function selectProfile(event, profile) {
             currentProfile = profile;
             document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('active'));
+            // 'event.target' agora funciona
             event.target.closest('.profile-btn').classList.add('active');
         }
         
-        function selectScenario(scenario) {
+        // CORREÇÃO DE JS: Adicionado 'event' como primeiro parâmetro
+        function selectScenario(event, scenario) {
             currentScenario = scenario;
             document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
+            // 'event.target' agora funciona
             event.target.classList.add('active');
             
             if (scenariosDB[scenario]) {
