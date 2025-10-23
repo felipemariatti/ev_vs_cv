@@ -594,6 +594,14 @@
                 }
                 
                 const text = await response.text();
+                
+                // ================================================================
+                // MUDANÇA PARA DEBUG:
+                // Vamos imprimir os primeiros 1000 caracteres da resposta DE QUALQUER FORMA
+                // para ver o que o Google está enviando para VEICULOS_ICE
+                // ================================================================
+                console.log(`📄 Resposta de ${aba}:`, text.substring(0, 1000));
+                
                 const jsonText = text.match(/google\.visualization\.Query\.setResponse\((.*)\);?$/s);
                 
                 if (!jsonText) {
@@ -642,13 +650,10 @@
                 
             } catch (error) {
                 console.error(`❌ ERRO em ${aba}:`, error.message);
-                return null; // Retorna null em caso de erro
+                return null;
             }
         }
         
-        // ================================================================
-        // NOVA ESTRUTURA DE INICIALIZAÇÃO
-        // ================================================================
         async function inicializarDashboard() {
             document.getElementById('connectionStatus').textContent = '🔄 Conectando...';
             console.log('=== INICIANDO DASHBOARD (NOVA LÓGICA) ===');
