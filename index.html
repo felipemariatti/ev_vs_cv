@@ -103,10 +103,8 @@
             for (let i = 0; i < attempts; i++) {
                 const npv = calculateNPV(cashflow, rate);
                 if (Math.abs(npv) < tolerance) return rate;
-
                 const npvPlus = calculateNPV(cashflow, rate + 0.001);
                 const derivative = (npvPlus - npv) / 0.001;
-
                 if (Math.abs(derivative) < 1e-9) break;
                 rate = rate - npv / derivative;
                 if (!isFinite(rate)) break;
@@ -114,7 +112,7 @@
             return NaN;
         }
 
-        // --- Função Principal de Busca e Processamento (com mais logs) ---
+        // --- Função Principal de Busca e Processamento (v3) ---
         async function loadAndProcessSheetData_v3(aba, processFunction) {
             console.log(`[v3 Load] Iniciando para: ${aba}`);
             try {
@@ -131,39 +129,31 @@
                 if (json.status === 'error') throw new Error(`Sheets Error: ${json.errors[0].detailed_message}`);
                 if (!json.table?.rows?.length || !json.table.rows[0].c) throw new Error('Tabela vazia ou sem cabeçalho');
 
-                // EXTRAIR CABEÇALHOS
-                const headers = json.table.rows[0].c.map((cell, i) => cell ? cell.v.trim() : `Col${i}`); // Adicionado .trim()
-                console.log(`[v3 Load] Cabeçalhos encontrados para ${aba}:`, JSON.stringify(headers)); // Log como string para ver caracteres ocultos
+                // EXTRAIR CABEÇALHOS - REMOVIDO O .trim() DAQUI
+                const headers = json.table.rows[0].c.map((cell, i) => cell ? cell.v : `Col${i}`);
+                console.log(`[v3 Load] Cabeçalhos encontrados para ${aba}:`, JSON.stringify(headers));
 
                 const dataRows = [];
-                // PROCESSAR LINHAS DE DADOS
                 for (let i = 1; i < json.table.rows.length; i++) {
                     const rowObject = json.table.rows[i];
-                    if (!rowObject?.c) {
-                         console.log(`[v3 Load] Pulando linha ${i} (vazia) em ${aba}`);
-                         continue;
-                    }
+                    if (!rowObject?.c) continue;
 
                     const rowData = {};
-                    let hasContent = false; // Flag para verificar se a linha tem algum dado
+                    let hasContent = false;
                     headers.forEach((header, index) => {
                         const cellValue = rowObject.c[index] ? rowObject.c[index].v : null;
+                        // Use o nome do header exatamente como veio da planilha
                         rowData[header] = cellValue;
-                        if (cellValue !== null && cellValue !== '') hasContent = true;
+                        if (cellValue !== null && String(cellValue).trim() !== '') hasContent = true; // Verifica se tem conteúdo *depois* de converter para string e trimar
                     });
 
-                     // LOG DETALHADO DA LINHA (APENAS PRIMEIRAS 2)
-                    if (i < 3) {
-                         console.log(`[v3 Load] Dados brutos linha ${i} (${aba}):`, JSON.stringify(rowData));
-                    }
-
-                    // CRITÉRIO PARA ADICIONAR LINHA: Deve ter algum conteúdo E um dos identificadores
-                    const idValue = rowData['ID'] ?? rowData['Id'] ?? rowData['id'] ?? null; // Tenta variações de 'ID'
-                    const perfilValue = rowData['Perfil'] ?? null;
-                    const cenarioValue = rowData['Cenario'] ?? null;
+                    // Verifica se a linha tem um identificador válido (ID, Perfil ou Cenario)
+                    // Usa .trim() aqui nos valores lidos para comparar, caso haja espaços
+                    const idValue = rowData['ID'] ? String(rowData['ID']).trim() : null;
+                    const perfilValue = rowData['Perfil'] ? String(rowData['Perfil']).trim() : null;
+                    const cenarioValue = rowData['Cenario'] ? String(rowData['Cenario']).trim() : null;
 
                     if (hasContent && (idValue || perfilValue || cenarioValue)) {
-                        // LOG ANTES DE ADICIONAR
                         console.log(`[v3 Load] Adicionando linha ${i} de ${aba}. ID=${idValue}, Perfil=${perfilValue}, Cenario=${cenarioValue}`);
                         dataRows.push(rowData);
                     } else if (hasContent) {
@@ -177,27 +167,28 @@
                     console.log(`[v3 Load] ${dataRows.length} linhas de dados VÁLIDAS encontradas para ${aba}`);
                 }
 
-                processFunction(dataRows); // Chama a função de processamento específica
+                processFunction(dataRows);
                 console.log(`[v3 Load] Processamento concluído para: ${aba}`);
                 return true;
 
             } catch (error) {
-                console.error(`[v3 Load] ERRO FATAL ao carregar ${aba}:`, error.message);
-                throw error;
+                console.error(`[v3 Load] ERRO FATAL ao carregar ${aba}:`, error); // Loga o erro completo
+                 console.error("Stack Trace:", error.stack); // Loga o stack trace
+                throw error; // Re-lança o erro para o Promise.all saber que falhou
             }
         }
 
-        // --- Funções de Processamento Específicas (Ajustadas para nova 'db') ---
+        // --- Funções de Processamento Específicas (v3) ---
          function processEvData_v3(dataRows) {
             db.ev = {};
             dataRows.forEach(row => {
-                 const id = row.ID; // Assume que o header é exatamente 'ID'
+                 const id = row['ID']; // Acessa usando a string exata do header
                  if (!id) return;
                  db.ev[id] = {
-                    id: id, nome: row.Modelo, preco: parseFloat(row.Preco) || 0,
-                    consumoUrb: parseFloat(row.Cons_Urb) || 0, consumoRod: parseFloat(row.Cons_Rod) || 0,
-                    residual: parseFloat(row.Residual) || 0, manutencao: parseFloat(row.Manutencao) || 0,
-                    seguro: parseFloat(row.Seguro) || 0, ipva: parseFloat(row.IPVA) || 0
+                    id: id, nome: row['Modelo'], preco: parseFloat(row['Preco']) || 0,
+                    consumoUrb: parseFloat(row['Cons_Urb']) || 0, consumoRod: parseFloat(row['Cons_Rod']) || 0,
+                    residual: parseFloat(row['Residual']) || 0, manutencao: parseFloat(row['Manutencao']) || 0,
+                    seguro: parseFloat(row['Seguro']) || 0, ipva: parseFloat(row['IPVA']) || 0
                 };
             });
             console.log(`[v3 Process] EVs carregados: ${Object.keys(db.ev).length}`);
@@ -205,13 +196,13 @@
          function processIceData_v3(dataRows) {
              db.ice = {};
              dataRows.forEach(row => {
-                 const id = row.ID;
+                 const id = row['ID'];
                  if (!id) return;
                  db.ice[id] = {
-                    id: id, nome: row.Modelo, preco: parseFloat(row.Preco) || 0,
-                    consumoUrb: parseFloat(row.Cons_Urb) || 0, consumoRod: parseFloat(row.Cons_Rod) || 0,
-                    residual: parseFloat(row.Residual) || 0, manutencao: parseFloat(row.Manutencao) || 0,
-                    seguro: parseFloat(row.Seguro) || 0, ipva: parseFloat(row.IPVA) || 0
+                    id: id, nome: row['Modelo'], preco: parseFloat(row['Preco']) || 0,
+                    consumoUrb: parseFloat(row['Cons_Urb']) || 0, consumoRod: parseFloat(row['Cons_Rod']) || 0,
+                    residual: parseFloat(row['Residual']) || 0, manutencao: parseFloat(row['Manutencao']) || 0,
+                    seguro: parseFloat(row['Seguro']) || 0, ipva: parseFloat(row['IPVA']) || 0
                  };
              });
              console.log(`[v3 Process] ICEs carregados: ${Object.keys(db.ice).length}`);
@@ -219,12 +210,12 @@
         function processProfileData_v3(dataRows) {
             db.profiles = {};
             dataRows.forEach(row => {
-                const profileName = row.Perfil ? row.Perfil.toLowerCase().trim() : null; // Adicionado trim()
+                const profileName = row['Perfil'] ? String(row['Perfil']).toLowerCase().trim() : null;
                 if (!profileName) return;
                 db.profiles[profileName] = {
-                    km: parseFloat(row.KM_Ano) || 0,
-                    urbano: parseFloat(row.Prop_Urbano) * 100 || 0,
-                    recargaRes: parseFloat(row.Recarga_Res) * 100 || 0
+                    km: parseFloat(row['KM_Ano']) || 0,
+                    urbano: parseFloat(row['Prop_Urbano']) * 100 || 0,
+                    recargaRes: parseFloat(row['Recarga_Res']) * 100 || 0
                 };
             });
             console.log(`[v3 Process] Perfis carregados: ${Object.keys(db.profiles).length}`);
@@ -232,82 +223,94 @@
         function processScenarioData_v3(dataRows) {
             db.scenarios = {};
              dataRows.forEach(row => {
-                 const scenarioName = row.Cenario ? row.Cenario.toLowerCase().trim() : null; // Adicionado trim()
+                 const scenarioName = row['Cenario'] ? String(row['Cenario']).toLowerCase().trim() : null;
                  if (!scenarioName) return;
                  db.scenarios[scenarioName] = {
-                    gasolina: parseFloat(row.Gasolina) || 0,
-                    tarifaRes: parseFloat(row.Tarifa_Res) || 0,
-                    tarifaPub: parseFloat(row.Tarifa_Pub) || 0
+                    gasolina: parseFloat(row['Gasolina']) || 0,
+                    tarifaRes: parseFloat(row['Tarifa_Res']) || 0,
+                    tarifaPub: parseFloat(row['Tarifa_Pub']) || 0
                  };
              });
             console.log(`[v3 Process] Cenários carregados: ${Object.keys(db.scenarios).length}`);
         }
 
-        // --- Função de Inicialização Principal (Nova v3) ---
+        // --- Função de Inicialização Principal (v3) ---
         async function initializeDashboard_v3() {
             const statusEl = document.getElementById('connectionStatus');
             statusEl.textContent = '🔄 Carregando v3...';
             console.log('=== INICIANDO DASHBOARD (v3) ===');
             try {
-                await Promise.all([
+                // Tenta carregar todas as abas em paralelo
+                const results = await Promise.allSettled([ // Usa allSettled para ver todos os resultados, mesmo se um falhar
                     loadAndProcessSheetData_v3(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_EV, processEvData_v3),
                     loadAndProcessSheetData_v3(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_ICE, processIceData_v3),
                     loadAndProcessSheetData_v3(GOOGLE_SHEETS_CONFIG.ABAS.PERFIS, processProfileData_v3),
                     loadAndProcessSheetData_v3(GOOGLE_SHEETS_CONFIG.ABAS.CENARIOS, processScenarioData_v3)
                 ]);
 
+                // Verifica se alguma das promessas falhou
+                const failedLoads = results.filter(r => r.status === 'rejected');
+                if (failedLoads.length > 0) {
+                    // Pega a mensagem do primeiro erro encontrado
+                    const firstError = failedLoads[0].reason;
+                    console.error("❌ Falha no carregamento de uma ou mais abas:", failedLoads.map(f => f.reason));
+                    throw new Error(`Falha ao carregar dados: ${firstError.message}`); // Lança um novo erro com a mensagem original
+                }
+
+                // Verifica se os dados essenciais foram populados
                 if (!Object.keys(db.ev).length) throw new Error('EVs não carregados');
                 if (!Object.keys(db.ice).length) throw new Error('ICEs não carregados');
                 if (!Object.keys(db.profiles).length) throw new Error('Perfis não carregados');
                 if (!Object.keys(db.scenarios).length) throw new Error('Cenários não carregados');
 
                 console.log('🚀 Sucesso v3! Todos os dados ok.');
-                populateDropdowns_v3(); // Chama a função com novo nome
+                populateDropdowns_v3();
                 statusEl.textContent = '✅ Conectado v3';
                 statusEl.classList.add('connected');
                 statusEl.classList.remove('error');
             } catch (error) {
-                console.error('❌ ERRO FATAL v3:', error);
+                 // Erros de carregamento ou verificação final caem aqui
+                console.error('❌ ERRO FATAL v3 na inicialização:', error);
                 statusEl.textContent = `⚠️ Erro v3: ${error.message}`;
                 statusEl.classList.add('error');
             }
         }
 
-        // --- Funções da Interface (Renomeadas e usando 'db') ---
-        function populateDropdowns_v3() { /* ... código igual a populateDropdowns ... */
+        // --- Funções da Interface (v3) ---
+        function populateDropdowns_v3() {
              console.log('[v3 Populate] Iniciando...');
             const evSelect = document.getElementById('ev_select');
             const iceSelect = document.getElementById('ice_select');
             evSelect.innerHTML = '<option value="">Selecione EV</option>';
-            Object.keys(db.ev).sort((a,b) => db.ev[a].nome.localeCompare(db.ev[b].nome)).forEach(id => { // Ordena por nome
+            Object.keys(db.ev).sort((a,b) => db.ev[a].nome.localeCompare(db.ev[b].nome)).forEach(id => {
                 evSelect.innerHTML += `<option value="${id}">${db.ev[id].nome}</option>`;
             });
             iceSelect.innerHTML = '<option value="">Selecione ICE</option>';
-             Object.keys(db.ice).sort((a,b) => db.ice[a].nome.localeCompare(db.ice[b].nome)).forEach(id => { // Ordena por nome
+             Object.keys(db.ice).sort((a,b) => db.ice[a].nome.localeCompare(db.ice[b].nome)).forEach(id => {
                 iceSelect.innerHTML += `<option value="${id}">${db.ice[id].nome}</option>`;
             });
             console.log('[v3 Populate] Concluído.');
         }
-        function loadEV() { /* ... código igual a loadEV ... */
+        function loadEV() {
              const id = document.getElementById('ev_select').value;
              if (!id || !db.ev[id]) { currentEV = null; document.getElementById('ev_info').textContent = 'Selecione'; document.getElementById('ev_preco').value = 0; return; }
              currentEV = db.ev[id]; document.getElementById('ev_preco').value = currentEV.preco;
              document.getElementById('ev_info').innerHTML = `💡 ${currentEV.consumoUrb} kWh/100km (urb) | ${currentEV.consumoRod} kWh/100km (rod)<br>💰 Seg: ${formatMoney(currentEV.seguro)} | Man: ${formatMoney(currentEV.manutencao)}/ano`;
         }
-        function loadICE() { /* ... código igual a loadICE ... */
+        function loadICE() {
              const id = document.getElementById('ice_select').value;
              if (!id || !db.ice[id]) { currentICE = null; document.getElementById('ice_info').textContent = 'Selecione'; document.getElementById('ice_preco').value = 0; return; }
              currentICE = db.ice[id]; document.getElementById('ice_preco').value = currentICE.preco;
              document.getElementById('ice_info').innerHTML = `⛽ ${currentICE.consumoUrb} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>💰 Seg: ${formatMoney(currentICE.seguro)} | Man: ${formatMoney(currentICE.manutencao)}/ano`;
         }
-        function selectProfile(event, profile) { /* ... código igual a selectProfile ... */
+        function selectProfile(event, profile) {
              currentProfile = profile; document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('active')); event.target.closest('.profile-btn').classList.add('active');
         }
-        function selectScenario(event, scenario) { /* ... código igual a selectScenario ... */
+        function selectScenario(event, scenario) {
              currentScenario = scenario; document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active');
              if (db.scenarios[scenario]) { document.getElementById('preco_gasolina').value = db.scenarios[scenario].gasolina; document.getElementById('tarifa_res').value = db.scenarios[scenario].tarifaRes; document.getElementById('tarifa_pub').value = db.scenarios[scenario].tarifaPub; }
         }
-        function calcular() { /* ... código igual a calcular ... */
+        function calcular() {
             if (!currentEV || !currentICE) { alert('Selecione ambos os veículos!'); return; }
             const perfil = db.profiles[currentProfile]; if (!perfil) { alert('Perfil inválido!'); return; }
             const periodo = parseInt(document.getElementById('periodo').value); const tma = parseFloat(document.getElementById('tma').value) / 100;
@@ -328,13 +331,13 @@
             document.getElementById('vpl_result').textContent = formatMoney(vplDif); document.getElementById('tir_result').textContent = isNaN(tir) ? '-' : tir.toFixed(1);
             document.getElementById('payback_result').textContent = payback; document.getElementById('custo_km_ev').textContent = formatMoney(custoKmEV);
             document.getElementById('custo_km_ice').textContent = formatMoney(custoKmICE); document.getElementById('economia_total').textContent = formatMoney(vplDif);
-            atualizarGraficos_v3(periodo, custoOperacionalEVAnual, custoOperacionalICEAnual, currentEV, currentICE, custoEnergiaEVAnual, custoCombustivelAnual); // Chama v3
+            atualizarGraficos_v3(periodo, custoOperacionalEVAnual, custoOperacionalICEAnual, currentEV, currentICE, custoEnergiaEVAnual, custoCombustivelAnual);
             let conclusao = ''; if (vplDif > 0) conclusao = `✅ Análise VPL: O VE (${currentEV.nome}) é mais vantajoso (+${formatMoney(vplDif)}) em ${periodo} anos vs ${currentICE.nome} (${currentProfile}, ${currentScenario}).`; else if (vplDif < 0) conclusao = `⚠️ Análise VPL: O ICE (${currentICE.nome}) é mais vantajoso (+${formatMoney(Math.abs(vplDif))}) em ${periodo} anos vs ${currentEV.nome} (${currentProfile}, ${currentScenario}).`; else conclusao = `⚖️ Análise VPL: Viabilidade econômica equivalente (${formatMoney(0)}) em ${periodo} anos (${currentProfile}, ${currentScenario}).`;
             document.getElementById('conclusao_texto').textContent = conclusao;
             const detalhamento = `<table class="data-table"><tr><th>Item</th><th>EV (${currentEV.nome})</th><th>ICE (${currentICE.nome})</th><th>Dif (ICE-EV)</th></tr><tr><td>Investimento</td><td>${formatMoney(currentEV.preco)}</td><td>${formatMoney(currentICE.preco)}</td><td>${formatMoney(currentICE.preco - currentEV.preco)}</td></tr><tr><td>Custo Anual: Energia/Comb.</td><td>${formatMoney(custoEnergiaEVAnual)}</td><td>${formatMoney(custoCombustivelAnual)}</td><td>${formatMoney(custoCombustivelAnual - custoEnergiaEVAnual)}</td></tr><tr><td>Custo Anual: Manutenção</td><td>${formatMoney(currentEV.manutencao)}</td><td>${formatMoney(currentICE.manutencao)}</td><td>${formatMoney(currentICE.manutencao - currentEV.manutencao)}</td></tr><tr><td>Custo Anual: Seguro</td><td>${formatMoney(currentEV.seguro)}</td><td>${formatMoney(currentICE.seguro)}</td><td>${formatMoney(currentICE.seguro - currentEV.seguro)}</td></tr><tr><td>Custo Anual: IPVA</td><td>${formatMoney(currentEV.ipva)}</td><td>${formatMoney(currentICE.ipva)}</td><td>${formatMoney(currentICE.ipva - currentEV.ipva)}</td></tr><tr><th>Custo Op. Anual Total</th><th>${formatMoney(custoOperacionalEVAnual)}</th><th>${formatMoney(custoOperacionalICEAnual)}</th><th>${formatMoney(custoOperacionalICEAnual - custoOperacionalEVAnual)}</th></tr><tr><th>Custo/KM</th><th>${formatMoney(custoKmEV)}</th><th>${formatMoney(custoKmICE)}</th><th>${formatMoney(custoKmICE - custoKmEV)}</th></tr><tr><td>Valor Residual (Ano ${periodo})</td><td>${formatMoney(currentEV.preco * (currentEV.residual / 100))}</td><td>${formatMoney(currentICE.preco * (currentICE.residual / 100))}</td><td>${formatMoney(currentICE.preco * (currentICE.residual / 100) - currentEV.preco * (currentEV.residual / 100))}</td></tr></table>`;
             document.getElementById('detalhamento').innerHTML = detalhamento;
         }
-        function atualizarGraficos_v3(periodo, custoEVAnual, custoICEAnual, evData, iceData, energiaEVAnual, combustivelICEAnual) { /* ... código igual a atualizarGraficos ... */
+        function atualizarGraficos_v3(periodo, custoEVAnual, custoICEAnual, evData, iceData, energiaEVAnual, combustivelICEAnual) {
              const anos = Array.from({length: periodo + 1}, (_, i) => `Ano ${i}`);
              const acumEV = [evData.preco]; const acumICE = [iceData.preco];
              for (let i = 1; i <= periodo; i++) { acumEV.push(acumEV[i-1] + custoEVAnual); acumICE.push(acumICE[i-1] + custoICEAnual); }
@@ -354,7 +357,7 @@
         }
         
         // --- Inicialização ---
-        window.addEventListener('load', initializeDashboard_v3); // Chama a nova função principal
+        window.addEventListener('load', initializeDashboard_v3);
     </script>
 </body>
 </html>
