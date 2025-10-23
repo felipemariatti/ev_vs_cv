@@ -3,412 +3,1049 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comparador de Veículos</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+    <title>Dashboard EV vs ICE</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        /* (Seu CSS está aqui, não mudei nada) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: flex-start;
-            min-height: 100vh; background-color: #e0e0f2; margin: 0; padding: 20px; box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px;
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
         }
+        
         .container {
-            display: flex; gap: 18px; width: 100%; max-width: 960px; flex-wrap: wrap; justify-content: center;
+            max-width: 100%;
+            height: calc(100vh - 16px);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-        .vehicle-section {
-            background-color: white; padding: 18px; border-radius: 12px; box-shadow: 0 8px 20px rgba(100, 50, 200, 0.2);
-            width: 45%; min-width: 320px; box-sizing: border-box; border: 1px solid #d0d0e0;
-            background-image: linear-gradient(to bottom, #ffffff, #fcfcff);
+        
+        .header {
+            background: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        @media (max-width: 700px) { .vehicle-section { width: 90%; } }
-        h2 {
-            font-size: 1.25em; color: #4a4a4a; margin-top: 0; margin-bottom: 18px; display: flex; align-items: center;
-            gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 1.3em;
         }
-        h2 i { font-size: 1.2em; color: #6a0dad; }
-        .image-container {
-            width: 100%; height: 170px; border-radius: 8px; overflow: hidden; margin-bottom: 15px;
-            background-color: #f0f0f0; display: none;
+        
+        .status {
+            font-size: 0.75em;
+            color: #666;
         }
-        .image-container img { width: 100%; height: 100%; object-fit: contain; display: block; }
-        .form-group { margin-bottom: 13px; }
+        
+        .status.connected {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .status.error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        .inputs-wrapper {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+        }
+        
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .input-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-card h3 {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 6px;
+        }
+        
         .form-group label {
-            display: block; font-size: 0.82em; color: #6a6a6a; margin-bottom: 5px; font-weight: 600;
+            display: block;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 3px;
         }
-        select {
-            width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 15px;
-            background-color: #f8f8f8; font-size: 0.9em; color: #333; -webkit-appearance: none; -moz-appearance: none;
-            appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.6%202-13.6%206.4-4%204.4-6.4%209.6-6.4%2016.2s2.4%2011.8%206.4%2016.2l127.8%20127.9c4%204.4%209.2%206.4%2014.2%206.4s10.2-2%2014.2-6.4L287%20101.8c4-4.4%206.4-9.6%206.4-16.2-.1-6.6-2.5-11.8-6.5-16.2z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 12px auto;
+        
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 5px 7px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.75em;
         }
-        select:focus { border-color: #6a0dad; outline: none; box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2); }
-        .input-group { display: flex; align-items: center; gap: 8px; }
-        .input-group input[type="text"] {
-            flex-grow: 1; padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px;
-            background-color: #f8f8f8; font-size: 0.9em; color: #333; box-sizing: border-box; opacity: 0.9;
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
         }
-        .input-group input[type="text"]:disabled { background-color: #f8f8f8; color: #666; cursor: not-allowed; }
-        .input-group input[type="text"]:focus:not(:disabled) {
-            border-color: #6a0dad; outline: none; box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
-            background-color: #fff; opacity: 1;
+        
+        .vehicle-info {
+            background: white;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 0.65em;
+            margin-top: 3px;
+            color: #666;
+            line-height: 1.3;
+            min-height: 32px;
         }
-        .edit-button {
-            padding: 5px 10px; background-color: #e6ffe6; color: #28a745; border: 1px solid #28a745;
-            border-radius: 6px; cursor: pointer; font-size: 0.82em; font-weight: 600;
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s; white-space: nowrap;
+        
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            margin-bottom: 6px;
         }
-        .edit-button:hover { background-color: #d4fcd4; border-color: #218838; }
-        .edit-button.active { background-color: #e0e0f2; color: #6a0dad; border-color: #6a0dad; }
-        .edit-button.saving { background-color: #f0f0f0; color: #888; border-color: #ccc; cursor: wait; }
-        .initial-value-input { color: #008000; font-weight: bold; }
+        
+        .profile-btn {
+            padding: 6px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.65em;
+            transition: all 0.2s;
+        }
+        
+        .profile-btn:hover {
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+        
+        .profile-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            font-weight: bold;
+        }
+        
+        .profile-btn div {
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+        
+        .scenario-grid {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+        
+        .scenario-btn {
+            flex: 1;
+            padding: 6px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.7em;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .scenario-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .scenario-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        
+        .btn-calculate {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85em;
+            cursor: pointer;
+            margin-top: auto;
+        }
+        
+        .btn-calculate:hover {
+            opacity: 0.9;
+        }
+        
+        .results-wrapper {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow: hidden;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .metric-card h4 {
+            font-size: 0.65em;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+        
+        .metric-card .value {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+        
+        .metric-card .label {
+            font-size: 0.6em;
+            opacity: 0.8;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 8px;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 8px;
+            min-height: 0;
+        }
+        
+        .chart-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .chart-card h4 {
+            color: #667eea;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
+        
+        .chart-container {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 0;
+        }
+        
+        .conclusion-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .conclusion-card h3 {
+            color: #667eea;
+            font-size: 0.85em;
+            margin-bottom: 6px;
+        }
+        
+        .conclusion-card p {
+            font-size: 0.7em;
+            line-height: 1.5;
+            color: #555;
+        }
+        
+        .table-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+        
+        .table-card h4 {
+            color: #667eea;
+            font-size: 0.8em;
+            margin-bottom: 6px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7em;
+        }
+        
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 5px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        
+        .data-table td {
+            padding: 4px 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: white;
+        }
+
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 0.7em;
+            max-height: 150px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="vehicle-section">
-        <h2><i class="fas fa-battery-full"></i> Veículos Elétricos</h2>
-        <div class="form-group">
-            <label for="electric-models">Selecione um modelo:</label>
-            <select id="electric-models" onchange="displayInfo('electric')">
-                <option value="">Carregando modelos...</option>
-            </select>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Análise Econômica: EV vs ICE</h1>
+            <div class="status" id="connectionStatus">🔄 Carregando...</div>
         </div>
-        <div class="image-container" id="electric-image-container">
-            <img id="electric-image" src="" alt="Veículo Elétrico">
+        
+        <div class="debug-info" id="debugPanel" style="display: none;">
+            <strong>🔍 Debug:</strong>
+            <div id="debugContent">Iniciando...</div>
         </div>
-        <div id="electric-info">
-            <div class="form-group">
-                <label for="electric-price">Preço Inicial (R$)</label>
-                <div class="input-group">
-                    <input type="text" id="electric-price" value="0.00" disabled class="initial-value-input">
-                    <button class="edit-button" 
-                            onclick="toggleEdit(
-                                'electric-price', 
-                                this, 
-                                'electric-models', 
-                                'Preço Inicial (R$)'
-                            )">Editável</button>
+        
+        <div class="inputs-wrapper">
+            <div class="inputs-grid">
+                <div class="input-card">
+                    <h3>⚡ Veículo Elétrico</h3>
+                    <div class="form-group">
+                        <label>Modelo:</label>
+                        <select id="ev_select" onchange="loadEV()">
+                            <option value="">Carregando...</option>
+                        </select>
+                        <div class="vehicle-info" id="ev_info">Selecione um veículo</div>
+                    </div>
+                    <div class="form-group">
+                        <label>💰 Preço (R$):</label>
+                        <input type="number" id="ev_preco" value="0" step="1000">
+                    </div>
+                </div>
+                
+                <div class="input-card">
+                    <h3>🚗 Veículo Combustão</h3>
+                    <div class="form-group">
+                        <label>Modelo:</label>
+                        <select id="ice_select" onchange="loadICE()">
+                            <option value="">Carregando...</option>
+                        </select>
+                        <div class="vehicle-info" id="ice_info">Selecione um veículo</div>
+                    </div>
+                    <div class="form-group">
+                        <label>💰 Preço (R$):</label>
+                        <input type="number" id="ice_preco" value="0" step="1000">
+                    </div>
+                </div>
+                
+                <div class="input-card">
+                    <h3>👤 Perfil & 💰 Custos</h3>
+                    <div class="profile-grid">
+                        <div class="profile-btn active" onclick="selectProfile('leve')">
+                            <div>🏠 Leve</div>
+                            <small>6k km/ano</small>
+                        </div>
+                        <div class="profile-btn" onclick="selectProfile('pesado')">
+                            <div>🚙 Pesado</div>
+                            <small>15k km/ano</small>
+                        </div>
+                        <div class="profile-btn" onclick="selectProfile('app')">
+                            <div>📱 App</div>
+                            <small>60k km/ano</small>
+                        </div>
+                        <div class="profile-btn" onclick="selectProfile('viajante')">
+                            <div>✈️ Viajante</div>
+                            <small>28k km/ano</small>
+                        </div>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Tarifa Res. (R$/kWh):</label>
+                            <input type="number" id="tarifa_res" value="0.65" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Tarifa Púb. (R$/kWh):</label>
+                            <input type="number" id="tarifa_pub" value="1.80" step="0.10">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Gasolina (R$/L):</label>
+                        <input type="number" id="preco_gasolina" value="5.80" step="0.10">
+                    </div>
+                </div>
+                
+                <div class="input-card">
+                    <h3>🎯 Cenário</h3>
+                    <div class="scenario-grid">
+                        <button class="scenario-btn" onclick="selectScenario('otimista')">📈 Otim</button>
+                        <button class="scenario-btn active" onclick="selectScenario('base')">📊 Base</button>
+                        <button class="scenario-btn" onclick="selectScenario('pessimista')">📉 Pess</button>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Período (anos):</label>
+                            <input type="number" id="periodo" value="5" step="1" min="1" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>TMA (%):</label>
+                            <input type="number" id="tma" value="10" step="0.5">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-calculate" onclick="calcular()">🚀 CALCULAR</button>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="electric-consumption">Consumo (km/kWh)</label>
-                <input type="text" id="electric-consumption" value="-" disabled>
-            </div>
-            <div class="form-group">
-                <label for="electric-cost-energy">Custo Energia (R$/kWh)</label>
-                <div class="input-group">
-                    <input type="text" id="electric-cost-energy" value="0.00" disabled class="initial-value-input">
-                    <button class="edit-button" 
-                            onclick="toggleEdit(
-                                'electric-cost-energy', 
-                                this, 
-                                'electric-models', 
-                                'Custo Energia/Combustível (R$/kWh ou R$/L)'
-                            )">Editável</button>
+        </div>
+        
+        <div class="results-wrapper">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h4>VPL DIFERENCIAL</h4>
+                    <div class="value" id="vpl_result">-</div>
+                    <div class="label">ICE - EV</div>
+                </div>
+                <div class="metric-card">
+                    <h4>TIR</h4>
+                    <div class="value" id="tir_result">-</div>
+                    <div class="label">%</div>
+                </div>
+                <div class="metric-card">
+                    <h4>PAYBACK</h4>
+                    <div class="value" id="payback_result">-</div>
+                    <div class="label">anos</div>
+                </div>
+                <div class="metric-card">
+                    <h4>R$/KM EV</h4>
+                    <div class="value" id="custo_km_ev">-</div>
+                    <div class="label">custo</div>
+                </div>
+                <div class="metric-card">
+                    <h4>R$/KM ICE</h4>
+                    <div class="value" id="custo_km_ice">-</div>
+                    <div class="label">custo</div>
+                </div>
+                <div class="metric-card">
+                    <h4>ECONOMIA</h4>
+                    <div class="value" id="economia_total">-</div>
+                    <div class="label">total</div>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="electric-maintenance">Custo Manutenção Anual (R$)</label>
-                <input type="text" id="electric-maintenance" value="-" disabled>
-            </div>
-            <div class="form-group">
-                <label for="electric-autonomy">Autonomia (km)</label>
-                <input type="text" id="electric-autonomy" value="-" disabled>
-            </div>
-            <div class="form-group">
-                <label for="electric-lifespan">Vida Útil (anos)</label>
-                <input type="text" id="electric-lifespan" value="-" disabled>
+            
+            <div class="content-grid">
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h4>📊 Custo Acumulado</h4>
+                        <div class="chart-container">
+                            <canvas id="chartCustoAcumulado"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h4>💰 Composição</h4>
+                        <div class="chart-container">
+                            <canvas id="chartComposicao"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h4>📈 Fluxo de Caixa</h4>
+                        <div class="chart-container">
+                            <canvas id="chartFluxoCaixa"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h4>🎯 Por Perfil</h4>
+                        <div class="chart-container">
+                            <canvas id="chartPerfis"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-panel">
+                    <div class="conclusion-card">
+                        <h3>💡 Conclusão</h3>
+                        <p id="conclusao_texto">Calcule para ver a conclusão</p>
+                    </div>
+                    
+                    <div class="table-card">
+                        <h4>📋 Detalhamento</h4>
+                        <div id="detalhamento">Calcule para ver os detalhes</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="vehicle-section">
-        <h2><i class="fas fa-gas-pump"></i> Veículos a Combustão</h2>
-        <div class="form-group">
-            <label for="combustion-models">Selecione um modelo:</label>
-            <select id="combustion-models" onchange="displayInfo('combustion')">
-                <option value="">Carregando modelos...</option>
-            </select>
-        </div>
-        <div class="image-container" id="combustion-image-container">
-            <img id="combustion-image" src="" alt="Veículo a Combustão">
-        </div>
-        <div id="combustion-info">
-            <div class="form-group">
-                <label for="combustion-price">Preço Inicial (R$)</label>
-                <div class="input-group">
-                    <input type="text" id="combustion-price" value="0.00" disabled class="initial-value-input">
-                    <button class="edit-button" 
-                            onclick="toggleEdit(
-                                'combustion-price', 
-                                this, 
-                                'combustion-models', 
-                                'Preço Inicial (R$)'
-                            )">Editável</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="combustion-consumption">Consumo (km/L)</label>
-                <input type="text" id="combustion-consumption" value="-" disabled>
-            </div>
-            <div class="form-group">
-                <label for="combustion-cost-fuel">Custo Combustível (R$/L)</label>
-                <div class="input-group">
-                    <input type="text" id="combustion-cost-fuel" value="0.00" disabled class="initial-value-input">
-                    <button class="edit-button" 
-                            onclick="toggleEdit(
-                                'combustion-cost-fuel', 
-                                this, 
-                                'combustion-models', 
-                                'Custo Energia/Combustível (R$/kWh ou R$/L)'
-                            )">Editável</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="combustion-maintenance">Custo Manutenção Anual (R$)</label>
-                <input type="text" id="combustion-maintenance" value="-" disabled>
-            </div>
-            <div class="form-group">
-                <label for="combustion-autonomy">Autonomia (km)</label>
-                <input type="text" id="combustion-autonomy" value="-" disabled>
-            </div>
-            <div class="form-group">
-                <label for="combustion-lifespan">Vida Útil (anos)</label>
-                <input type="text" id="combustion-lifespan" value="-" disabled>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // =========================================================================
-    // COLE A URL DO SEU APLICATIVO WEB (DO PASSO 2) AQUI DENTRO DAS ASPAS
-    // =========================================================================
-    const webAppUrl = 'COLE_A_SUA_URL_AQUI'; 
-    // =========================================================================
-
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTFZ7oW12L0gS9LAjPxY6HHLLHxG2gZvE40dy1BzTSZsvZ1Xibe1R20dzD7gZcGLbGG4-lhD-RxCsR5/pub?output=csv';
-    let vehicleData = [];
-
-    // (O resto das suas variáveis de referência... todas iguais)
-    const electricModelsSelect = document.getElementById('electric-models');
-    const combustionModelsSelect = document.getElementById('combustion-models');
-    // ... etc ...
-    const electricImageContainer = document.getElementById('electric-image-container');
-    const electricImage = document.getElementById('electric-image');
-    const combustionImageContainer = document.getElementById('combustion-image-container');
-    const combustionImage = document.getElementById('combustion-image');
-    const electricPriceInput = document.getElementById('electric-price');
-    const electricConsumptionInput = document.getElementById('electric-consumption');
-    const electricCostEnergyInput = document.getElementById('electric-cost-energy');
-    const electricMaintenanceInput = document.getElementById('electric-maintenance');
-    const electricAutonomyInput = document.getElementById('electric-autonomy');
-    const electricLifespanInput = document.getElementById('electric-lifespan');
-    const combustionPriceInput = document.getElementById('combustion-price');
-    const combustionConsumptionInput = document.getElementById('combustion-consumption');
-    const combustionCostFuelInput = document.getElementById('combustion-cost-fuel');
-    const combustionMaintenanceInput = document.getElementById('combustion-maintenance');
-    const combustionAutonomyInput = document.getElementById('combustion-autonomy');
-    const combustionLifespanInput = document.getElementById('combustion-lifespan');
-
-
-    // (Função loadCSVData - Sem mudanças)
-    function loadCSVData() {
-        Papa.parse(csvUrl, {
-            download: true, header: true, dynamicTyping: true, skipEmptyLines: true,
-            complete: function(results) {
-                vehicleData = results.data;
-                populateSelects(vehicleData);
-            },
-            error: function(error) {
-                console.error("Erro ao carregar o CSV:", error);
-                electricModelsSelect.innerHTML = '<option value="">Erro ao carregar dados</option>';
-                combustionModelsSelect.innerHTML = '<option value="">Erro ao carregar dados</option>';
+    <script>
+        const GOOGLE_SHEETS_CONFIG = {
+            SHEET_ID: '1WbsZp2pRYLh6AzEz12xmKdAw2doKRA_9A_DipgbGG2A',
+            ABAS: {
+                VEICULOS_EV: 'VEICULOS_EV',
+                VEICULOS_ICE: 'VEICULOS_ICE',
+                PERFIS: 'PERFIS',
+                CENARIOS: 'CENARIOS'
             }
-        });
-    }
-
-    // (Função populateSelects - Sem mudanças)
-    function populateSelects(data) {
-        electricModelsSelect.innerHTML = '<option value="">Selecione um modelo...</option>';
-        combustionModelsSelect.innerHTML = '<option value="">Selecione um modelo...</option>';
-        data.forEach(vehicle => {
-            const option = document.createElement('option');
-            option.value = vehicle.Modelo;
-            option.textContent = vehicle.Modelo;
-            if (vehicle.Tipo === 'Elétrico') {
-                electricModelsSelect.appendChild(option);
-            } else if (vehicle.Tipo === 'Combustão') {
-                combustionModelsSelect.appendChild(option);
-            }
-        });
-    }
-
-    // (Função formatNumber - Sem mudanças)
-    function formatNumber(value, currency = false) {
-        if (value === null || value === undefined || value === '') return '-';
-        if (typeof value === 'number') {
-            if (currency) return value.toFixed(2).replace('.', ',');
-            return value.toString().replace('.', ',');
-        }
-        const num = parseFloat(String(value).replace(',', '.'));
-        if (!isNaN(num)) {
-            if (currency) return num.toFixed(2).replace('.', ',');
-            return num.toString().replace('.', ',');
-        }
-        return String(value);
-    }
-
-    // (Função displayInfo - Sem mudanças)
-    function displayInfo(type) {
-        let selectedModelName;
-        let priceInput, consumptionInput, costEnergyFuelInput, maintenanceInput, autonomyInput, lifespanInput;
-        let imageContainer, imageElement;
-
-        if (type === 'electric') {
-            selectedModelName = electricModelsSelect.value;
-            priceInput = electricPriceInput; consumptionInput = electricConsumptionInput;
-            costEnergyFuelInput = electricCostEnergyInput; maintenanceInput = electricMaintenanceInput;
-            autonomyInput = electricAutonomyInput; lifespanInput = electricLifespanInput;
-            imageContainer = electricImageContainer; imageElement = electricImage;
-        } else {
-            selectedModelName = combustionModelsSelect.value;
-            priceInput = combustionPriceInput; consumptionInput = combustionConsumptionInput;
-            costEnergyFuelInput = combustionCostFuelInput; maintenanceInput = combustionMaintenanceInput;
-            autonomyInput = combustionAutonomyInput; lifespanInput = combustionLifespanInput;
-            imageContainer = combustionImageContainer; imageElement = combustionImage;
-        }
-
-        const selectedVehicle = vehicleData.find(v => v.Modelo === selectedModelName);
-
-        if (selectedVehicle) {
-            priceInput.value = formatNumber(selectedVehicle['Preço Inicial (R$)'], true);
-            consumptionInput.value = formatNumber(selectedVehicle['Consumo (km/kWh ou km/L)']);
-            costEnergyFuelInput.value = formatNumber(selectedVehicle['Custo Energia/Combustível (R$/kWh ou R$/L)'], true);
-            maintenanceInput.value = formatNumber(selectedVehicle['Custo Manutenção Anual (R$)'], true);
-            autonomyInput.value = formatNumber(selectedVehicle['Autonomia (km)']);
-            lifespanInput.value = formatNumber(selectedVehicle['Vida Útil (anos)']);
-
-            if (selectedVehicle.imagem && selectedVehicle.imagem.trim() !== '') {
-                imageElement.src = selectedVehicle.imagem; imageContainer.style.display = 'block'; 
-            } else {
-                imageElement.src = ''; imageContainer.style.display = 'none';
-            }
-        } else {
-            priceInput.value = '0.00'; consumptionInput.value = '-'; costEnergyFuelInput.value = '0.00';
-            maintenanceInput.value = '-'; autonomyInput.value = '-'; lifespanInput.value = '-';
-            imageElement.src = ''; imageContainer.style.display = 'none';
-
-            // Passa os cabeçalhos corretos da planilha ao resetar
-            toggleEdit('electric-price', electricPriceInput.nextElementSibling, undefined, false, 'Preço Inicial (R$)');
-            toggleEdit('electric-cost-energy', electricCostEnergyInput.nextElementSibling, undefined, false, 'Custo Energia/Combustível (R$/kWh ou R$/L)');
-            toggleEdit('combustion-price', combustionPriceInput.nextElementSibling, undefined, false, 'Preço Inicial (R$)');
-            toggleEdit('combustion-cost-fuel', combustionCostFuelInput.nextElementSibling, undefined, false, 'Custo Energia/Combustível (R$/kWh ou R$/L)');
-        }
-    }
-
-    // =========================================================================
-    // FUNÇÃO toggleEdit ATUALIZADA
-    // Agora ela também chama a função saveData()
-    // =========================================================================
-    function toggleEdit(inputId, buttonElement, selectId, nomeColunaPlanilha, forceState = undefined) {
-        const input = document.getElementById(inputId);
+        };
         
-        let shouldBeEditable;
-        if (forceState !== undefined) {
-            shouldBeEditable = forceState;
-        } else {
-            shouldBeEditable = input.disabled;
-        }
-
-        input.disabled = !shouldBeEditable;
+        const getSheetURL = (aba) => {
+            return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${aba}`;
+        };
         
-        if (shouldBeEditable) {
-            // Habilitando a edição
-            buttonElement.textContent = 'Salvar';
-            buttonElement.classList.add('active');
-            buttonElement.classList.remove('saving');
-            input.focus();
-            input.classList.remove('initial-value-input');
-        } else {
-            // Desabilitando (ou seja, clicou em "Salvar")
-            buttonElement.textContent = 'Editável';
-            buttonElement.classList.remove('active');
+        let vehiclesDB = { ev: {}, ice: {} };
+        let profilesDB = {};
+        let scenariosDB = {};
+        let currentProfile = 'leve';
+        let currentScenario = 'base';
+        let currentEV = null;
+        let currentICE = null;
+        let charts = {};
+        
+        async function fetchSheetData(aba) {
+            try {
+                const url = getSheetURL(aba);
+                console.log(`📥 Tentando carregar: ${aba}`);
+                console.log(`🔗 URL: ${url}`);
+                
+                const response = await fetch(url);
+                console.log(`📡 Response status: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const text = await response.text();
+                console.log(`📄 Primeiros 500 caracteres:`, text.substring(0, 500));
+                
+                const jsonText = text.match(/google\.visualization\.Query\.setResponse\((.*)\);?$/s);
+                
+                if (!jsonText) {
+                    console.error('❌ Não encontrou padrão JSON na resposta');
+                    throw new Error('Formato de resposta inválido');
+                }
+                
+                const json = JSON.parse(jsonText[1]);
+                console.log(`📊 JSON parseado para ${aba}:`, json);
+                
+                if (json.status === 'error') {
+                    console.error('❌ Erro retornado pelo Sheets:', json.errors);
+                    throw new Error(`Erro: ${json.errors[0].detailed_message}`);
+                }
+                
+                const rows = json.table.rows;
+                const cols = json.table.cols;
+                
+                console.log(`📋 Total de linhas: ${rows.length}`);
+                console.log(`📋 Total de colunas: ${cols.length}`);
+                
+                // Pega os headers da primeira linha
+                const headers = rows[0].c.map((cell, i) => cell ? cell.v : `Col${i}`);
+                console.log(`✨ Headers encontrados:`, headers);
+                
+                const data = [];
+                
+                // Começa da segunda linha (índice 1)
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i].c;
+                    if (!row) continue;
+                    
+                    const rowData = {};
+                    headers.forEach((header, index) => {
+                        rowData[header] = row[index] ? row[index].v : null;
+                    });
+                    
+                    // Só adiciona se tiver ID
+                    if (rowData.ID || rowData.Perfil || rowData.Cenario) {
+                        data.push(rowData);
+                        if (data.length <= 2) {
+                            console.log(`📝 Exemplo de linha ${i}:`, rowData);
+                        }
+                    }
+                }
+                
+                console.log(`✅ ${data.length} registros válidos de ${aba}`);
+                return data;
+                
+            } catch (error) {
+                console.error(`❌ ERRO em ${aba}:`, error);
+                console.error(`❌ Stack:`, error.stack);
+                return null;
+            }
+        }
+        
+        async function inicializarDashboard() {
+            try {
+                document.getElementById('connectionStatus').textContent = '🔄 Conectando...';
+                console.log('=== INICIANDO DASHBOARD ===');
+                
+                const [evData, iceData, perfilData, cenarioData] = await Promise.all([
+                    fetchSheetData(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_EV),
+                    fetchSheetData(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_ICE),
+                    fetchSheetData(GOOGLE_SHEETS_CONFIG.ABAS.PERFIS),
+                    fetchSheetData(GOOGLE_SHEETS_CONFIG.ABAS.CENARIOS)
+                ]);
+                
+                if (!evData || !iceData || !perfilData || !cenarioData) {
+                    throw new Error('Falha ao carregar dados');
+                }
+                
+                // Processa veículos EV
+                evData.forEach(row => {
+                    const id = row.ID;
+                    if (!id) return;
+                    vehiclesDB.ev[id] = {
+                        id: id,
+                        nome: row.Modelo,
+                        preco: parseFloat(row.Preco) || 0,
+                        consumoUrb: parseFloat(row.Cons_Urb) || 0,
+                        consumoRod: parseFloat(row.Cons_Rod) || 0,
+                        residual: parseFloat(row.Residual) || 0,
+                        manutencao: parseFloat(row.Manutencao) || 0,
+                        seguro: parseFloat(row.Seguro) || 0,
+                        ipva: parseFloat(row.IPVA) || 0
+                    };
+                });
+                
+                // Processa veículos ICE
+                iceData.forEach(row => {
+                    const id = row.ID;
+                    if (!id) return;
+                    vehiclesDB.ice[id] = {
+                        id: id,
+                        nome: row.Modelo,
+                        preco: parseFloat(row.Preco) || 0,
+                        consumoUrb: parseFloat(row.Cons_Urb) || 0,
+                        consumoRod: parseFloat(row.Cons_Rod) || 0,
+                        residual: parseFloat(row.Residual) || 0,
+                        manutencao: parseFloat(row.Manutencao) || 0,
+                        seguro: parseFloat(row.Seguro) || 0,
+                        ipva: parseFloat(row.IPVA) || 0
+                    };
+                });
+                
+                // Processa perfis
+                perfilData.forEach(row => {
+                    const id = row.Perfil ? row.Perfil.toLowerCase() : null;
+                    if (!id) return;
+                    profilesDB[id] = {
+                        km: parseFloat(row.KM_Ano) || 0,
+                        urbano: parseFloat(row.Prop_Urbano) * 100 || 0,
+                        recargaRes: parseFloat(row.Recarga_Res) * 100 || 0
+                    };
+                });
+                
+                // Processa cenários
+                cenarioData.forEach(row => {
+                    const id = row.Cenario ? row.Cenario.toLowerCase() : null;
+                    if (!id) return;
+                    scenariosDB[id] = {
+                        gasolina: parseFloat(row.Gasolina) || 0,
+                        tarifaRes: parseFloat(row.Tarifa_Res) || 0,
+                        tarifaPub: parseFloat(row.Tarifa_Pub) || 0
+                    };
+                });
+                
+                console.log('✅ EVs:', Object.keys(vehiclesDB.ev).length);
+                console.log('✅ ICEs:', Object.keys(vehiclesDB.ice).length);
+                console.log('✅ Perfis:', Object.keys(profilesDB));
+                console.log('✅ Cenários:', Object.keys(scenariosDB));
+                
+                if (Object.keys(vehiclesDB.ev).length === 0) {
+                    throw new Error('Nenhum veículo EV carregado');
+                }
+                
+                popularDropdowns();
+                document.getElementById('connectionStatus').textContent = '✅ Conectado';
+                document.getElementById('connectionStatus').classList.add('connected');
+                
+            } catch (error) {
+                console.error('❌ ERRO:', error);
+                document.getElementById('connectionStatus').textContent = '⚠️ Erro: ' + error.message;
+                document.getElementById('connectionStatus').classList.add('error');
+            }
+        }
+        
+        function popularDropdowns() {
+            const evSelect = document.getElementById('ev_select');
+            const iceSelect = document.getElementById('ice_select');
             
-            if (input.value === '0.00') {
-                 input.classList.add('initial-value-input');
+            evSelect.innerHTML = '<option value="">Selecione EV</option>';
+            Object.keys(vehiclesDB.ev).forEach(id => {
+                const v = vehiclesDB.ev[id];
+                evSelect.innerHTML += `<option value="${id}">${v.nome}</option>`;
+            });
+            
+            iceSelect.innerHTML = '<option value="">Selecione ICE</option>';
+            Object.keys(vehiclesDB.ice).forEach(id => {
+                const v = vehiclesDB.ice[id];
+                iceSelect.innerHTML += `<option value="${id}">${v.nome}</option>`;
+            });
+        }
+        
+        function loadEV() {
+            const select = document.getElementById('ev_select');
+            const id = select.value;
+            if (!id) return;
+            
+            currentEV = vehiclesDB.ev[id];
+            document.getElementById('ev_preco').value = currentEV.preco;
+            document.getElementById('ev_info').innerHTML = `
+                💡 ${currentEV.consumoUrb} kWh/100km (urb) | ${currentEV.consumoRod} kWh/100km (rod)<br>
+                💰 Seg: R$ ${currentEV.seguro} | Man: R$ ${currentEV.manutencao}/ano
+            `;
+        }
+        
+        function loadICE() {
+            const select = document.getElementById('ice_select');
+            const id = select.value;
+            if (!id) return;
+            
+            currentICE = vehiclesDB.ice[id];
+            document.getElementById('ice_preco').value = currentICE.preco;
+            document.getElementById('ice_info').innerHTML = `
+                ⛽ ${currentICE.consumoUrb} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>
+                💰 Seg: R$ ${currentICE.seguro} | Man: R$ ${currentICE.manutencao}/ano
+            `;
+        }
+        
+        function selectProfile(profile) {
+            currentProfile = profile;
+            document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.profile-btn').classList.add('active');
+        }
+        
+        function selectScenario(scenario) {
+            currentScenario = scenario;
+            document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (scenariosDB[scenario]) {
+                document.getElementById('preco_gasolina').value = scenariosDB[scenario].gasolina;
+                document.getElementById('tarifa_res').value = scenariosDB[scenario].tarifaRes;
+                document.getElementById('tarifa_pub').value = scenariosDB[scenario].tarifaPub;
+            }
+        }
+        
+        function calcular() {
+            if (!currentEV || !currentICE) {
+                alert('Selecione ambos os veículos!');
+                return;
             }
             
-            // Se forceState não foi definido E estamos desabilitando, significa que o usuário clicou em "Salvar"
-            if (forceState === undefined) {
-                const modeloSelecionado = document.getElementById(selectId).value;
-                if (modeloSelecionado) {
-                    saveData(modeloSelecionado, nomeColunaPlanilha, input.value, buttonElement);
+            const perfil = profilesDB[currentProfile];
+            const periodo = parseInt(document.getElementById('periodo').value);
+            const tma = parseFloat(document.getElementById('tma').value) / 100;
+            const tarifaRes = parseFloat(document.getElementById('tarifa_res').value);
+            const tarifaPub = parseFloat(document.getElementById('tarifa_pub').value);
+            const precoGasolina = parseFloat(document.getElementById('preco_gasolina').value);
+            
+            // Cálculo EV
+            const kmUrb = perfil.km * (perfil.urbano / 100);
+            const kmRod = perfil.km * (1 - perfil.urbano / 100);
+            
+            const consumoEV = (kmUrb * currentEV.consumoUrb / 100) + (kmRod * currentEV.consumoRod / 100);
+            const custoEnergiaRes = consumoEV * (perfil.recargaRes / 100) * tarifaRes;
+            const custoEnergiaPub = consumoEV * (1 - perfil.recargaRes / 100) * tarifaPub;
+            const custoEnergiaEV = custoEnergiaRes + custoEnergiaPub;
+            
+            const custoTotalEV = custoEnergiaEV + currentEV.manutencao + currentEV.seguro + currentEV.ipva;
+            const custoKmEV = custoTotalEV / perfil.km;
+            
+            // Cálculo ICE
+            const consumoCombUrb = kmUrb / currentICE.consumoUrb;
+            const consumoCombRod = kmRod / currentICE.consumoRod;
+            const custoCombustivel = (consumoCombUrb + consumoCombRod) * precoGasolina;
+            
+            const custoTotalICE = custoCombustivel + currentICE.manutencao + currentICE.seguro + currentICE.ipva;
+            const custoKmICE = custoTotalICE / perfil.km;
+            
+            // Fluxo de caixa
+            const fluxoEV = [-currentEV.preco];
+            const fluxoICE = [-currentICE.preco];
+            
+            for (let ano = 1; ano <= periodo; ano++) {
+                fluxoEV.push(-custoTotalEV);
+                fluxoICE.push(-custoTotalICE);
+            }
+            
+            // Valor residual
+            fluxoEV[periodo] += currentEV.preco * (currentEV.residual / 100);
+            fluxoICE[periodo] += currentICE.preco * (currentICE.residual / 100);
+            
+            // VPL
+            const vplEV = calcularVPL(fluxoEV, tma);
+            const vplICE = calcularVPL(fluxoICE, tma);
+            const vplDif = vplICE - vplEV;
+            
+            // TIR
+            const fluxoDif = fluxoEV.map((v, i) => fluxoICE[i] - v);
+            const tir = calcularTIR(fluxoDif) * 100;
+            
+            // Payback
+            let payback = '-';
+            let acumEV = currentEV.preco;
+            let acumICE = currentICE.preco;
+            for (let ano = 1; ano <= periodo; ano++) {
+                acumEV += custoTotalEV;
+                acumICE += custoTotalICE;
+                if (acumICE > acumEV && payback === '-') {
+                    payback = ano;
+                    break;
                 }
             }
-        }
-    }
-
-    // =========================================================================
-    // NOVA FUNÇÃO para salvar os dados
-    // =========================================================================
-    function saveData(modelo, campo, valor, buttonElement) {
-        if (webAppUrl === 'COLE_A_SUA_URL_AQUI' || !webAppUrl) {
-            alert("Erro: A URL do Web App não foi configurada no script.");
-            return;
-        }
-
-        // Mostra que está salvando
-        buttonElement.textContent = 'Salvando...';
-        buttonElement.classList.add('saving');
-        buttonElement.disabled = true; // Desabilita o botão
-
-        const dataToSave = {
-            modelo: modelo,
-            campo: campo,
-            valor: valor
-        };
-
-        fetch(webAppUrl, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataToSave)
-        })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            if (result.status === 'success') {
-                // Sucesso!
-                alert(result.message);
-                // Atualiza os dados locais para refletir a mudança (ou recarrega tudo)
-                // Por enquanto, apenas resetamos o botão
+            
+            // Atualiza métricas
+            document.getElementById('vpl_result').textContent = formatMoney(vplDif);
+            document.getElementById('tir_result').textContent = tir.toFixed(1);
+            document.getElementById('payback_result').textContent = payback;
+            document.getElementById('custo_km_ev').textContent = 'R$ ' + custoKmEV.toFixed(2);
+            document.getElementById('custo_km_ice').textContent = 'R$ ' + custoKmICE.toFixed(2);
+            document.getElementById('economia_total').textContent = formatMoney((custoKmICE - custoKmEV) * perfil.km * periodo);
+            
+            // Gráficos
+            atualizarGraficos(periodo, custoTotalEV, custoTotalICE, currentEV, currentICE, custoEnergiaEV, custoCombustivel);
+            
+            // Conclusão
+            let conclusao = '';
+            if (vplDif > 0) {
+                conclusao = `✅ O veículo elétrico ${currentEV.nome} é mais econômico que o ${currentICE.nome}. Economia de ${formatMoney(vplDif)} em ${periodo} anos no perfil ${currentProfile}. Custo por km: EV R$ ${custoKmEV.toFixed(2)} vs ICE R$ ${custoKmICE.toFixed(2)}.`;
             } else {
-                // Erro do Apps Script
-                alert("Erro ao salvar: " + result.message);
+                conclusao = `⚠️ O veículo a combustão ${currentICE.nome} apresenta melhor viabilidade econômica neste cenário, com diferença de ${formatMoney(Math.abs(vplDif))} em ${periodo} anos.`;
             }
-        })
-        .catch(error => {
-            // Erro de rede/fetch
-            console.error('Erro no Fetch:', error);
-            alert('Erro de conexão ao salvar os dados.');
-        })
-        .finally(() => {
-            // Reabilita o botão e restaura o texto, independentemente do resultado
-            buttonElement.textContent = 'Editável';
-            buttonElement.classList.remove('saving');
-            buttonElement.disabled = false;
-        });
-    }
-
-    // Inicia o carregamento
-    document.addEventListener('DOMContentLoaded', loadCSVData);
-</script>
-
-</body>
-</html>
+            document.getElementById('conclusao_texto').textContent = conclusao;
+            
+            // Detalhamento
+            const detalhamento = `
+                <table class="data-table">
+                    <tr><th>Item</th><th>EV</th><th>ICE</th></tr>
+                    <tr><td>Investimento</td><td>${formatMoney(currentEV.preco)}</td><td>${formatMoney(currentICE.preco)}</td></tr>
+                    <tr><td>Energia/Combustível</td><td>${formatMoney(custoEnergiaEV)}/ano</td><td>${formatMoney(custoCombustivel)}/ano</td></tr>
+                    <tr><td>Manutenção</td><td>${formatMoney(currentEV.manutencao)}/ano</td><td>${formatMoney(currentICE.manutencao)}/ano</td></tr>
+                    <tr><td>Seguro</td><td>${formatMoney(currentEV.seguro)}/ano</td><td>${formatMoney(currentICE.seguro)}/ano</td></tr>
+                    <tr><td>IPVA</td><td>${formatMoney(currentEV.ipva)}/ano</td><td>${formatMoney(currentICE.ipva)}/ano</td></tr>
+                    <tr><th>Total Anual</th><th>${formatMoney(custoTotalEV)}</th><th>${formatMoney(custoTotalICE)}</th></tr>
+                    <tr><th>Custo/km</th><th>R$ ${custoKmEV.toFixed(2)}</th><th>R$ ${custoKmICE.toFixed(2)}</th></tr>
+                    <tr><td>Valor Residual</td><td>${formatMoney(currentEV.preco * currentEV.residual / 100)}</td><td>${formatMoney(currentICE.preco * currentICE.residual / 100)}</td></tr>
+                </table>
+            `;
+            document.getElementById('detalhamento').innerHTML = detalhamento;
+        }
+        
+        function calcularVPL(fluxo, taxa) {
+            return fluxo.reduce((acc, val, i) => acc + val / Math.pow(1 + taxa, i), 0);
+        }
+        
+        function calcularTIR(fluxo, tentativas = 100) {
+            let taxa = 0.1;
+            for (let i = 0; i < tentativas; i++) {
+                const vpla = calcularVPL(fluxo, taxa);
+                const vplb = calcularVPL(fluxo, taxa + 0.001);
+                const derivada = (vplb - vpla) / 0.001;
+                taxa = taxa - vpla / derivada;
+                if (Math.abs(vpla) < 0.01) break;
+            }
+            return taxa;
+        }
+        
+        function formatMoney(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+        
+        function atualizarGraficos(periodo, custoEV, custoICE, evData, iceData, energiaEV, combustivelICE) {
+            // Custo Acumulado
+            const anos = Array.from({length: periodo + 1}, (_, i) => `Ano ${i}`);
+            const acumEV = [evData.preco];
+            const acumICE = [iceData.preco];
+            
+            for (let i = 1; i <= periodo; i++) {
+                acumEV.push(acumEV[i-1] + custoEV);
+                acumICE.push(acumICE[i-1] + custoICE);
+            }
+            
+            if (charts.acumulado) charts.acumulado.destroy();
+            charts.acumulado = new Chart(document.getElementById('chartCustoAcumulado'), {
+                type: 'line',
+                data: {
+                    labels: anos,
+                    datasets: [{
+                        label: 'EV',
+                        data: acumEV,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'ICE',
+                        data: acumICE,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'top' } }
+                }
+            });
+            
+            // Composição
+            if (charts.composicao) charts.composicao.destroy();
+            charts.composicao = new Chart(document.getElementById('chartComposicao'), {
+                type: 'bar',
+                data: {
+                    labels: ['EV', 'ICE'],
+                    datasets: [{
+                        label: 'Energia/Combustível',
+                        data: [energiaEV, combustivelICE],
+                        backgroundColor: '#667eea'
+                    }, {
+                        label: 'Manutenção',
+                        data: [evData.manutencao, iceData.manutencao],
+                        backgroundColor: '#f59e0b'
+                    }, {
+                        label: 'Seguro',
+                        data: [evData.seguro, iceData.seguro],
+                        backgroundColor: '#8b5cf6'
+                    }, {
+                        label: 'IPVA',
+                        data: [evData.ipva, iceData.ipva],
+                        backgroundColor: '#ec4899'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { stacked: true }, y: { stacked: true } },
+                    plugins: { legend: { display: true, position: 'top' } }
+                }
+            });
+            
+            // Fluxo de Caixa
+            const fluxoAnual = anos.map((_, i) => i === 0 ? 0 : custoICE - custoEV);
+            
+            if (charts.fluxo) charts.fluxo.destroy();
+            charts.fluxo = new Chart(document.getElementById('chartFluxoCaixa'), {
+                type: 'bar',
+                data: {
+                    labels: anos,
+                    datasets: [{
+                        label: 'Economia Anual (ICE - EV)',
+                        data: fluxoAnual,
+                        backgroundColor: fluxoAnual.map(v => v >= 0 ? '#10b981' : '#ef4444')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+            
+            // Por Perfil
+            const perfis = ['Leve', 'Pesado', 'App', 'Viajante'];
+            const economias = perfis.map((p, i) => {
+                const km = [6000, 15000, 60000, 28000][i];
+                return (custoICE - custoEV) * periodo * km / 1000;
+            });
+            
+            if (charts.perfis) charts.perfis.destroy();
+            charts.perfis = new Chart(document.getElementById('chartPerfis'), {
+                type: 'bar',
+                data: {
+                    labels: perfis,
+                    datasets: [{
+                        label: 'Economia Total (R$ mil)',
+                        data: economias,
+                        backgroundColor: ['#667eea', '#764ba2', '#10b981', '#f59e0b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+        
+        // Inicializar ao carregar
+        window.addEventListener('load', inicializarDashboard);
