@@ -561,6 +561,7 @@
         const GOOGLE_SHEETS_CONFIG = {
             SHEET_ID: '1WbsZp2pRYLh6AzEz12xmKdAw2doKRA_9A_DipgbGG2A',
             ABAS: {
+                // CORREÇÃO: Nomes das abas conforme sua última imagem (sem acentos, com underline)
                 VEICULOS_EV: 'VEICULOS_EV',
                 VEICULOS_ICE: 'VEICULOS_ICE',
                 PERFIS: 'PERFIS',
@@ -569,7 +570,8 @@
         };
         
         const getSheetURL = (aba) => {
-            return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${aba}`;
+            // A função encodeURIComponent é mantida por segurança, mas não é estritamente necessária para estes nomes
+            return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}`;
         };
         
         let vehiclesDB = { ev: {}, ice: {} };
@@ -783,7 +785,7 @@
             currentICE = vehiclesDB.ice[id];
             document.getElementById('ice_preco').value = currentICE.preco;
             document.getElementById('ice_info').innerHTML = `
-                ⛽ ${currentICE.consumoUrb} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>
+                ⛽ ${currentICE.consumoUB} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>
                 💰 Seg: R$ ${currentICE.seguro} | Man: R$ ${currentICE.manutencao}/ano
             `;
         }
@@ -1049,3 +1051,6 @@
         
         // Inicializar ao carregar
         window.addEventListener('load', inicializarDashboard);
+    </script>
+</body>
+</html>
