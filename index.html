@@ -66,72 +66,34 @@
         // --- Configuração ---
         const GOOGLE_SHEETS_CONFIG = {
             SHEET_ID: '1WbsZp2pRYLh6AzEz12xmKdAw2doKRA_9A_DipgbGG2A',
-            ABAS: {
-                VEICULOS_EV: 'VEICULOS_EV',
-                VEICULOS_ICE: 'VEICULOS_ICE',
-                PERFIS: 'PERFIS',
-                CENARIOS: 'CENARIOS'
-            }
+            ABAS: { VEICULOS_EV: 'VEICULOS_EV', VEICULOS_ICE: 'VEICULOS_ICE', PERFIS: 'PERFIS', CENARIOS: 'CENARIOS' }
         };
-
-        // --- Variáveis Globais ---
         let db = { ev: {}, ice: {}, profiles: {}, scenarios: {} };
-        let currentProfile = 'leve';
-        let currentScenario = 'base';
-        let currentEV = null;
-        let currentICE = null;
-        let charts = {};
+        let currentProfile = 'leve'; let currentScenario = 'base'; let currentEV = null; let currentICE = null; let charts = {};
 
         // --- Funções Auxiliares ---
-        const getSheetURL = (aba) => {
-            const timestamp = new Date().getTime();
-            return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}&t=${timestamp}`;
-        };
+        const getSheetURL = (aba) => { const ts = new Date().getTime(); return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}&t=${ts}`; };
+        function formatMoney(v) { return (isNaN(v) || v === null) ? '-' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v); }
+        function calculateNPV(cf, r) { return (r <= -1) ? NaN : cf.reduce((a, v, i) => a + v / Math.pow(1 + r, i), 0); }
+        function calculateIRR(cf, att = 100, g = 0.1, tol = 0.0001) { let r = g; for (let i = 0; i < att; i++) { const n = calculateNPV(cf, r); if (Math.abs(n) < tol) return r; const nP = calculateNPV(cf, r + 0.001); const d = (nP - n) / 0.001; if (Math.abs(d) < 1e-9) break; r -= n / d; if (!isFinite(r)) break; } return NaN; }
 
-        function formatMoney(value) {
-             if (isNaN(value) || value === null) return '-';
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-        }
-
-         function calculateNPV(cashflow, rate) {
-            if (rate <= -1) return NaN;
-            return cashflow.reduce((acc, val, i) => acc + val / Math.pow(1 + rate, i), 0);
-        }
-
-        function calculateIRR(cashflow, attempts = 100, guess = 0.1, tolerance = 0.0001) {
-            let rate = guess;
-            for (let i = 0; i < attempts; i++) {
-                const npv = calculateNPV(cashflow, rate);
-                if (Math.abs(npv) < tolerance) return rate;
-                const npvPlus = calculateNPV(cashflow, rate + 0.001);
-                const derivative = (npvPlus - npv) / 0.001;
-                if (Math.abs(derivative) < 1e-9) break;
-                rate = rate - npv / derivative;
-                if (!isFinite(rate)) break;
-            }
-            return NaN;
-        }
-
-        // --- Função Principal de Busca e Processamento (v3) ---
-        async function loadAndProcessSheetData_v3(aba, processFunction) {
-            console.log(`[v3 Load] Iniciando para: ${aba}`);
+        // --- Função Principal de Busca e Processamento (v4 - Logs Detalhados) ---
+        async function loadAndProcessSheetData_v4(aba, processFunction) {
+            console.log(`[v4 Load] Iniciando para: ${aba}`);
             try {
                 const url = getSheetURL(aba);
                 const response = await fetch(url);
-
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const text = await response.text();
                 const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\((.*)\);?$/s);
-
                 if (!jsonMatch) throw new Error('Formato inválido (não JSONP)');
                 const json = JSON.parse(jsonMatch[1]);
-
                 if (json.status === 'error') throw new Error(`Sheets Error: ${json.errors[0].detailed_message}`);
-                if (!json.table?.rows?.length || !json.table.rows[0].c) throw new Error('Tabela vazia ou sem cabeçalho');
+                if (!json.table?.rows?.length || !json.table.rows[0]?.c) throw new Error('Tabela vazia/sem cabeçalho');
 
-                // EXTRAIR CABEÇALHOS - REMOVIDO O .trim() DAQUI
+                // CABEÇALHOS (sem trim aqui)
                 const headers = json.table.rows[0].c.map((cell, i) => cell ? cell.v : `Col${i}`);
-                console.log(`[v3 Load] Cabeçalhos encontrados para ${aba}:`, JSON.stringify(headers));
+                console.log(`[v4 Load] Cabeçalhos para ${aba}: ${JSON.stringify(headers)}`);
 
                 const dataRows = [];
                 for (let i = 1; i < json.table.rows.length; i++) {
@@ -141,223 +103,89 @@
                     const rowData = {};
                     let hasContent = false;
                     headers.forEach((header, index) => {
-                        const cellValue = rowObject.c[index] ? rowObject.c[index].v : null;
-                        // Use o nome do header exatamente como veio da planilha
+                        const cellValue = rowObject.c[index]?.v ?? null; // Usa ?? null para garantir que é null se undefined
+                        // Usa o nome exato do header como chave
                         rowData[header] = cellValue;
-                        if (cellValue !== null && String(cellValue).trim() !== '') hasContent = true; // Verifica se tem conteúdo *depois* de converter para string e trimar
+                         // Verifica conteúdo convertendo para string e trimando
+                        if (cellValue !== null && String(cellValue).trim() !== '') {
+                            hasContent = true;
+                        }
                     });
 
-                    // Verifica se a linha tem um identificador válido (ID, Perfil ou Cenario)
-                    // Usa .trim() aqui nos valores lidos para comparar, caso haja espaços
-                    const idValue = rowData['ID'] ? String(rowData['ID']).trim() : null;
-                    const perfilValue = rowData['Perfil'] ? String(rowData['Perfil']).trim() : null;
-                    const cenarioValue = rowData['Cenario'] ? String(rowData['Cenario']).trim() : null;
+                    // =================== LOGS DE DEBUG ADICIONADOS ===================
+                    const idVal = rowData['ID']; // Acessa diretamente
+                    const perfilVal = rowData['Perfil'];
+                    const cenarioVal = rowData['Cenario'];
+                    const idExists = idVal !== null && idVal !== undefined && String(idVal).trim() !== '';
+                    const perfilExists = perfilVal !== null && perfilVal !== undefined && String(perfilVal).trim() !== '';
+                    const cenarioExists = cenarioVal !== null && cenarioVal !== undefined && String(cenarioVal).trim() !== '';
+                    const hasIdentifier = idExists || perfilExists || cenarioExists;
 
-                    if (hasContent && (idValue || perfilValue || cenarioValue)) {
-                        console.log(`[v3 Load] Adicionando linha ${i} de ${aba}. ID=${idValue}, Perfil=${perfilValue}, Cenario=${cenarioValue}`);
+                    if (i < 4) { // Loga detalhes apenas para as primeiras linhas
+                        console.debug(`[v4 Debug] Linha ${i} (${aba}): hasContent=${hasContent}, idVal='${idVal}' (exists=${idExists}), perfilVal='${perfilVal}' (exists=${perfilExists}), cenarioVal='${cenarioVal}' (exists=${cenarioExists}), hasIdentifier=${hasIdentifier}`);
+                        console.debug(`[v4 Debug] RowData:`, JSON.stringify(rowData));
+                    }
+                    // ================================================================
+
+                    if (hasContent && hasIdentifier) {
+                        console.log(`[v4 Load] ✅ Adicionando linha ${i} de ${aba}.`);
                         dataRows.push(rowData);
                     } else if (hasContent) {
-                         console.warn(`[v3 Load] Linha ${i} de ${aba} tem conteúdo mas foi pulada (sem ID/Perfil/Cenario):`, JSON.stringify(rowData));
+                         console.warn(`[v4 Load] ⚠️ Linha ${i} de ${aba} pulada (sem ID/Perfil/Cenario válido). hasContent=${hasContent}, hasIdentifier=${hasIdentifier}. Dados:`, JSON.stringify(rowData));
                     }
                 }
                 
-                if (dataRows.length === 0) {
-                     console.warn(`[v3 Load] Nenhuma linha de dados VÁLIDA encontrada para ${aba} após o cabeçalho.`);
-                } else {
-                    console.log(`[v3 Load] ${dataRows.length} linhas de dados VÁLIDAS encontradas para ${aba}`);
-                }
+                if (dataRows.length === 0) console.warn(`[v4 Load] 🚨 Nenhuma linha VÁLIDA encontrada para ${aba}.`);
+                else console.log(`[v4 Load] ${dataRows.length} linhas VÁLIDAS encontradas para ${aba}.`);
 
                 processFunction(dataRows);
-                console.log(`[v3 Load] Processamento concluído para: ${aba}`);
+                console.log(`[v4 Load] Processamento concluído para: ${aba}`);
                 return true;
-
             } catch (error) {
-                console.error(`[v3 Load] ERRO FATAL ao carregar ${aba}:`, error); // Loga o erro completo
-                 console.error("Stack Trace:", error.stack); // Loga o stack trace
-                throw error; // Re-lança o erro para o Promise.all saber que falhou
+                console.error(`[v4 Load] ❌ ERRO FATAL ao carregar ${aba}:`, error);
+                throw error;
             }
         }
 
-        // --- Funções de Processamento Específicas (v3) ---
-         function processEvData_v3(dataRows) {
-            db.ev = {};
-            dataRows.forEach(row => {
-                 const id = row['ID']; // Acessa usando a string exata do header
-                 if (!id) return;
-                 db.ev[id] = {
-                    id: id, nome: row['Modelo'], preco: parseFloat(row['Preco']) || 0,
-                    consumoUrb: parseFloat(row['Cons_Urb']) || 0, consumoRod: parseFloat(row['Cons_Rod']) || 0,
-                    residual: parseFloat(row['Residual']) || 0, manutencao: parseFloat(row['Manutencao']) || 0,
-                    seguro: parseFloat(row['Seguro']) || 0, ipva: parseFloat(row['IPVA']) || 0
-                };
-            });
-            console.log(`[v3 Process] EVs carregados: ${Object.keys(db.ev).length}`);
-        }
-         function processIceData_v3(dataRows) {
-             db.ice = {};
-             dataRows.forEach(row => {
-                 const id = row['ID'];
-                 if (!id) return;
-                 db.ice[id] = {
-                    id: id, nome: row['Modelo'], preco: parseFloat(row['Preco']) || 0,
-                    consumoUrb: parseFloat(row['Cons_Urb']) || 0, consumoRod: parseFloat(row['Cons_Rod']) || 0,
-                    residual: parseFloat(row['Residual']) || 0, manutencao: parseFloat(row['Manutencao']) || 0,
-                    seguro: parseFloat(row['Seguro']) || 0, ipva: parseFloat(row['IPVA']) || 0
-                 };
-             });
-             console.log(`[v3 Process] ICEs carregados: ${Object.keys(db.ice).length}`);
-        }
-        function processProfileData_v3(dataRows) {
-            db.profiles = {};
-            dataRows.forEach(row => {
-                const profileName = row['Perfil'] ? String(row['Perfil']).toLowerCase().trim() : null;
-                if (!profileName) return;
-                db.profiles[profileName] = {
-                    km: parseFloat(row['KM_Ano']) || 0,
-                    urbano: parseFloat(row['Prop_Urbano']) * 100 || 0,
-                    recargaRes: parseFloat(row['Recarga_Res']) * 100 || 0
-                };
-            });
-            console.log(`[v3 Process] Perfis carregados: ${Object.keys(db.profiles).length}`);
-        }
-        function processScenarioData_v3(dataRows) {
-            db.scenarios = {};
-             dataRows.forEach(row => {
-                 const scenarioName = row['Cenario'] ? String(row['Cenario']).toLowerCase().trim() : null;
-                 if (!scenarioName) return;
-                 db.scenarios[scenarioName] = {
-                    gasolina: parseFloat(row['Gasolina']) || 0,
-                    tarifaRes: parseFloat(row['Tarifa_Res']) || 0,
-                    tarifaPub: parseFloat(row['Tarifa_Pub']) || 0
-                 };
-             });
-            console.log(`[v3 Process] Cenários carregados: ${Object.keys(db.scenarios).length}`);
-        }
+        // --- Funções de Processamento (v4 - Usam nomes exatos dos headers) ---
+         function processEvData_v4(dataRows) {
+             db.ev = {}; dataRows.forEach(r => { if (!r['ID']) return; db.ev[r['ID']] = { id: r['ID'], nome: r['Modelo'], preco: parseFloat(r['Preco'])||0, consumoUrb: parseFloat(r['Cons_Urb'])||0, consumoRod: parseFloat(r['Cons_Rod'])||0, residual: parseFloat(r['Residual'])||0, manutencao: parseFloat(r['Manutencao'])||0, seguro: parseFloat(r['Seguro'])||0, ipva: parseFloat(r['IPVA'])||0 }; }); console.log(`[v4 Process] EVs: ${Object.keys(db.ev).length}`); }
+         function processIceData_v4(dataRows) {
+             db.ice = {}; dataRows.forEach(r => { if (!r['ID']) return; db.ice[r['ID']] = { id: r['ID'], nome: r['Modelo'], preco: parseFloat(r['Preco'])||0, consumoUrb: parseFloat(r['Cons_Urb'])||0, consumoRod: parseFloat(r['Cons_Rod'])||0, residual: parseFloat(r['Residual'])||0, manutencao: parseFloat(r['Manutencao'])||0, seguro: parseFloat(r['Seguro'])||0, ipva: parseFloat(r['IPVA'])||0 }; }); console.log(`[v4 Process] ICEs: ${Object.keys(db.ice).length}`); }
+        function processProfileData_v4(dataRows) {
+            db.profiles = {}; dataRows.forEach(r => { const pN = r['Perfil'] ? String(r['Perfil']).toLowerCase().trim() : null; if (!pN) return; db.profiles[pN] = { km: parseFloat(r['KM_Ano'])||0, urbano: parseFloat(r['Prop_Urbano'])*100||0, recargaRes: parseFloat(r['Recarga_Res'])*100||0 }; }); console.log(`[v4 Process] Perfis: ${Object.keys(db.profiles).length}`); }
+        function processScenarioData_v4(dataRows) {
+            db.scenarios = {}; dataRows.forEach(r => { const sN = r['Cenario'] ? String(r['Cenario']).toLowerCase().trim() : null; if (!sN) return; db.scenarios[sN] = { gasolina: parseFloat(r['Gasolina'])||0, tarifaRes: parseFloat(r['Tarifa_Res'])||0, tarifaPub: parseFloat(r['Tarifa_Pub'])||0 }; }); console.log(`[v4 Process] Cenários: ${Object.keys(db.scenarios).length}`); }
 
-        // --- Função de Inicialização Principal (v3) ---
-        async function initializeDashboard_v3() {
-            const statusEl = document.getElementById('connectionStatus');
-            statusEl.textContent = '🔄 Carregando v3...';
-            console.log('=== INICIANDO DASHBOARD (v3) ===');
+        // --- Função de Inicialização Principal (v4) ---
+        async function initializeDashboard_v4() {
+            const statusEl = document.getElementById('connectionStatus'); statusEl.textContent = '🔄 Carregando v4...'; console.log('=== INICIANDO DASHBOARD (v4) ===');
             try {
-                // Tenta carregar todas as abas em paralelo
-                const results = await Promise.allSettled([ // Usa allSettled para ver todos os resultados, mesmo se um falhar
-                    loadAndProcessSheetData_v3(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_EV, processEvData_v3),
-                    loadAndProcessSheetData_v3(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_ICE, processIceData_v3),
-                    loadAndProcessSheetData_v3(GOOGLE_SHEETS_CONFIG.ABAS.PERFIS, processProfileData_v3),
-                    loadAndProcessSheetData_v3(GOOGLE_SHEETS_CONFIG.ABAS.CENARIOS, processScenarioData_v3)
+                const results = await Promise.allSettled([
+                    loadAndProcessSheetData_v4(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_EV, processEvData_v4),
+                    loadAndProcessSheetData_v4(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_ICE, processIceData_v4),
+                    loadAndProcessSheetData_v4(GOOGLE_SHEETS_CONFIG.ABAS.PERFIS, processProfileData_v4),
+                    loadAndProcessSheetData_v4(GOOGLE_SHEETS_CONFIG.ABAS.CENARIOS, processScenarioData_v4)
                 ]);
-
-                // Verifica se alguma das promessas falhou
-                const failedLoads = results.filter(r => r.status === 'rejected');
-                if (failedLoads.length > 0) {
-                    // Pega a mensagem do primeiro erro encontrado
-                    const firstError = failedLoads[0].reason;
-                    console.error("❌ Falha no carregamento de uma ou mais abas:", failedLoads.map(f => f.reason));
-                    throw new Error(`Falha ao carregar dados: ${firstError.message}`); // Lança um novo erro com a mensagem original
-                }
-
-                // Verifica se os dados essenciais foram populados
-                if (!Object.keys(db.ev).length) throw new Error('EVs não carregados');
-                if (!Object.keys(db.ice).length) throw new Error('ICEs não carregados');
-                if (!Object.keys(db.profiles).length) throw new Error('Perfis não carregados');
-                if (!Object.keys(db.scenarios).length) throw new Error('Cenários não carregados');
-
-                console.log('🚀 Sucesso v3! Todos os dados ok.');
-                populateDropdowns_v3();
-                statusEl.textContent = '✅ Conectado v3';
-                statusEl.classList.add('connected');
-                statusEl.classList.remove('error');
-            } catch (error) {
-                 // Erros de carregamento ou verificação final caem aqui
-                console.error('❌ ERRO FATAL v3 na inicialização:', error);
-                statusEl.textContent = `⚠️ Erro v3: ${error.message}`;
-                statusEl.classList.add('error');
-            }
+                const failed = results.filter(r => r.status === 'rejected');
+                if (failed.length > 0) throw new Error(`Falha(s) no carregamento: ${failed.map(f => f.reason.message).join('; ')}`);
+                if (!Object.keys(db.ev).length) throw new Error('EVs não carregados'); if (!Object.keys(db.ice).length) throw new Error('ICEs não carregados');
+                if (!Object.keys(db.profiles).length) throw new Error('Perfis não carregados'); if (!Object.keys(db.scenarios).length) throw new Error('Cenários não carregados');
+                console.log('🚀 Sucesso v4!'); populateDropdowns_v4(); statusEl.textContent = '✅ Conectado v4'; statusEl.classList.add('connected'); statusEl.classList.remove('error');
+            } catch (error) { console.error('❌ ERRO FATAL v4:', error); statusEl.textContent = `⚠️ Erro v4: ${error.message}`; statusEl.classList.add('error'); }
         }
 
-        // --- Funções da Interface (v3) ---
-        function populateDropdowns_v3() {
-             console.log('[v3 Populate] Iniciando...');
-            const evSelect = document.getElementById('ev_select');
-            const iceSelect = document.getElementById('ice_select');
-            evSelect.innerHTML = '<option value="">Selecione EV</option>';
-            Object.keys(db.ev).sort((a,b) => db.ev[a].nome.localeCompare(db.ev[b].nome)).forEach(id => {
-                evSelect.innerHTML += `<option value="${id}">${db.ev[id].nome}</option>`;
-            });
-            iceSelect.innerHTML = '<option value="">Selecione ICE</option>';
-             Object.keys(db.ice).sort((a,b) => db.ice[a].nome.localeCompare(db.ice[b].nome)).forEach(id => {
-                iceSelect.innerHTML += `<option value="${id}">${db.ice[id].nome}</option>`;
-            });
-            console.log('[v3 Populate] Concluído.');
-        }
-        function loadEV() {
-             const id = document.getElementById('ev_select').value;
-             if (!id || !db.ev[id]) { currentEV = null; document.getElementById('ev_info').textContent = 'Selecione'; document.getElementById('ev_preco').value = 0; return; }
-             currentEV = db.ev[id]; document.getElementById('ev_preco').value = currentEV.preco;
-             document.getElementById('ev_info').innerHTML = `💡 ${currentEV.consumoUrb} kWh/100km (urb) | ${currentEV.consumoRod} kWh/100km (rod)<br>💰 Seg: ${formatMoney(currentEV.seguro)} | Man: ${formatMoney(currentEV.manutencao)}/ano`;
-        }
-        function loadICE() {
-             const id = document.getElementById('ice_select').value;
-             if (!id || !db.ice[id]) { currentICE = null; document.getElementById('ice_info').textContent = 'Selecione'; document.getElementById('ice_preco').value = 0; return; }
-             currentICE = db.ice[id]; document.getElementById('ice_preco').value = currentICE.preco;
-             document.getElementById('ice_info').innerHTML = `⛽ ${currentICE.consumoUrb} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>💰 Seg: ${formatMoney(currentICE.seguro)} | Man: ${formatMoney(currentICE.manutencao)}/ano`;
-        }
-        function selectProfile(event, profile) {
-             currentProfile = profile; document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('active')); event.target.closest('.profile-btn').classList.add('active');
-        }
-        function selectScenario(event, scenario) {
-             currentScenario = scenario; document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active');
-             if (db.scenarios[scenario]) { document.getElementById('preco_gasolina').value = db.scenarios[scenario].gasolina; document.getElementById('tarifa_res').value = db.scenarios[scenario].tarifaRes; document.getElementById('tarifa_pub').value = db.scenarios[scenario].tarifaPub; }
-        }
-        function calcular() {
-            if (!currentEV || !currentICE) { alert('Selecione ambos os veículos!'); return; }
-            const perfil = db.profiles[currentProfile]; if (!perfil) { alert('Perfil inválido!'); return; }
-            const periodo = parseInt(document.getElementById('periodo').value); const tma = parseFloat(document.getElementById('tma').value) / 100;
-            const tarifaRes = parseFloat(document.getElementById('tarifa_res').value); const tarifaPub = parseFloat(document.getElementById('tarifa_pub').value); const precoGasolina = parseFloat(document.getElementById('preco_gasolina').value);
-            const kmAnual = perfil.km; const kmUrb = kmAnual * (perfil.urbano / 100); const kmRod = kmAnual * (1 - perfil.urbano / 100);
-            const consumoTotalEV_kWh = (kmUrb * currentEV.consumoUrb / 100) + (kmRod * currentEV.consumoRod / 100);
-            const custoEnergiaEVAnual = consumoTotalEV_kWh * (perfil.recargaRes / 100) * tarifaRes + consumoTotalEV_kWh * (1 - perfil.recargaRes / 100) * tarifaPub;
-            const custoOperacionalEVAnual = custoEnergiaEVAnual + currentEV.manutencao + currentEV.seguro + currentEV.ipva; const custoKmEV = kmAnual > 0 ? custoOperacionalEVAnual / kmAnual : 0;
-            const consumoTotalICE_L = (kmUrb / currentICE.consumoUrb) + (kmRod / currentICE.consumoRod); const custoCombustivelAnual = consumoTotalICE_L * precoGasolina;
-            const custoOperacionalICEAnual = custoCombustivelAnual + currentICE.manutencao + currentICE.seguro + currentICE.ipva; const custoKmICE = kmAnual > 0 ? custoOperacionalICEAnual / kmAnual : 0;
-            const fluxoEV = [-currentEV.preco]; const fluxoICE = [-currentICE.preco];
-            for (let ano = 1; ano <= periodo; ano++) { fluxoEV.push(-custoOperacionalEVAnual); fluxoICE.push(-custoOperacionalICEAnual); }
-            fluxoEV[periodo] += currentEV.preco * (currentEV.residual / 100); fluxoICE[periodo] += currentICE.preco * (currentICE.residual / 100);
-            const vplEV = calculateNPV(fluxoEV, tma); const vplICE = calculateNPV(fluxoICE, tma); const vplDif = vplICE - vplEV;
-            const fluxoDif = fluxoICE.map((val, i) => val - fluxoEV[i]); const tir = calculateIRR(fluxoDif) * 100;
-            let payback = '-'; let saldoAcumulado = fluxoDif[0];
-            if (saldoAcumulado < 0) { for (let ano = 1; ano <= periodo; ano++) { saldoAcumulado += fluxoDif[ano]; if (saldoAcumulado >= 0) { payback = ano; break; } } } else { payback = 0; }
-            document.getElementById('vpl_result').textContent = formatMoney(vplDif); document.getElementById('tir_result').textContent = isNaN(tir) ? '-' : tir.toFixed(1);
-            document.getElementById('payback_result').textContent = payback; document.getElementById('custo_km_ev').textContent = formatMoney(custoKmEV);
-            document.getElementById('custo_km_ice').textContent = formatMoney(custoKmICE); document.getElementById('economia_total').textContent = formatMoney(vplDif);
-            atualizarGraficos_v3(periodo, custoOperacionalEVAnual, custoOperacionalICEAnual, currentEV, currentICE, custoEnergiaEVAnual, custoCombustivelAnual);
-            let conclusao = ''; if (vplDif > 0) conclusao = `✅ Análise VPL: O VE (${currentEV.nome}) é mais vantajoso (+${formatMoney(vplDif)}) em ${periodo} anos vs ${currentICE.nome} (${currentProfile}, ${currentScenario}).`; else if (vplDif < 0) conclusao = `⚠️ Análise VPL: O ICE (${currentICE.nome}) é mais vantajoso (+${formatMoney(Math.abs(vplDif))}) em ${periodo} anos vs ${currentEV.nome} (${currentProfile}, ${currentScenario}).`; else conclusao = `⚖️ Análise VPL: Viabilidade econômica equivalente (${formatMoney(0)}) em ${periodo} anos (${currentProfile}, ${currentScenario}).`;
-            document.getElementById('conclusao_texto').textContent = conclusao;
-            const detalhamento = `<table class="data-table"><tr><th>Item</th><th>EV (${currentEV.nome})</th><th>ICE (${currentICE.nome})</th><th>Dif (ICE-EV)</th></tr><tr><td>Investimento</td><td>${formatMoney(currentEV.preco)}</td><td>${formatMoney(currentICE.preco)}</td><td>${formatMoney(currentICE.preco - currentEV.preco)}</td></tr><tr><td>Custo Anual: Energia/Comb.</td><td>${formatMoney(custoEnergiaEVAnual)}</td><td>${formatMoney(custoCombustivelAnual)}</td><td>${formatMoney(custoCombustivelAnual - custoEnergiaEVAnual)}</td></tr><tr><td>Custo Anual: Manutenção</td><td>${formatMoney(currentEV.manutencao)}</td><td>${formatMoney(currentICE.manutencao)}</td><td>${formatMoney(currentICE.manutencao - currentEV.manutencao)}</td></tr><tr><td>Custo Anual: Seguro</td><td>${formatMoney(currentEV.seguro)}</td><td>${formatMoney(currentICE.seguro)}</td><td>${formatMoney(currentICE.seguro - currentEV.seguro)}</td></tr><tr><td>Custo Anual: IPVA</td><td>${formatMoney(currentEV.ipva)}</td><td>${formatMoney(currentICE.ipva)}</td><td>${formatMoney(currentICE.ipva - currentEV.ipva)}</td></tr><tr><th>Custo Op. Anual Total</th><th>${formatMoney(custoOperacionalEVAnual)}</th><th>${formatMoney(custoOperacionalICEAnual)}</th><th>${formatMoney(custoOperacionalICEAnual - custoOperacionalEVAnual)}</th></tr><tr><th>Custo/KM</th><th>${formatMoney(custoKmEV)}</th><th>${formatMoney(custoKmICE)}</th><th>${formatMoney(custoKmICE - custoKmEV)}</th></tr><tr><td>Valor Residual (Ano ${periodo})</td><td>${formatMoney(currentEV.preco * (currentEV.residual / 100))}</td><td>${formatMoney(currentICE.preco * (currentICE.residual / 100))}</td><td>${formatMoney(currentICE.preco * (currentICE.residual / 100) - currentEV.preco * (currentEV.residual / 100))}</td></tr></table>`;
-            document.getElementById('detalhamento').innerHTML = detalhamento;
-        }
-        function atualizarGraficos_v3(periodo, custoEVAnual, custoICEAnual, evData, iceData, energiaEVAnual, combustivelICEAnual) {
-             const anos = Array.from({length: periodo + 1}, (_, i) => `Ano ${i}`);
-             const acumEV = [evData.preco]; const acumICE = [iceData.preco];
-             for (let i = 1; i <= periodo; i++) { acumEV.push(acumEV[i-1] + custoEVAnual); acumICE.push(acumICE[i-1] + custoICEAnual); }
-             acumEV[periodo] -= evData.preco * (evData.residual / 100); acumICE[periodo] -= iceData.preco * (iceData.residual / 100);
-             if (charts.acumulado) charts.acumulado.destroy();
-             charts.acumulado = new Chart(document.getElementById('chartCustoAcumulado'), { type: 'line', data: { labels: anos, datasets: [ { label: `EV (${evData.nome})`, data: acumEV, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.1 }, { label: `ICE (${iceData.nome})`, data: acumICE, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.1 } ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Custo Total Acumulado (Líquido do Residual)'}, legend: { display: true, position: 'top' }}} });
-             if (charts.composicao) charts.composicao.destroy();
-             charts.composicao = new Chart(document.getElementById('chartComposicao'), { type: 'bar', data: { labels: ['EV', 'ICE'], datasets: [ { label: 'Energia/Combustível', data: [energiaEVAnual, combustivelICEAnual], backgroundColor: '#667eea' }, { label: 'Manutenção', data: [evData.manutencao, iceData.manutencao], backgroundColor: '#f59e0b' }, { label: 'Seguro', data: [evData.seguro, iceData.seguro], backgroundColor: '#8b5cf6' }, { label: 'IPVA', data: [evData.ipva, iceData.ipva], backgroundColor: '#ec4899' } ]}, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'R$ / Ano'} } }, plugins: { title: { display: true, text: 'Composição do Custo Operacional Anual'}, legend: { display: true, position: 'top' }}} });
-             const fluxoAnualDif = anos.map((_, i) => i === 0 ? iceData.preco - evData.preco : custoICEAnual - custoEVAnual);
-             fluxoAnualDif[periodo] += (iceData.preco * (iceData.residual / 100)) - (evData.preco * (evData.residual / 100));
-             if (charts.fluxo) charts.fluxo.destroy();
-             charts.fluxo = new Chart(document.getElementById('chartFluxoCaixa'), { type: 'bar', data: { labels: anos, datasets: [{ label: 'Economia Anual (ICE - EV)', data: fluxoAnualDif, backgroundColor: fluxoAnualDif.map(v => v >= 0 ? '#10b981' : '#ef4444') }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Fluxo de Caixa Incremental Anual (ICE - EV)'}, legend: { display: false }}, scales: { y: { title: { display: true, text: 'R$ / Ano'}}}} });
-             const perfisSimulados = Object.keys(db.profiles); const tmaRate = parseFloat(document.getElementById('tma').value) / 100; const tarifaRes = parseFloat(document.getElementById('tarifa_res').value); const tarifaPub = parseFloat(document.getElementById('tarifa_pub').value); const precoGasolina = parseFloat(document.getElementById('preco_gasolina').value);
-             const vplPorPerfil = perfisSimulados.map(idPerfil => { const perfilSim = db.profiles[idPerfil]; if (!perfilSim) return 0; const km = perfilSim.km; const kmUrbSim = km * (perfilSim.urbano / 100); const kmRodSim = km * (1 - perfilSim.urbano / 100); const evConsumoSim = (kmUrbSim * evData.consumoUrb / 100) + (kmRodSim * evData.consumoRod / 100); const evEnergiaSim = evConsumoSim * (perfilSim.recargaRes / 100) * tarifaRes + evConsumoSim * (1 - perfilSim.recargaRes / 100) * tarifaPub; const evTotalSim = evEnergiaSim + evData.manutencao + evData.seguro + evData.ipva; const iceConsumoSim = (kmUrbSim / iceData.consumoUrb) + (kmRodSim / iceData.consumoRod); const iceCombSim = iceConsumoSim * precoGasolina; const iceTotalSim = iceCombSim + iceData.manutencao + iceData.seguro + iceData.ipva; const fluxoSim = [- (evData.preco - iceData.preco)]; for(let y=1; y<=periodo; y++) fluxoSim.push(iceTotalSim - evTotalSim); fluxoSim[periodo] += (iceData.preco * (iceData.residual / 100)) - (evData.preco * (evData.residual / 100)); return calculateNPV(fluxoSim, tmaRate); });
-             if (charts.perfis) charts.perfis.destroy();
-             charts.perfis = new Chart(document.getElementById('chartPerfis'), { type: 'bar', data: { labels: perfisSimulados.map(p => p.charAt(0).toUpperCase() + p.slice(1)), datasets: [{ label: 'VPL Diferencial (ICE - EV)', data: vplPorPerfil, backgroundColor: perfisSimulados.map((p, i) => ['#667eea', '#764ba2', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'][i % 6]) }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: `Vantagem Econômica do EV por Perfil (VPL ${periodo}a @ ${tmaRate*100}%)`}, legend: { display: false }}, scales: { y: { title: { display: true, text: 'R$'}}}} });
-        }
+        // --- Funções da Interface (v4) ---
+        function populateDropdowns_v4() { /* Idêntico a v3 */ console.log('[v4 Populate] Iniciando...'); const evSelect = document.getElementById('ev_select'); const iceSelect = document.getElementById('ice_select'); evSelect.innerHTML = '<option value="">Selecione EV</option>'; Object.keys(db.ev).sort((a,b) => db.ev[a].nome.localeCompare(db.ev[b].nome)).forEach(id => { evSelect.innerHTML += `<option value="${id}">${db.ev[id].nome}</option>`; }); iceSelect.innerHTML = '<option value="">Selecione ICE</option>'; Object.keys(db.ice).sort((a,b) => db.ice[a].nome.localeCompare(db.ice[b].nome)).forEach(id => { iceSelect.innerHTML += `<option value="${id}">${db.ice[id].nome}</option>`; }); console.log('[v4 Populate] Concluído.'); }
+        function loadEV() { /* Idêntico a v3 */ const id = document.getElementById('ev_select').value; if (!id || !db.ev[id]) { currentEV = null; document.getElementById('ev_info').textContent = 'Selecione'; document.getElementById('ev_preco').value = 0; return; } currentEV = db.ev[id]; document.getElementById('ev_preco').value = currentEV.preco; document.getElementById('ev_info').innerHTML = `💡 ${currentEV.consumoUrb} kWh/100km (urb) | ${currentEV.consumoRod} kWh/100km (rod)<br>💰 Seg: ${formatMoney(currentEV.seguro)} | Man: ${formatMoney(currentEV.manutencao)}/ano`; }
+        function loadICE() { /* Idêntico a v3 */ const id = document.getElementById('ice_select').value; if (!id || !db.ice[id]) { currentICE = null; document.getElementById('ice_info').textContent = 'Selecione'; document.getElementById('ice_preco').value = 0; return; } currentICE = db.ice[id]; document.getElementById('ice_preco').value = currentICE.preco; document.getElementById('ice_info').innerHTML = `⛽ ${currentICE.consumoUrb} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>💰 Seg: ${formatMoney(currentICE.seguro)} | Man: ${formatMoney(currentICE.manutencao)}/ano`; }
+        function selectProfile(event, profile) { /* Idêntico a v3 */ currentProfile = profile; document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('active')); event.target.closest('.profile-btn').classList.add('active'); }
+        function selectScenario(event, scenario) { /* Idêntico a v3 */ currentScenario = scenario; document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active'); if (db.scenarios[scenario]) { document.getElementById('preco_gasolina').value = db.scenarios[scenario].gasolina; document.getElementById('tarifa_res').value = db.scenarios[scenario].tarifaRes; document.getElementById('tarifa_pub').value = db.scenarios[scenario].tarifaPub; } }
+        function calcular() { /* Idêntico a v3 */ if (!currentEV || !currentICE) { alert('Selecione ambos os veículos!'); return; } const perfil = db.profiles[currentProfile]; if (!perfil) { alert('Perfil inválido!'); return; } const periodo = parseInt(document.getElementById('periodo').value); const tma = parseFloat(document.getElementById('tma').value) / 100; const tarifaRes = parseFloat(document.getElementById('tarifa_res').value); const tarifaPub = parseFloat(document.getElementById('tarifa_pub').value); const precoGasolina = parseFloat(document.getElementById('preco_gasolina').value); const kmAnual = perfil.km; const kmUrb = kmAnual * (perfil.urbano / 100); const kmRod = kmAnual * (1 - perfil.urbano / 100); const consumoTotalEV_kWh = (kmUrb * currentEV.consumoUrb / 100) + (kmRod * currentEV.consumoRod / 100); const custoEnergiaEVAnual = consumoTotalEV_kWh * (perfil.recargaRes / 100) * tarifaRes + consumoTotalEV_kWh * (1 - perfil.recargaRes / 100) * tarifaPub; const custoOperacionalEVAnual = custoEnergiaEVAnual + currentEV.manutencao + currentEV.seguro + currentEV.ipva; const custoKmEV = kmAnual > 0 ? custoOperacionalEVAnual / kmAnual : 0; const consumoTotalICE_L = (kmUrb / currentICE.consumoUrb) + (kmRod / currentICE.consumoRod); const custoCombustivelAnual = consumoTotalICE_L * precoGasolina; const custoOperacionalICEAnual = custoCombustivelAnual + currentICE.manutencao + currentICE.seguro + currentICE.ipva; const custoKmICE = kmAnual > 0 ? custoOperacionalICEAnual / kmAnual : 0; const fluxoEV = [-currentEV.preco]; const fluxoICE = [-currentICE.preco]; for (let ano = 1; ano <= periodo; ano++) { fluxoEV.push(-custoOperacionalEVAnual); fluxoICE.push(-custoOperacionalICEAnual); } fluxoEV[periodo] += currentEV.preco * (currentEV.residual / 100); fluxoICE[periodo] += currentICE.preco * (currentICE.residual / 100); const vplEV = calculateNPV(fluxoEV, tma); const vplICE = calculateNPV(fluxoICE, tma); const vplDif = vplICE - vplEV; const fluxoDif = fluxoICE.map((val, i) => val - fluxoEV[i]); const tir = calculateIRR(fluxoDif) * 100; let payback = '-'; let saldoAcumulado = fluxoDif[0]; if (saldoAcumulado < 0) { for (let ano = 1; ano <= periodo; ano++) { saldoAcumulado += fluxoDif[ano]; if (saldoAcumulado >= 0) { payback = ano; break; } } } else { payback = 0; } document.getElementById('vpl_result').textContent = formatMoney(vplDif); document.getElementById('tir_result').textContent = isNaN(tir) ? '-' : tir.toFixed(1); document.getElementById('payback_result').textContent = payback; document.getElementById('custo_km_ev').textContent = formatMoney(custoKmEV); document.getElementById('custo_km_ice').textContent = formatMoney(custoKmICE); document.getElementById('economia_total').textContent = formatMoney(vplDif); atualizarGraficos_v4(periodo, custoOperacionalEVAnual, custoOperacionalICEAnual, currentEV, currentICE, custoEnergiaEVAnual, custoCombustivelAnual); let conclusao = ''; if (vplDif > 0) conclusao = `✅ Análise VPL: O VE (${currentEV.nome}) é mais vantajoso (+${formatMoney(vplDif)}) em ${periodo} anos vs ${currentICE.nome} (${currentProfile}, ${currentScenario}).`; else if (vplDif < 0) conclusao = `⚠️ Análise VPL: O ICE (${currentICE.nome}) é mais vantajoso (+${formatMoney(Math.abs(vplDif))}) em ${periodo} anos vs ${currentEV.nome} (${currentProfile}, ${currentScenario}).`; else conclusao = `⚖️ Análise VPL: Viabilidade econômica equivalente (${formatMoney(0)}) em ${periodo} anos (${currentProfile}, ${currentScenario}).`; document.getElementById('conclusao_texto').textContent = conclusao; const detalhamento = `<table class="data-table"><tr><th>Item</th><th>EV (${currentEV.nome})</th><th>ICE (${currentICE.nome})</th><th>Dif (ICE-EV)</th></tr><tr><td>Investimento</td><td>${formatMoney(currentEV.preco)}</td><td>${formatMoney(currentICE.preco)}</td><td>${formatMoney(currentICE.preco - currentEV.preco)}</td></tr><tr><td>Custo Anual: Energia/Comb.</td><td>${formatMoney(custoEnergiaEVAnual)}</td><td>${formatMoney(custoCombustivelAnual)}</td><td>${formatMoney(custoCombustivelAnual - custoEnergiaEVAnual)}</td></tr><tr><td>Custo Anual: Manutenção</td><td>${formatMoney(currentEV.manutencao)}</td><td>${formatMoney(currentICE.manutencao)}</td><td>${formatMoney(currentICE.manutencao - currentEV.manutencao)}</td></tr><tr><td>Custo Anual: Seguro</td><td>${formatMoney(currentEV.seguro)}</td><td>${formatMoney(currentICE.seguro)}</td><td>${formatMoney(currentICE.seguro - currentEV.seguro)}</td></tr><tr><td>Custo Anual: IPVA</td><td>${formatMoney(currentEV.ipva)}</td><td>${formatMoney(currentICE.ipva)}</td><td>${formatMoney(currentICE.ipva - currentEV.ipva)}</td></tr><tr><th>Custo Op. Anual Total</th><th>${formatMoney(custoOperacionalEVAnual)}</th><th>${formatMoney(custoOperacionalICEAnual)}</th><th>${formatMoney(custoOperacionalICEAnual - custoOperacionalEVAnual)}</th></tr><tr><th>Custo/KM</th><th>${formatMoney(custoKmEV)}</th><th>${formatMoney(custoKmICE)}</th><th>${formatMoney(custoKmICE - custoKmEV)}</th></tr><tr><td>Valor Residual (Ano ${periodo})</td><td>${formatMoney(currentEV.preco * (currentEV.residual / 100))}</td><td>${formatMoney(currentICE.preco * (currentICE.residual / 100))}</td><td>${formatMoney(currentICE.preco * (currentICE.residual / 100) - currentEV.preco * (currentEV.residual / 100))}</td></tr></table>`; document.getElementById('detalhamento').innerHTML = detalhamento; }
+        function atualizarGraficos_v4(periodo, custoEVAnual, custoICEAnual, evData, iceData, energiaEVAnual, combustivelICEAnual) { /* Idêntico a v3 */ const anos = Array.from({length: periodo + 1}, (_, i) => `Ano ${i}`); const acumEV = [evData.preco]; const acumICE = [iceData.preco]; for (let i = 1; i <= periodo; i++) { acumEV.push(acumEV[i-1] + custoEVAnual); acumICE.push(acumICE[i-1] + custoICEAnual); } acumEV[periodo] -= evData.preco * (evData.residual / 100); acumICE[periodo] -= iceData.preco * (iceData.residual / 100); if (charts.acumulado) charts.acumulado.destroy(); charts.acumulado = new Chart(document.getElementById('chartCustoAcumulado'), { type: 'line', data: { labels: anos, datasets: [ { label: `EV (${evData.nome})`, data: acumEV, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.1 }, { label: `ICE (${iceData.nome})`, data: acumICE, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.1 } ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Custo Total Acumulado (Líquido do Residual)'}, legend: { display: true, position: 'top' }}} }); if (charts.composicao) charts.composicao.destroy(); charts.composicao = new Chart(document.getElementById('chartComposicao'), { type: 'bar', data: { labels: ['EV', 'ICE'], datasets: [ { label: 'Energia/Combustível', data: [energiaEVAnual, combustivelICEAnual], backgroundColor: '#667eea' }, { label: 'Manutenção', data: [evData.manutencao, iceData.manutencao], backgroundColor: '#f59e0b' }, { label: 'Seguro', data: [evData.seguro, iceData.seguro], backgroundColor: '#8b5cf6' }, { label: 'IPVA', data: [evData.ipva, iceData.ipva], backgroundColor: '#ec4899' } ]}, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'R$ / Ano'} } }, plugins: { title: { display: true, text: 'Composição do Custo Operacional Anual'}, legend: { display: true, position: 'top' }}} }); const fluxoAnualDif = anos.map((_, i) => i === 0 ? iceData.preco - evData.preco : custoICEAnual - custoEVAnual); fluxoAnualDif[periodo] += (iceData.preco * (iceData.residual / 100)) - (evData.preco * (evData.residual / 100)); if (charts.fluxo) charts.fluxo.destroy(); charts.fluxo = new Chart(document.getElementById('chartFluxoCaixa'), { type: 'bar', data: { labels: anos, datasets: [{ label: 'Economia Anual (ICE - EV)', data: fluxoAnualDif, backgroundColor: fluxoAnualDif.map(v => v >= 0 ? '#10b981' : '#ef4444') }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Fluxo de Caixa Incremental Anual (ICE - EV)'}, legend: { display: false }}, scales: { y: { title: { display: true, text: 'R$ / Ano'}}}} }); const perfisSimulados = Object.keys(db.profiles); const tmaRate = parseFloat(document.getElementById('tma').value) / 100; const tarifaRes = parseFloat(document.getElementById('tarifa_res').value); const tarifaPub = parseFloat(document.getElementById('tarifa_pub').value); const precoGasolina = parseFloat(document.getElementById('preco_gasolina').value); const vplPorPerfil = perfisSimulados.map(idPerfil => { const perfilSim = db.profiles[idPerfil]; if (!perfilSim) return 0; const km = perfilSim.km; const kmUrbSim = km * (perfilSim.urbano / 100); const kmRodSim = km * (1 - perfilSim.urbano / 100); const evConsumoSim = (kmUrbSim * evData.consumoUrb / 100) + (kmRodSim * evData.consumoRod / 100); const evEnergiaSim = evConsumoSim * (perfilSim.recargaRes / 100) * tarifaRes + evConsumoSim * (1 - perfilSim.recargaRes / 100) * tarifaPub; const evTotalSim = evEnergiaSim + evData.manutencao + evData.seguro + evData.ipva; const iceConsumoSim = (kmUrbSim / iceData.consumoUrb) + (kmRodSim / iceData.consumoRod); const iceCombSim = iceConsumoSim * precoGasolina; const iceTotalSim = iceCombSim + iceData.manutencao + iceData.seguro + iceData.ipva; const fluxoSim = [- (evData.preco - iceData.preco)]; for(let y=1; y<=periodo; y++) fluxoSim.push(iceTotalSim - evTotalSim); fluxoSim[periodo] += (iceData.preco * (iceData.residual / 100)) - (evData.preco * (evData.residual / 100)); return calculateNPV(fluxoSim, tmaRate); }); if (charts.perfis) charts.perfis.destroy(); charts.perfis = new Chart(document.getElementById('chartPerfis'), { type: 'bar', data: { labels: perfisSimulados.map(p => p.charAt(0).toUpperCase() + p.slice(1)), datasets: [{ label: 'VPL Diferencial (ICE - EV)', data: vplPorPerfil, backgroundColor: perfisSimulados.map((p, i) => ['#667eea', '#764ba2', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'][i % 6]) }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: `Vantagem Econômica do EV por Perfil (VPL ${periodo}a @ ${tmaRate*100}%)`}, legend: { display: false }}, scales: { y: { title: { display: true, text: 'R$'}}}} }); }
         
         // --- Inicialização ---
-        window.addEventListener('load', initializeDashboard_v3);
+        window.addEventListener('load', initializeDashboard_v4); // Chama a nova função principal v4
     </script>
 </body>
 </html>
