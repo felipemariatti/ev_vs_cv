@@ -568,8 +568,14 @@
             }
         };
         
+        // ================================================================
+        // CORREÇÃO DE CACHE:
+        // Adicionamos um carimbo de data/hora ('&t=...') para forçar
+        // o navegador a baixar uma nova cópia dos dados toda vez.
+        // ================================================================
         const getSheetURL = (aba) => {
-            return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}`;
+            const timestamp = new Date().getTime();
+            return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}&t=${timestamp}`;
         };
         
         let vehiclesDB = { ev: {}, ice: {} };
@@ -612,7 +618,6 @@
                     throw new Error(`Erro: ${json.errors[0].detailed_message}`);
                 }
 
-                // Verificação de segurança: checa se 'table' e 'rows' existem
                 if (!json.table || !json.table.rows) {
                     console.error('❌ Resposta JSON não contém `table` ou `rows`');
                     throw new Error('Formato de dados inesperado');
@@ -624,39 +629,29 @@
                 console.log(`📋 Total de linhas: ${rows.length}`);
                 console.log(`📋 Total de colunas: ${cols.length}`);
 
-                // Verificação de segurança: checa se a linha de cabeçalho existe
                 if (rows.length === 0 || !rows[0] || !rows[0].c) {
                     console.error('❌ Planilha está vazia ou não tem cabeçalho');
                     throw new Error('Planilha vazia ou sem cabeçalho');
                 }
                 
-                // Pega os headers da primeira linha
                 const headers = rows[0].c.map((cell, i) => cell ? cell.v : `Col${i}`);
                 console.log(`✨ Headers encontrados:`, headers);
                 
                 const data = [];
                 
-                // Começa da segunda linha (índice 1)
                 for (let i = 1; i < rows.length; i++) {
-                    
-                    // ================================================================
-                    // CORREÇÃO CRÍTICA:
-                    // 1. Pegamos o objeto da linha (pode ser 'null' se a linha estiver em branco)
                     const rowObject = rows[i];
                     
-                    // 2. Verificamos se o objeto da linha é nulo ANTES de tentar ler '.c'
                     if (!rowObject) {
                         console.log(`⏩ Pulando linha ${i} (nula)`);
                         continue; 
                     }
                     
-                    // 3. Agora que sabemos que rowObject existe, podemos ler os dados da célula (o 'c')
                     const row = rowObject.c; 
                     if (!row) {
                         console.log(`⏩ Pulando linha ${i} (sem dados 'c')`);
-                        continue; // Segurança extra
+                        continue;
                     }
-                    // ================================================================
 
                     const rowData = {};
                     headers.forEach((header, index) => {
@@ -767,6 +762,9 @@
                 }
                 if (Object.keys(profilesDB).length === 0) {
                     throw new Error('Nenhum Perfil carregado');
+                }
+                if (Object.keys(scenariosDB).length === 0) {
+                    throw new Error('Nenhum Cenário carregado');
                 }
                 
                 popularDropdowns();
@@ -960,8 +958,8 @@
             for (let i = 0; i < tentativas; i++) {
                 const vpla = calcularVPL(fluxo, taxa);
                 const vplb = calcularVPL(fluxo, taxa + 0.001);
-                if (Math.abs(derivada) < 1e-6) break; // Evita divisão por zero
                 const derivada = (vplb - vpla) / 0.001;
+                if (Math.abs(derivada) < 1e-6) break; // Evita divisão por zero
                 taxa = taxa - vpla / derivada;
                 if (Math.abs(vpla) < 0.01) break;
             }
@@ -1069,20 +1067,22 @@
                 if (!profilesDB[idPerfil]) return 0;
 
                 const perfilKM = profilesDB[idPerfil].km || 0;
+                const perfil = profilesDB[idPerfil];
                 
                 // Recalcula custos por km para este perfil
-                const perfilUrb = profilesDB[idPerfil].urbano / 100;
-                const perfilRod = 1 - perfilUrb;
-                const perfilRecarga = profilesDB[idPerfil].recargaRes / 100;
+                const kmUrb = perfil.km * (perfil.urbano / 100);
+                const kmRod = perfil.km * (1 - perfil.urbano / 100);
                 
-                const evCons = (perfilKM * perfilUrb * currentEV.consumoUrb / 100) + (perfilKM * perfilRod * currentEV.consumoRod / 100);
-                const evEnergia = (evCons * perfilRecarga * tarifaRes) + (evCons * (1-perfilRecarga) * tarifaPub);
-                const evTotal = evEnergia + currentEV.manutencao + currentEV.seguro + currentEV.ipva;
+                const consumoEV = (kmUrb * currentEV.consumoUrb / 100) + (kmRod * currentEV.consumoRod / 100);
+                const custoEnergiaRes = consumoEV * (perfil.recargaRes / 100) * tarifaRes;
+                const custoEnergiaPub = consumoEV * (1 - perfil.recargaRes / 100) * tarifaPub;
+                const custoEnergiaEV = custoEnergiaRes + custoEnergiaPub;
+                const evTotal = custoEnergiaEV + currentEV.manutencao + currentEV.seguro + currentEV.ipva;
 
-                const iceConsUrb = (perfilKM * perfilUrb) / currentICE.consumoUrb;
-                const iceConsRod = (perfilKM * perfilRod) / currentICE.consumoRod;
-                const iceComb = (iceConsUrb + iceConsRod) * precoGasolina;
-                const iceTotal = iceComb + currentICE.manutencao + currentICE.seguro + currentICE.ipva;
+                const consumoCombUrb = kmUrb / currentICE.consumoUrb;
+                const consumoCombRod = kmRod / currentICE.consumoRod;
+                const custoCombustivel = (consumoCombUrb + consumoCombRod) * precoGasolina;
+                const iceTotal = custoCombustivel + currentICE.manutencao + currentICE.seguro + currentICE.ipva;
 
                 return (iceTotal - evTotal) * periodo / 1000; // Economia em R$ mil
             });
