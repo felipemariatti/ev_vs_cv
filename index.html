@@ -6,370 +6,59 @@
     <title>Dashboard EV vs ICE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 8px;
-            color: #333;
-            overflow: hidden;
-            height: 100vh;
-        }
-        
-        .container {
-            max-width: 100%;
-            height: calc(100vh - 16px);
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        
-        .header {
-            background: white;
-            padding: 8px 20px;
-            border-radius: 8px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header h1 {
-            color: #667eea;
-            font-size: 1.3em;
-        }
-        
-        .status {
-            font-size: 0.75em;
-            color: #666;
-        }
-        
-        .status.connected {
-            color: #10b981;
-            font-weight: bold;
-        }
-        
-        .status.error {
-            color: #ef4444;
-            font-weight: bold;
-        }
-        
-        .inputs-wrapper {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-        }
-        
-        .inputs-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .input-card {
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .input-card h3 {
-            color: #667eea;
-            font-size: 0.9em;
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #667eea;
-        }
-        
-        .form-group {
-            margin-bottom: 6px;
-        }
-        
-        .form-group label {
-            display: block;
-            font-size: 0.7em;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 3px;
-        }
-        
-        .form-group select,
-        .form-group input {
-            width: 100%;
-            padding: 5px 7px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 0.75em;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .vehicle-info {
-            background: white;
-            padding: 5px;
-            border-radius: 4px;
-            font-size: 0.65em;
-            margin-top: 3px;
-            color: #666;
-            line-height: 1.3;
-            min-height: 32px;
-        }
-        
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-            margin-bottom: 6px;
-        }
-        
-        .profile-btn {
-            padding: 6px;
-            border: 2px solid #ddd;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 0.65em;
-            transition: all 0.2s;
-        }
-        
-        .profile-btn:hover {
-            border-color: #667eea;
-            transform: scale(1.02);
-        }
-        
-        .profile-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: #667eea;
-            font-weight: bold;
-        }
-        
-        .profile-btn div {
-            font-weight: bold;
-            margin-bottom: 1px;
-        }
-        
-        .scenario-grid {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 6px;
-        }
-        
-        .scenario-btn {
-            flex: 1;
-            padding: 6px;
-            border: 2px solid #ddd;
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.7em;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        
-        .scenario-btn:hover {
-            border-color: #667eea;
-        }
-        
-        .scenario-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-        
-        .btn-calculate {
-            width: 100%;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.85em;
-            cursor: pointer;
-            margin-top: auto;
-        }
-        
-        .btn-calculate:hover {
-            opacity: 0.9;
-        }
-        
-        .results-wrapper {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-            flex: 1;
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            overflow: hidden;
-        }
-        
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-        }
-        
-        .metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .metric-card h4 {
-            font-size: 0.65em;
-            opacity: 0.9;
-            margin-bottom: 4px;
-        }
-        
-        .metric-card .value {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 1px;
-        }
-        
-        .metric-card .label {
-            font-size: 0.6em;
-            opacity: 0.8;
-        }
-        
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 8px;
-            flex: 1;
-            min-height: 0;
-        }
-        
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 8px;
-            min-height: 0;
-        }
-        
-        .chart-card {
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-        
-        .chart-card h4 {
-            color: #667eea;
-            font-size: 0.8em;
-            margin-bottom: 5px;
-        }
-        
-        .chart-container {
-            position: relative;
-            flex: 1;
-            min-height: 0;
-        }
-        
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-height: 0;
-        }
-        
-        .conclusion-card {
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-left: 4px solid #667eea;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        
-        .conclusion-card h3 {
-            color: #667eea;
-            font-size: 0.85em;
-            margin-bottom: 6px;
-        }
-        
-        .conclusion-card p {
-            font-size: 0.7em;
-            line-height: 1.5;
-            color: #555;
-        }
-        
-        .table-card {
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 8px;
-            flex: 1;
-            overflow-y: auto;
-            min-height: 0;
-        }
-        
-        .table-card h4 {
-            color: #667eea;
-            font-size: 0.8em;
-            margin-bottom: 6px;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.7em;
-        }
-        
-        .data-table th {
-            background: #667eea;
-            color: white;
-            padding: 5px;
-            text-align: left;
-            font-size: 0.9em;
-        }
-        
-        .data-table td {
-            padding: 4px 5px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .data-table tr:nth-child(even) {
-            background: white;
-        }
-
-        .debug-info {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 4px;
-            font-size: 0.7em;
-            max-height: 150px;
-            overflow-y: auto;
-        }
+        /* ================================================================ */
+        /* ==================== ESTILOS (INTOCADOS) ===================== */
+        /* ================================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 8px; color: #333; overflow: hidden; height: 100vh; }
+        .container { max-width: 100%; height: calc(100vh - 16px); display: flex; flex-direction: column; gap: 6px; }
+        .header { background: white; padding: 8px 20px; border-radius: 8px; box-shadow: 0 3px 15px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { color: #667eea; font-size: 1.3em; }
+        .status { font-size: 0.75em; color: #666; }
+        .status.connected { color: #10b981; font-weight: bold; }
+        .status.error { color: #ef4444; font-weight: bold; }
+        .inputs-wrapper { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 3px 15px rgba(0,0,0,0.2); }
+        .inputs-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+        .input-card { background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; }
+        .input-card h3 { color: #667eea; font-size: 0.9em; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px solid #667eea; }
+        .form-group { margin-bottom: 6px; }
+        .form-group label { display: block; font-size: 0.7em; font-weight: 600; color: #555; margin-bottom: 3px; }
+        .form-group select, .form-group input { width: 100%; padding: 5px 7px; border: 2px solid #ddd; border-radius: 5px; font-size: 0.75em; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+        .vehicle-info { background: white; padding: 5px; border-radius: 4px; font-size: 0.65em; margin-top: 3px; color: #666; line-height: 1.3; min-height: 32px; }
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 6px; }
+        .profile-btn { padding: 6px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; text-align: center; font-size: 0.65em; transition: all 0.2s; }
+        .profile-btn:hover { border-color: #667eea; transform: scale(1.02); }
+        .profile-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: #667eea; font-weight: bold; }
+        .profile-btn div { font-weight: bold; margin-bottom: 1px; }
+        .scenario-grid { display: flex; gap: 5px; margin-bottom: 6px; }
+        .scenario-btn { flex: 1; padding: 6px; border: 2px solid #ddd; background: white; border-radius: 5px; cursor: pointer; font-size: 0.7em; font-weight: 600; transition: all 0.2s; }
+        .scenario-btn:hover { border-color: #667eea; }
+        .scenario-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .btn-calculate { width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 10px; border: none; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer; margin-top: auto; }
+        .btn-calculate:hover { opacity: 0.9; }
+        .results-wrapper { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 3px 15px rgba(0,0,0,0.2); flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+        .metric-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px; border-radius: 8px; text-align: center; }
+        .metric-card h4 { font-size: 0.65em; opacity: 0.9; margin-bottom: 4px; }
+        .metric-card .value { font-size: 1.2em; font-weight: bold; margin-bottom: 1px; }
+        .metric-card .label { font-size: 0.6em; opacity: 0.8; }
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; flex: 1; min-height: 0; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; min-height: 0; }
+        .chart-card { background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; min-height: 0; }
+        .chart-card h4 { color: #667eea; font-size: 0.8em; margin-bottom: 5px; }
+        .chart-container { position: relative; flex: 1; min-height: 0; }
+        .right-panel { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+        .conclusion-card { background: #f8f9fa; border: 2px solid #e0e0e0; border-left: 4px solid #667eea; border-radius: 8px; padding: 10px; }
+        .conclusion-card h3 { color: #667eea; font-size: 0.85em; margin-bottom: 6px; }
+        .conclusion-card p { font-size: 0.7em; line-height: 1.5; color: #555; }
+        .table-card { background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 8px; padding: 8px; flex: 1; overflow-y: auto; min-height: 0; }
+        .table-card h4 { color: #667eea; font-size: 0.8em; margin-bottom: 6px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.7em; }
+        .data-table th { background: #667eea; color: white; padding: 5px; text-align: left; font-size: 0.9em; }
+        .data-table td { padding: 4px 5px; border-bottom: 1px solid #ddd; }
+        .data-table tr:nth-child(even) { background: white; }
     </style>
 </head>
 <body>
@@ -377,11 +66,6 @@
         <div class="header">
             <h1>⚡ Análise Econômica: EV vs ICE</h1>
             <div class="status" id="connectionStatus">🔄 Carregando...</div>
-        </div>
-        
-        <div class="debug-info" id="debugPanel" style="display: none;">
-            <strong>🔍 Debug:</strong>
-            <div id="debugContent">Iniciando...</div>
         </div>
         
         <div class="inputs-wrapper">
@@ -558,6 +242,11 @@
     </div>
 
     <script>
+        /* ================================================================ */
+        /* ================== JAVASCRIPT (REESCRITO) ==================== */
+        /* ================================================================ */
+
+        // --- Configuração ---
         const GOOGLE_SHEETS_CONFIG = {
             SHEET_ID: '1WbsZp2pRYLh6AzEz12xmKdAw2doKRA_9A_DipgbGG2A',
             ABAS: {
@@ -567,278 +256,283 @@
                 CENARIOS: 'CENARIOS'
             }
         };
-        
-        const getSheetURL = (aba) => {
-            const timestamp = new Date().getTime();
-            return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}&t=${timestamp}`;
+
+        // --- Variáveis Globais de Dados ---
+        let db = {
+            ev: {},      // Armazenará os dados dos veículos EV (chave: ID)
+            ice: {},     // Armazenará os dados dos veículos ICE (chave: ID)
+            profiles: {},// Armazenará os dados dos perfis (chave: nome do perfil em minúsculo)
+            scenarios: {} // Armazenará os dados dos cenários (chave: nome do cenário em minúsculo)
         };
-        
-        let vehiclesDB = { ev: {}, ice: {} };
-        let profilesDB = {};
-        let scenariosDB = {};
+
+        // --- Estado da Aplicação ---
         let currentProfile = 'leve';
         let currentScenario = 'base';
         let currentEV = null;
         let currentICE = null;
-        let charts = {};
-        
-        // ================================================================
-        // RENOMEADO PARA 'fetchSheetData_v2' para quebrar o cache
-        // ================================================================
-        async function fetchSheetData_v2(aba) {
+        let charts = {}; // Armazena instâncias dos gráficos Chart.js
+
+        // --- Função Auxiliar para URL (com cache-busting) ---
+        const getSheetURL = (aba) => {
+            const timestamp = new Date().getTime(); // Parâmetro único para evitar cache
+            return `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}&t=${timestamp}`;
+        };
+
+        // --- Função Principal de Busca e Processamento ---
+        async function loadAndProcessSheetData(aba, processFunction) {
+            console.log(`[loadAndProcessSheetData] Iniciando para: ${aba}`);
             try {
                 const url = getSheetURL(aba);
-                console.log(`📥 Tentando carregar: ${aba}`);
-                
                 const response = await fetch(url);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const text = await response.text();
-                const jsonText = text.match(/google\.visualization\.Query\.setResponse\((.*)\);?$/s);
-                
-                if (!jsonText) {
-                    console.error(`❌ Resposta de ${aba} não é JSON:`, text.substring(0, 500));
+                const jsonTextMatch = text.match(/google\.visualization\.Query\.setResponse\((.*)\);?$/s);
+
+                if (!jsonTextMatch) {
+                    console.error(`[loadAndProcessSheetData] Resposta de ${aba} não parece ser JSON:`, text.substring(0, 500));
                     throw new Error('Formato de resposta inválido');
                 }
-                
-                const json = JSON.parse(jsonText[1]);
-                
+
+                const json = JSON.parse(jsonTextMatch[1]);
+
                 if (json.status === 'error') {
-                    throw new Error(`Erro: ${json.errors[0].detailed_message}`);
+                    throw new Error(`Erro retornado pelo Google Sheets: ${json.errors[0].detailed_message}`);
                 }
 
-                if (!json.table || !json.table.rows) {
-                    throw new Error('Formato de dados inesperado');
+                if (!json.table || !json.table.rows || json.table.rows.length === 0 || !json.table.rows[0].c) {
+                    throw new Error('Dados da tabela inválidos ou vazios');
                 }
-                
-                const rows = json.table.rows;
-                
-                if (rows.length === 0 || !rows[0] || !rows[0].c) {
-                    throw new Error('Planilha vazia ou sem cabeçalho');
-                }
-                
-                const headers = rows[0].c.map((cell, i) => cell ? cell.v : `Col${i}`);
-                console.log(`✨ Headers para ${aba}:`, headers);
-                
-                const data = [];
-                
-                for (let i = 1; i < rows.length; i++) {
-                    const rowObject = rows[i];
-                    if (!rowObject) continue; 
-                    const row = rowObject.c; 
-                    if (!row) continue;
+
+                const headers = json.table.rows[0].c.map((cell, i) => cell ? cell.v : `Col${i}`);
+                const dataRows = [];
+
+                for (let i = 1; i < json.table.rows.length; i++) {
+                    const rowObject = json.table.rows[i];
+                    if (!rowObject || !rowObject.c) continue; // Pula linhas vazias
 
                     const rowData = {};
+                    let hasIdentifier = false; // Verifica se a linha tem um ID, Perfil ou Cenario
                     headers.forEach((header, index) => {
-                        rowData[header] = row[index] ? row[index].v : null;
+                        rowData[header] = rowObject.c[index] ? rowObject.c[index].v : null;
+                        if ((header === 'ID' || header === 'Perfil' || header === 'Cenario') && rowData[header]) {
+                            hasIdentifier = true;
+                        }
                     });
                     
-                    if (rowData.ID || rowData.Perfil || rowData.Cenario) {
-                        data.push(rowData);
+                    if (hasIdentifier) { // Só adiciona se tiver um identificador
+                       dataRows.push(rowData);
                     }
                 }
                 
-                console.log(`✅ ${data.length} registros válidos de ${aba}`);
-                return data;
+                console.log(`[loadAndProcessSheetData] ${dataRows.length} linhas de dados encontradas para ${aba}`);
                 
+                // Chama a função de processamento específica
+                processFunction(dataRows);
+                
+                console.log(`[loadAndProcessSheetData] Processamento concluído para: ${aba}`);
+                return true; // Indica sucesso
+
             } catch (error) {
-                console.error(`❌ ERRO em ${aba}:`, error.message);
-                return null;
+                console.error(`[loadAndProcessSheetData] ERRO FATAL ao carregar ${aba}:`, error.message);
+                throw error; // Repassa o erro para o Promise.all
             }
         }
-        
-        // ================================================================
-        // RENOMEADO PARA 'inicializarDashboard_v2' para quebrar o cache
-        // ================================================================
-        async function inicializarDashboard_v2() {
-            document.getElementById('connectionStatus').textContent = '🔄 Conectando...';
-            console.log('=== INICIANDO DASHBOARD (versão 2) ===');
-            
+
+        // --- Funções de Processamento Específicas ---
+        function processEvData(dataRows) {
+            db.ev = {}; // Limpa dados anteriores
+            dataRows.forEach(row => {
+                if (!row.ID) return;
+                db.ev[row.ID] = {
+                    id: row.ID,
+                    nome: row.Modelo,
+                    preco: parseFloat(row.Preco) || 0,
+                    consumoUrb: parseFloat(row.Cons_Urb) || 0,
+                    consumoRod: parseFloat(row.Cons_Rod) || 0,
+                    residual: parseFloat(row.Residual) || 0,
+                    manutencao: parseFloat(row.Manutencao) || 0,
+                    seguro: parseFloat(row.Seguro) || 0,
+                    ipva: parseFloat(row.IPVA) || 0
+                };
+            });
+            console.log(`[processEvData] EVs carregados:`, Object.keys(db.ev).length);
+        }
+
+        function processIceData(dataRows) {
+            db.ice = {}; // Limpa dados anteriores
+            dataRows.forEach(row => {
+                if (!row.ID) return;
+                db.ice[row.ID] = {
+                     id: row.ID,
+                    nome: row.Modelo,
+                    preco: parseFloat(row.Preco) || 0,
+                    consumoUrb: parseFloat(row.Cons_Urb) || 0,
+                    consumoRod: parseFloat(row.Cons_Rod) || 0,
+                    residual: parseFloat(row.Residual) || 0,
+                    manutencao: parseFloat(row.Manutencao) || 0,
+                    seguro: parseFloat(row.Seguro) || 0,
+                    ipva: parseFloat(row.IPVA) || 0
+                };
+            });
+             console.log(`[processIceData] ICEs carregados:`, Object.keys(db.ice).length);
+        }
+
+        function processProfileData(dataRows) {
+            db.profiles = {}; // Limpa dados anteriores
+            dataRows.forEach(row => {
+                const profileName = row.Perfil ? row.Perfil.toLowerCase() : null;
+                if (!profileName) return;
+                db.profiles[profileName] = {
+                    km: parseFloat(row.KM_Ano) || 0,
+                    urbano: parseFloat(row.Prop_Urbano) * 100 || 0, // Convertido para %
+                    recargaRes: parseFloat(row.Recarga_Res) * 100 || 0 // Convertido para %
+                };
+            });
+            console.log(`[processProfileData] Perfis carregados:`, Object.keys(db.profiles).length);
+        }
+
+        function processScenarioData(dataRows) {
+            db.scenarios = {}; // Limpa dados anteriores
+            dataRows.forEach(row => {
+                const scenarioName = row.Cenario ? row.Cenario.toLowerCase() : null;
+                 if (!scenarioName) return;
+                 db.scenarios[scenarioName] = {
+                    gasolina: parseFloat(row.Gasolina) || 0,
+                    tarifaRes: parseFloat(row.Tarifa_Res) || 0,
+                    tarifaPub: parseFloat(row.Tarifa_Pub) || 0
+                 };
+            });
+            console.log(`[processScenarioData] Cenários carregados:`, Object.keys(db.scenarios).length);
+        }
+
+        // --- Função de Inicialização Principal (Nova) ---
+        async function initializeDashboard_freshStart() {
+            const statusElement = document.getElementById('connectionStatus');
+            statusElement.textContent = '🔄 Carregando dados...';
+            console.log('=== INICIANDO DASHBOARD (FRESH START) ===');
+
             try {
-                // 1. Carrega EV
-                const evData = await fetchSheetData_v2(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_EV);
-                if (!evData || !Array.isArray(evData)) {
-                    throw new Error('Falha ao carregar dados de VEICULOS_EV');
+                // Carrega todos os dados em paralelo, cada um com sua função de processamento
+                await Promise.all([
+                    loadAndProcessSheetData(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_EV, processEvData),
+                    loadAndProcessSheetData(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_ICE, processIceData),
+                    loadAndProcessSheetData(GOOGLE_SHEETS_CONFIG.ABAS.PERFIS, processProfileData),
+                    loadAndProcessSheetData(GOOGLE_SHEETS_CONFIG.ABAS.CENARIOS, processScenarioData)
+                ]);
+
+                // Verifica se os dados essenciais foram carregados
+                if (Object.keys(db.ev).length === 0) {
+                    throw new Error('Nenhum veículo EV foi carregado após processamento.');
                 }
-                console.log(`📦 evData recebido:`, evData);
-                evData.forEach(row => {
-                    const id = row.ID;
-                    if (!id) return;
-                    console.log(`...Processando EV: ${id}`);
-                    vehiclesDB.ev[id] = {
-                        id: id,
-                        nome: row.Modelo,
-                        preco: parseFloat(row.Preco) || 0,
-                        consumoUrb: parseFloat(row.Cons_Urb) || 0,
-                        consumoRod: parseFloat(row.Cons_Rod) || 0,
-                        residual: parseFloat(row.Residual) || 0,
-                        manutencao: parseFloat(row.Manutencao) || 0,
-                        seguro: parseFloat(row.Seguro) || 0,
-                        ipva: parseFloat(row.IPVA) || 0
-                    };
-                });
-                console.log('✅ EVs processados:', Object.keys(vehiclesDB.ev).length);
-                if (Object.keys(vehiclesDB.ev).length === 0) {
-                    throw new Error('Nenhum veículo EV carregado (após processamento)');
+                 if (Object.keys(db.ice).length === 0) {
+                    throw new Error('Nenhum veículo ICE foi carregado após processamento.');
+                }
+                 if (Object.keys(db.profiles).length === 0) {
+                    throw new Error('Nenhum Perfil foi carregado após processamento.');
+                }
+                 if (Object.keys(db.scenarios).length === 0) {
+                    throw new Error('Nenhum Cenário foi carregado após processamento.');
                 }
 
-                // 2. Carrega ICE
-                const iceData = await fetchSheetData_v2(GOOGLE_SHEETS_CONFIG.ABAS.VEICULOS_ICE);
-                if (!iceData || !Array.isArray(iceData)) {
-                    throw new Error('Falha ao carregar dados de VEICULOS_ICE');
-                }
-                console.log(`📦 iceData recebido:`, iceData);
-                iceData.forEach(row => {
-                    const id = row.ID;
-                    if (!id) return;
-                    console.log(`...Processando ICE: ${id}`);
-                    vehiclesDB.ice[id] = {
-                        id: id,
-                        nome: row.Modelo,
-                        preco: parseFloat(row.Preco) || 0,
-                        consumoUrb: parseFloat(row.Cons_Urb) || 0,
-                        consumoRod: parseFloat(row.Cons_Rod) || 0,
-                        residual: parseFloat(row.Residual) || 0,
-                        manutencao: parseFloat(row.Manutencao) || 0,
-                        seguro: parseFloat(row.Seguro) || 0,
-                        ipva: parseFloat(row.IPVA) || 0
-                    };
-                });
-                console.log('✅ ICEs processados:', Object.keys(vehiclesDB.ice).length);
-                if (Object.keys(vehiclesDB.ice).length === 0) {
-                    throw new Error('Nenhum veículo ICE carregado (após processamento)');
-                }
-                
-                // 3. Carrega Perfis
-                const perfilData = await fetchSheetData_v2(GOOGLE_SHEETS_CONFIG.ABAS.PERFIS);
-                if (!perfilData || !Array.isArray(perfilData)) {
-                    throw new Error('Falha ao carregar dados de PERFIS');
-                }
-                console.log(`📦 perfilData recebido:`, perfilData);
-                perfilData.forEach(row => {
-                    const id = row.Perfil ? row.Perfil.toLowerCase() : null;
-                    if (!id) return;
-                    console.log(`...Processando Perfil: ${id}`);
-                    profilesDB[id] = {
-                        km: parseFloat(row.KM_Ano) || 0,
-                        urbano: parseFloat(row.Prop_Urbano) * 100 || 0,
-                        recargaRes: parseFloat(row.Recarga_Res) * 100 || 0
-                    };
-                });
-                console.log('✅ Perfis processados:', Object.keys(profilesDB).length);
-                if (Object.keys(profilesDB).length === 0) {
-                    throw new Error('Nenhum Perfil carregado (após processamento)');
-                }
+                console.log('🚀 Sucesso! Todos os dados carregados e processados.');
+                populateDropdowns();
+                statusElement.textContent = '✅ Conectado';
+                statusElement.classList.add('connected');
+                statusElement.classList.remove('error');
 
-                // 4. Carrega Cenários
-                const cenarioData = await fetchSheetData_v2(GOOGLE_SHEETS_CONFIG.ABAS.CENARIOS);
-                if (!cenarioData || !Array.isArray(cenarioData)) {
-                    throw new Error('Falha ao carregar dados de CENARIOS');
-                }
-                console.log(`📦 cenarioData recebido:`, cenarioData);
-                cenarioData.forEach(row => {
-                    const id = row.Cenario ? row.Cenario.toLowerCase() : null;
-                    if (!id) return;
-                    console.log(`...Processando Cenário: ${id}`);
-                    scenariosDB[id] = {
-                        gasolina: parseFloat(row.Gasolina) || 0,
-                        tarifaRes: parseFloat(row.Tarifa_Res) || 0,
-                        tarifaPub: parseFloat(row.Tarifa_Pub) || 0
-                    };
-                });
-                console.log('✅ Cenários processados:', Object.keys(scenariosDB).length);
-                if (Object.keys(scenariosDB).length === 0) {
-                    throw new Error('Nenhum Cenário carregado (após processamento)');
-                }
-
-                // 5. Sucesso
-                console.log('🚀 Todos os dados carregados e processados!');
-                popularDropdowns();
-                document.getElementById('connectionStatus').textContent = '✅ Conectado';
-                document.getElementById('connectionStatus').classList.add('connected');
-                
             } catch (error) {
-                console.error('❌ ERRO FATAL em inicializarDashboard:', error);
-                document.getElementById('connectionStatus').textContent = '⚠️ Erro: ' + error.message;
-                document.getElementById('connectionStatus').classList.add('error');
+                console.error('❌ ERRO FATAL na inicialização:', error);
+                statusElement.textContent = `⚠️ Erro na inicialização: ${error.message}`;
+                statusElement.classList.add('error');
+                statusElement.classList.remove('connected');
             }
         }
-        
-        function popularDropdowns() {
-            console.log('Populating dropdowns...');
+
+        // --- Funções da Interface (Mantidas, mas usando 'db') ---
+        function populateDropdowns() {
+            console.log('[populateDropdowns] Iniciando...');
             const evSelect = document.getElementById('ev_select');
             const iceSelect = document.getElementById('ice_select');
-            
+
             evSelect.innerHTML = '<option value="">Selecione EV</option>';
-            Object.keys(vehiclesDB.ev).forEach(id => {
-                const v = vehiclesDB.ev[id];
+            Object.keys(db.ev).forEach(id => {
+                const v = db.ev[id];
                 evSelect.innerHTML += `<option value="${id}">${v.nome}</option>`;
             });
-            
+
             iceSelect.innerHTML = '<option value="">Selecione ICE</option>';
-            Object.keys(vehiclesDB.ice).forEach(id => {
-                const v = vehiclesDB.ice[id];
+            Object.keys(db.ice).forEach(id => {
+                const v = db.ice[id];
                 iceSelect.innerHTML += `<option value="${id}">${v.nome}</option>`;
             });
-            console.log('Dropdowns populated.');
+            console.log('[populateDropdowns] Concluído.');
         }
-        
+
         function loadEV() {
             const select = document.getElementById('ev_select');
             const id = select.value;
-            if (!id) return;
-            
-            currentEV = vehiclesDB.ev[id];
+            if (!id || !db.ev[id]) {
+                 currentEV = null;
+                 document.getElementById('ev_info').innerHTML = 'Selecione um veículo';
+                 document.getElementById('ev_preco').value = 0;
+                 return;
+            }
+            currentEV = db.ev[id];
             document.getElementById('ev_preco').value = currentEV.preco;
             document.getElementById('ev_info').innerHTML = `
                 💡 ${currentEV.consumoUrb} kWh/100km (urb) | ${currentEV.consumoRod} kWh/100km (rod)<br>
-                💰 Seg: R$ ${currentEV.seguro} | Man: R$ ${currentEV.manutencao}/ano
+                💰 Seg: ${formatMoney(currentEV.seguro)} | Man: ${formatMoney(currentEV.manutencao)}/ano
             `;
         }
-        
+
         function loadICE() {
             const select = document.getElementById('ice_select');
             const id = select.value;
-            if (!id) return;
-            
-            currentICE = vehiclesDB.ice[id];
+             if (!id || !db.ice[id]) {
+                 currentICE = null;
+                 document.getElementById('ice_info').innerHTML = 'Selecione um veículo';
+                 document.getElementById('ice_preco').value = 0;
+                 return;
+            }
+            currentICE = db.ice[id];
             document.getElementById('ice_preco').value = currentICE.preco;
             document.getElementById('ice_info').innerHTML = `
                 ⛽ ${currentICE.consumoUrb} km/L (urb) | ${currentICE.consumoRod} km/L (rod)<br>
-                💰 Seg: R$ ${currentICE.seguro} | Man: R$ ${currentICE.manutencao}/ano
+                💰 Seg: ${formatMoney(currentICE.seguro)} | Man: ${formatMoney(currentICE.manutencao)}/ano
             `;
         }
-        
+
         function selectProfile(event, profile) {
             currentProfile = profile;
             document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('active'));
             event.target.closest('.profile-btn').classList.add('active');
         }
-        
+
         function selectScenario(event, scenario) {
             currentScenario = scenario;
             document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            if (scenariosDB[scenario]) {
-                document.getElementById('preco_gasolina').value = scenariosDB[scenario].gasolina;
-                document.getElementById('tarifa_res').value = scenariosDB[scenario].tarifaRes;
-                document.getElementById('tarifa_pub').value = scenariosDB[scenario].tarifaPub;
+            if (db.scenarios[scenario]) {
+                document.getElementById('preco_gasolina').value = db.scenarios[scenario].gasolina;
+                document.getElementById('tarifa_res').value = db.scenarios[scenario].tarifaRes;
+                document.getElementById('tarifa_pub').value = db.scenarios[scenario].tarifaPub;
             }
         }
-        
+
         function calcular() {
             if (!currentEV || !currentICE) {
                 alert('Selecione ambos os veículos!');
                 return;
             }
             
-            const perfil = profilesDB[currentProfile];
+            const perfil = db.profiles[currentProfile];
             if (!perfil) {
-                alert('Perfil não encontrado. Selecione um perfil.');
+                alert('Perfil selecionado inválido ou não carregado!');
                 return;
             }
 
@@ -848,255 +542,209 @@
             const tarifaPub = parseFloat(document.getElementById('tarifa_pub').value);
             const precoGasolina = parseFloat(document.getElementById('preco_gasolina').value);
             
-            // Cálculo EV
-            const kmUrb = perfil.km * (perfil.urbano / 100);
-            const kmRod = perfil.km * (1 - perfil.urbano / 100);
+            // --- Cálculos (sem alterações lógicas) ---
+            const kmAnual = perfil.km;
+            const kmUrb = kmAnual * (perfil.urbano / 100);
+            const kmRod = kmAnual * (1 - perfil.urbano / 100);
             
-            const consumoEV = (kmUrb * currentEV.consumoUrb / 100) + (kmRod * currentEV.consumoRod / 100);
-            const custoEnergiaRes = consumoEV * (perfil.recargaRes / 100) * tarifaRes;
-            const custoEnergiaPub = consumoEV * (1 - perfil.recargaRes / 100) * tarifaPub;
-            const custoEnergiaEV = custoEnergiaRes + custoEnergiaPub;
+            const consumoTotalEV_kWh = (kmUrb * currentEV.consumoUrb / 100) + (kmRod * currentEV.consumoRod / 100);
+            const custoEnergiaRes = consumoTotalEV_kWh * (perfil.recargaRes / 100) * tarifaRes;
+            const custoEnergiaPub = consumoTotalEV_kWh * (1 - perfil.recargaRes / 100) * tarifaPub;
+            const custoEnergiaEVAnual = custoEnergiaRes + custoEnergiaPub;
+            const custoOperacionalEVAnual = custoEnergiaEVAnual + currentEV.manutencao + currentEV.seguro + currentEV.ipva;
+            const custoKmEV = kmAnual > 0 ? custoOperacionalEVAnual / kmAnual : 0;
             
-            const custoTotalEV = custoEnergiaEV + currentEV.manutencao + currentEV.seguro + currentEV.ipva;
-            const custoKmEV = custoTotalEV / perfil.km;
-            
-            // Cálculo ICE
-            const consumoCombUrb = kmUrb / currentICE.consumoUrb;
-            const consumoCombRod = kmRod / currentICE.consumoRod;
-            const custoCombustivel = (consumoCombUrb + consumoCombRod) * precoGasolina;
-            
-            const custoTotalICE = custoCombustivel + currentICE.manutencao + currentICE.seguro + currentICE.ipva;
-            const custoKmICE = custoTotalICE / perfil.km;
-            
+            const consumoTotalICE_L = (kmUrb / currentICE.consumoUrb) + (kmRod / currentICE.consumoRod);
+            const custoCombustivelAnual = consumoTotalICE_L * precoGasolina;
+            const custoOperacionalICEAnual = custoCombustivelAnual + currentICE.manutencao + currentICE.seguro + currentICE.ipva;
+            const custoKmICE = kmAnual > 0 ? custoOperacionalICEAnual / kmAnual : 0;
+
             // Fluxo de caixa
             const fluxoEV = [-currentEV.preco];
             const fluxoICE = [-currentICE.preco];
-            
             for (let ano = 1; ano <= periodo; ano++) {
-                fluxoEV.push(-custoTotalEV);
-                fluxoICE.push(-custoTotalICE);
+                fluxoEV.push(-custoOperacionalEVAnual);
+                fluxoICE.push(-custoOperacionalICEAnual);
             }
-            
-            // Valor residual
-            fluxoEV[periodo] += currentEV.preco * (currentEV.residual / 100);
-            fluxoICE[periodo] += currentICE.preco * (currentICE.residual / 100);
-            
-            // VPL
+            fluxoEV[periodo] += currentEV.preco * (currentEV.residual / 100); // Valor residual no final
+            fluxoICE[periodo] += currentICE.preco * (currentICE.residual / 100); // Valor residual no final
+
+            // Indicadores Financeiros
             const vplEV = calcularVPL(fluxoEV, tma);
             const vplICE = calcularVPL(fluxoICE, tma);
-            const vplDif = vplICE - vplEV;
+            const vplDif = vplICE - vplEV; // VPL Diferencial (ICE - EV), positivo é bom para EV
             
-            // TIR
-            const fluxoDif = fluxoEV.map((v, i) => fluxoICE[i] - v);
+            const fluxoDif = fluxoICE.map((val, i) => val - fluxoEV[i]); // Fluxo incremental (ICE - EV)
             const tir = calcularTIR(fluxoDif) * 100;
-            
-            // Payback
+
             let payback = '-';
-            let acumEV = currentEV.preco;
-            let acumICE = currentICE.preco;
-            for (let ano = 1; ano <= periodo; ano++) {
-                acumEV += custoTotalEV;
-                acumICE += custoTotalICE;
-                if (acumICE > acumEV && payback === '-') {
-                    payback = ano;
-                    break;
+            let saldoAcumulado = fluxoDif[0]; // Investimento inicial diferencial
+            if (saldoAcumulado < 0) { // Só calcula payback se EV é mais caro inicialmente
+                 for (let ano = 1; ano <= periodo; ano++) {
+                    saldoAcumulado += fluxoDif[ano];
+                    if (saldoAcumulado >= 0) {
+                        // Interpolação opcional para payback fracionado (simplificado aqui)
+                        payback = ano; 
+                        break;
+                    }
                 }
+            } else {
+                payback = 0; // EV já é mais barato ou igual no início
             }
-            
-            // Atualiza métricas
+
+            // --- Atualiza Interface ---
             document.getElementById('vpl_result').textContent = formatMoney(vplDif);
-            document.getElementById('tir_result').textContent = tir.toFixed(1);
+            document.getElementById('tir_result').textContent = isNaN(tir) ? '-' : tir.toFixed(1);
             document.getElementById('payback_result').textContent = payback;
-            document.getElementById('custo_km_ev').textContent = 'R$ ' + custoKmEV.toFixed(2);
-            document.getElementById('custo_km_ice').textContent = 'R$ ' + custoKmICE.toFixed(2);
-            document.getElementById('economia_total').textContent = formatMoney((custoKmICE - custoKmEV) * perfil.km * periodo);
-            
-            // Gráficos
-            atualizarGraficos(periodo, custoTotalEV, custoTotalICE, currentEV, currentICE, custoEnergiaEV, custoCombustivel);
-            
-            // Conclusão
+            document.getElementById('custo_km_ev').textContent = formatMoney(custoKmEV);
+            document.getElementById('custo_km_ice').textContent = formatMoney(custoKmICE);
+            document.getElementById('economia_total').textContent = formatMoney(vplDif); // VPL já representa a economia total em valor presente
+
+            atualizarGraficos(periodo, custoOperacionalEVAnual, custoOperacionalICEAnual, currentEV, currentICE, custoEnergiaEVAnual, custoCombustivelAnual);
+
             let conclusao = '';
             if (vplDif > 0) {
-                conclusao = `✅ O veículo elétrico ${currentEV.nome} é mais econômico que o ${currentICE.nome}. Economia de ${formatMoney(vplDif)} em ${periodo} anos no perfil ${currentProfile}. Custo por km: EV R$ ${custoKmEV.toFixed(2)} vs ICE R$ ${custoKmICE.toFixed(2)}.`;
+                conclusao = `✅ Análise VPL: O veículo elétrico (${currentEV.nome}) é mais vantajoso, gerando uma economia de ${formatMoney(vplDif)} em valor presente ao longo de ${periodo} anos, comparado ao ${currentICE.nome} neste cenário (${currentProfile}, ${currentScenario}).`;
+            } else if (vplDif < 0) {
+                 conclusao = `⚠️ Análise VPL: O veículo a combustão (${currentICE.nome}) é mais vantajoso, apresentando um custo ${formatMoney(Math.abs(vplDif))} menor em valor presente ao longo de ${periodo} anos, comparado ao ${currentEV.nome} neste cenário (${currentProfile}, ${currentScenario}).`;
             } else {
-                conclusao = `⚠️ O veículo a combustão ${currentICE.nome} apresenta melhor viabilidade econômica neste cenário, com diferença de ${formatMoney(Math.abs(vplDif))} em ${periodo} anos.`;
+                 conclusao = `⚖️ Análise VPL: Os veículos apresentam viabilidade econômica equivalente (${formatMoney(0)}) neste cenário (${currentProfile}, ${currentScenario}) ao longo de ${periodo} anos.`;
             }
-            document.getElementById('conclusao_texto').textContent = conclusao;
-            
-            // Detalhamento
+             document.getElementById('conclusao_texto').textContent = conclusao;
+
             const detalhamento = `
                 <table class="data-table">
-                    <tr><th>Item</th><th>EV</th><th>ICE</th></tr>
-                    <tr><td>Investimento</td><td>${formatMoney(currentEV.preco)}</td><td>${formatMoney(currentICE.preco)}</td></tr>
-                    <tr><td>Energia/Combustível</td><td>${formatMoney(custoEnergiaEV)}/ano</td><td>${formatMoney(custoCombustivel)}/ano</td></tr>
-                    <tr><td>Manutenção</td><td>${formatMoney(currentEV.manutencao)}/ano</td><td>${formatMoney(currentICE.manutencao)}/ano</td></tr>
-                    <tr><td>Seguro</td><td>${formatMoney(currentEV.seguro)}/ano</td><td>${formatMoney(currentICE.seguro)}/ano</td></tr>
-                    <tr><td>IPVA</td><td>${formatMoney(currentEV.ipva)}/ano</td><td>${formatMoney(currentICE.ipva)}/ano</td></tr>
-                    <tr><th>Total Anual</th><th>${formatMoney(custoTotalEV)}</th><th>${formatMoney(custoTotalICE)}</th></tr>
-                    <tr><th>Custo/km</th><th>R$ ${custoKmEV.toFixed(2)}</th><th>R$ ${custoKmICE.toFixed(2)}</th></tr>
-                    <tr><td>Valor Residual</td><td>${formatMoney(currentEV.preco * currentEV.residual / 100)}</td><td>${formatMoney(currentICE.preco * currentICE.residual / 100)}</td></tr>
+                    <tr><th>Item</th><th>EV (${currentEV.nome})</th><th>ICE (${currentICE.nome})</th><th>Diferença (ICE-EV)</th></tr>
+                    <tr><td>Investimento Inicial</td><td>${formatMoney(currentEV.preco)}</td><td>${formatMoney(currentICE.preco)}</td><td>${formatMoney(currentICE.preco - currentEV.preco)}</td></tr>
+                    <tr><td>Custo Anual: Energia/Comb.</td><td>${formatMoney(custoEnergiaEVAnual)}</td><td>${formatMoney(custoCombustivelAnual)}</td><td>${formatMoney(custoCombustivelAnual - custoEnergiaEVAnual)}</td></tr>
+                    <tr><td>Custo Anual: Manutenção</td><td>${formatMoney(currentEV.manutencao)}</td><td>${formatMoney(currentICE.manutencao)}</td><td>${formatMoney(currentICE.manutencao - currentEV.manutencao)}</td></tr>
+                    <tr><td>Custo Anual: Seguro</td><td>${formatMoney(currentEV.seguro)}</td><td>${formatMoney(currentICE.seguro)}</td><td>${formatMoney(currentICE.seguro - currentEV.seguro)}</td></tr>
+                    <tr><td>Custo Anual: IPVA</td><td>${formatMoney(currentEV.ipva)}</td><td>${formatMoney(currentICE.ipva)}</td><td>${formatMoney(currentICE.ipva - currentEV.ipva)}</td></tr>
+                    <tr><th>Custo Operacional Anual Total</th><th>${formatMoney(custoOperacionalEVAnual)}</th><th>${formatMoney(custoOperacionalICEAnual)}</th><th>${formatMoney(custoOperacionalICEAnual - custoOperacionalEVAnual)}</th></tr>
+                    <tr><th>Custo por KM</th><th>${formatMoney(custoKmEV)}</th><th>${formatMoney(custoKmICE)}</th><th>${formatMoney(custoKmICE - custoKmEV)}</th></tr>
+                    <tr><td>Valor Residual (Ano ${periodo})</td><td>${formatMoney(currentEV.preco * (currentEV.residual / 100))}</td><td>${formatMoney(currentICE.preco * (currentICE.residual / 100))}</td><td>${formatMoney(currentICE.preco * (currentICE.residual / 100) - currentEV.preco * (currentEV.residual / 100))}</td></tr>
                 </table>
             `;
             document.getElementById('detalhamento').innerHTML = detalhamento;
         }
         
+        // --- Funções Auxiliares (Mantidas) ---
         function calcularVPL(fluxo, taxa) {
+            if (taxa <= -1) return NaN; // Taxa inválida
             return fluxo.reduce((acc, val, i) => acc + val / Math.pow(1 + taxa, i), 0);
         }
-        
-        function calcularTIR(fluxo, tentativas = 100) {
-            let taxa = 0.1;
+
+        function calcularTIR(fluxo, tentativas = 100, palpiteInicial = 0.1, tolerancia = 0.0001) {
+            let taxa = palpiteInicial;
             for (let i = 0; i < tentativas; i++) {
                 const vpla = calcularVPL(fluxo, taxa);
-                const vplb = calcularVPL(fluxo, taxa + 0.001);
-                const derivada = (vplb - vpla) / 0.001;
-                if (Math.abs(derivada) < 1e-6) break;
-                taxa = taxa - vpla / derivada;
-                if (Math.abs(vpla) < 0.01) break;
+                if (Math.abs(vpla) < tolerancia) return taxa; // Encontrou a taxa
+
+                // Derivada do VPL (usando diferença finita)
+                 const vplb = calcularVPL(fluxo, taxa + 0.001);
+                 const derivada = (vplb - vpla) / 0.001;
+
+                if (Math.abs(derivada) < 1e-9) break; // Evita divisão por zero ou derivada muito pequena
+
+                taxa = taxa - vpla / derivada; // Método de Newton-Raphson
+
+                if (!isFinite(taxa)) break; // Verifica se a taxa se tornou inválida
             }
-            return taxa;
+            return NaN; // Não convergiu
         }
         
         function formatMoney(value) {
+             if (isNaN(value)) return '-';
             return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
         }
         
-        function atualizarGraficos(periodo, custoEV, custoICE, evData, iceData, energiaEV, combustivelICE) {
-            // Custo Acumulado
+        function atualizarGraficos(periodo, custoEVAnual, custoICEAnual, evData, iceData, energiaEVAnual, combustivelICEAnual) {
             const anos = Array.from({length: periodo + 1}, (_, i) => `Ano ${i}`);
+            
+            // --- Custo Acumulado ---
             const acumEV = [evData.preco];
             const acumICE = [iceData.preco];
-            
             for (let i = 1; i <= periodo; i++) {
-                acumEV.push(acumEV[i-1] + custoEV);
-                acumICE.push(acumICE[i-1] + custoICE);
+                acumEV.push(acumEV[i-1] + custoEVAnual);
+                acumICE.push(acumICE[i-1] + custoICEAnual);
             }
-            
+            // Adiciona valor residual negativo (como uma "receita") no último ano para visualização do custo líquido
+            acumEV[periodo] -= evData.preco * (evData.residual / 100);
+            acumICE[periodo] -= iceData.preco * (iceData.residual / 100);
+
             if (charts.acumulado) charts.acumulado.destroy();
             charts.acumulado = new Chart(document.getElementById('chartCustoAcumulado'), {
-                type: 'line',
-                data: {
-                    labels: anos,
-                    datasets: [{
-                        label: 'EV',
-                        data: acumEV,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'ICE',
-                        data: acumICE,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: true, position: 'top' } }
-                }
+                type: 'line', data: { labels: anos, datasets: [
+                    { label: `EV (${evData.nome})`, data: acumEV, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.1 },
+                    { label: `ICE (${iceData.nome})`, data: acumICE, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.1 }
+                ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Custo Total Acumulado (Líquido do Residual)'}, legend: { display: true, position: 'top' }}}
             });
-            
-            // Composição
-            if (charts.composicao) charts.composicao.destroy();
+
+            // --- Composição Custo Anual ---
+             if (charts.composicao) charts.composicao.destroy();
             charts.composicao = new Chart(document.getElementById('chartComposicao'), {
-                type: 'bar',
-                data: {
-                    labels: ['EV', 'ICE'],
-                    datasets: [{
-                        label: 'Energia/Combustível',
-                        data: [energiaEV, combustivelICE],
-                        backgroundColor: '#667eea'
-                    }, {
-                        label: 'Manutenção',
-                        data: [evData.manutencao, iceData.manutencao],
-                        backgroundColor: '#f59e0b'
-                    }, {
-                        label: 'Seguro',
-                        data: [evData.seguro, iceData.seguro],
-                        backgroundColor: '#8b5cf6'
-                    }, {
-                        label: 'IPVA',
-                        data: [evData.ipva, iceData.ipva],
-                        backgroundColor: '#ec4899'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x: { stacked: true }, y: { stacked: true } },
-                    plugins: { legend: { display: true, position: 'top' } }
-                }
+                 type: 'bar', data: { labels: ['EV', 'ICE'], datasets: [
+                    { label: 'Energia/Combustível', data: [energiaEVAnual, combustivelICEAnual], backgroundColor: '#667eea' },
+                    { label: 'Manutenção', data: [evData.manutencao, iceData.manutencao], backgroundColor: '#f59e0b' },
+                    { label: 'Seguro', data: [evData.seguro, iceData.seguro], backgroundColor: '#8b5cf6' },
+                    { label: 'IPVA', data: [evData.ipva, iceData.ipva], backgroundColor: '#ec4899' }
+                 ]}, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'R$ / Ano'} } }, plugins: { title: { display: true, text: 'Composição do Custo Operacional Anual'}, legend: { display: true, position: 'top' }}}
             });
-            
-            // Fluxo de Caixa
-            const fluxoAnual = anos.map((_, i) => i === 0 ? 0 : custoICE - custoEV);
-            
+
+            // --- Fluxo de Caixa Diferencial Anual ---
+            const fluxoAnualDif = anos.map((_, i) => i === 0 ? iceData.preco - evData.preco : custoICEAnual - custoEVAnual);
+             // Inclui o valor residual diferencial no último ano
+            fluxoAnualDif[periodo] += (iceData.preco * (iceData.residual / 100)) - (evData.preco * (evData.residual / 100));
+
             if (charts.fluxo) charts.fluxo.destroy();
             charts.fluxo = new Chart(document.getElementById('chartFluxoCaixa'), {
-                type: 'bar',
-                data: {
-                    labels: anos,
-                    datasets: [{
-                        label: 'Economia Anual (ICE - EV)',
-                        data: fluxoAnual,
-                        backgroundColor: fluxoAnual.map(v => v >= 0 ? '#10b981' : '#ef4444')
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
+                type: 'bar', data: { labels: anos, datasets: [{
+                    label: 'Economia Anual (ICE - EV)', data: fluxoAnualDif,
+                    backgroundColor: fluxoAnualDif.map(v => v >= 0 ? '#10b981' : '#ef4444') // Verde se ICE mais caro, Vermelho se EV mais caro
+                }]}, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Fluxo de Caixa Incremental Anual (ICE - EV)'}, legend: { display: false }}, scales: { y: { title: { display: true, text: 'R$ / Ano'}}}}
             });
             
-            // Por Perfil
-            const perfis = ['Leve', 'Pesado', 'App', 'Viajante'];
-            const economias = perfis.map((p, i) => {
-                const idPerfil = p.toLowerCase();
-                if (!profilesDB[idPerfil]) return 0;
+             // --- VPL por Perfil (Simulação) ---
+            const perfisSimulados = Object.keys(db.profiles); // Pega os nomes dos perfis carregados
+            const vplPorPerfil = perfisSimulados.map(idPerfil => {
+                const perfilSim = db.profiles[idPerfil];
+                if (!perfilSim) return 0;
 
-                const perfil = profilesDB[idPerfil];
-                
-                const kmUrb = perfil.km * (perfil.urbano / 100);
-                const kmRod = perfil.km * (1 - perfil.urbano / 100);
-                
-                const consumoEV = (kmUrb * currentEV.consumoUrb / 100) + (kmRod * currentEV.consumoRod / 100);
-                const custoEnergiaRes = consumoEV * (perfil.recargaRes / 100) * tarifaRes;
-                const custoEnergiaPub = consumoEV * (1 - perfil.recargaRes / 100) * tarifaPub;
-                const custoEnergiaEV = custoEnergiaRes + custoEnergiaPub;
-                const evTotal = custoEnergiaEV + currentEV.manutencao + currentEV.seguro + currentEV.ipva;
-
-                const consumoCombUrb = kmUrb / currentICE.consumoUrb;
-                const consumoCombRod = kmRod / currentICE.consumoRod;
-                const custoCombustivel = (consumoCombUrb + consumoCombRod) * precoGasolina;
-                const iceTotal = custoCombustivel + currentICE.manutencao + currentICE.seguro + currentICE.ipva;
-
-                return (iceTotal - evTotal) * periodo / 1000;
+                 // Recalcula custos anuais para este perfil
+                 const km = perfilSim.km;
+                 const kmUrbSim = km * (perfilSim.urbano / 100);
+                 const kmRodSim = km * (1 - perfilSim.urbano / 100);
+                 
+                 const evConsumoSim = (kmUrbSim * evData.consumoUrb / 100) + (kmRodSim * evData.consumoRod / 100);
+                 const evEnergiaSim = evConsumoSim * (perfilSim.recargaRes / 100) * tarifaRes + evConsumoSim * (1 - perfilSim.recargaRes / 100) * tarifaPub;
+                 const evTotalSim = evEnergiaSim + evData.manutencao + evData.seguro + evData.ipva;
+                 
+                 const iceConsumoSim = (kmUrbSim / iceData.consumoUrb) + (kmRodSim / iceData.consumoRod);
+                 const iceCombSim = iceConsumoSim * precoGasolina;
+                 const iceTotalSim = iceCombSim + iceData.manutencao + iceData.seguro + iceData.ipva;
+                 
+                 // Monta fluxo diferencial para este perfil
+                 const fluxoSim = [- (evData.preco - iceData.preco)]; // Ano 0: Investimento ICE - EV
+                 for(let y=1; y<=periodo; y++) fluxoSim.push(iceTotalSim - evTotalSim); // Anos 1 a N: Custo ICE - Custo EV
+                 fluxoSim[periodo] += (iceData.preco * (iceData.residual / 100)) - (evData.preco * (evData.residual / 100)); // Residual no final
+                 
+                 return calcularVPL(fluxoSim, tma / 100); // Calcula o VPL diferencial
             });
-            
+
             if (charts.perfis) charts.perfis.destroy();
             charts.perfis = new Chart(document.getElementById('chartPerfis'), {
-                type: 'bar',
-                data: {
-                    labels: perfis,
+                type: 'bar', data: { labels: perfisSimulados.map(p => p.charAt(0).toUpperCase() + p.slice(1)), // Capitaliza nomes
                     datasets: [{
-                        label: 'Economia Total (R$ mil)',
-                        data: economias,
-                        backgroundColor: ['#667eea', '#764ba2', '#10b981', '#f59e0b']
+                        label: 'VPL Diferencial (ICE - EV)', data: vplPorPerfil,
+                        backgroundColor: ['#667eea', '#764ba2', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'][i % 6] // Cores variadas
                     }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
+                 }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: `Vantagem Econômica do EV por Perfil (VPL em ${periodo} anos)`}, legend: { display: false }}, scales: { y: { title: { display: true, text: 'R$'}}}}
             });
         }
         
-        // Inicializar ao carregar, chamando a nova função
-        window.addEventListener('load', inicializarDashboard_v2);
+        // --- Inicialização ---
+        window.addEventListener('load', initializeDashboard_freshStart);
+
     </script>
 </body>
 </html>
