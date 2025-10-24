@@ -118,10 +118,10 @@
 /* === CONFIGURAÇÃO DOS LINKS CSV === */
 const USE_PROXY = false;
 const URLS = {
-  ENTRADAS: "COLE_AQUI_O_LINK_CSV_DA_ABA_Entradas",
-  PERFIS:   "COLE_AQUI_O_LINK_CSV_DA_ABA_Perfis",
-  VEICULOS: "COLE_AQUI_O_LINK_CSV_DA_ABA_Veiculos",
-  CENARIOS: "COLE_AQUI_O_LINK_CSV_DA_ABA_Cenarios",
+  ENTRADAS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=637003117&single=true&output=csv",
+  PERFIS:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=155387580&single=true&output=csv",
+  VEICULOS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=0&single=true&output=csv",
+  CENARIOS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=1970963524&single=true&output=csv",
 };
 const prox = url => USE_PROXY ? `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}` : url;
 
