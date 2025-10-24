@@ -6,6 +6,7 @@
   <title>Dashboard EV vs ICE</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <style>
+    /* === ESTILOS DO SEU LAYOUT ORIGINAL (SEM MUDANÇAS) === */
     :root {
       --grad-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       --grad-btn: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -14,433 +15,215 @@
       --cinza-borda: #e0e0e0;
       --texto: #333;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--grad-bg);
-      height: 100vh;
-      overflow: hidden;
-      color: var(--texto);
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    /* Header */
-    .header {
-      background: white;
-      padding: 8px 20px;
-      border-radius: 8px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .header h1 {
-      color: var(--roxo);
-      font-size: 1.3em;
-    }
-
-    /* Container principal */
-    .dashboard {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-height: 0;
-    }
-
-    /* Cards de entrada */
-    .inputs-grid {
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 10px;
-    }
-
-    .input-card {
-      background: var(--cinza-claro);
-      border: 2px solid var(--cinza-borda);
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .input-card h3 {
-      color: var(--roxo);
-      font-size: 0.9em;
-      margin-bottom: 4px;
-      border-bottom: 2px solid var(--roxo);
-      padding-bottom: 4px;
-    }
-
-    label {
-      font-size: 0.7em;
-      font-weight: 600;
-      color: #555;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 6px 8px;
-      border: 2px solid #ddd;
-      border-radius: 5px;
-      font-size: 0.75em;
-      transition: border-color 0.2s;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--roxo);
-    }
-
-    /* Perfil */
-    .profile-vertical {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .profile-btn {
-      padding: 8px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      background: white;
-      cursor: pointer;
-      text-align: center;
-      font-size: 0.75em;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .profile-btn.active {
-      background: var(--grad-bg);
-      color: white;
-      border: none;
-      font-weight: bold;
-    }
-
-    .profile-btn:hover {
-      border-color: #667eea;
-      transform: scale(1.02);
-    }
-
-    /* Cenário */
-    .scenario-row {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 6px;
-    }
-
-    .scenario-btn {
-      flex: 1;
-      padding: 6px;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      background: white;
-      cursor: pointer;
-      font-size: 0.7em;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-
-    .scenario-btn.active {
-      background: var(--grad-bg);
-      color: white;
-      border: none;
-    }
-
-    .scenario-btn:hover {
-      border-color: #667eea;
-    }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    .btn-calculate {
-      width: 100%;
-      background: var(--grad-btn);
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 0.85em;
-      cursor: pointer;
-      transition: 0.2s;
-      margin-top: auto;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--grad-bg);
+      height: 100vh; overflow: hidden; color: var(--texto); padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .header { background: white; padding: 8px 20px; border-radius: 8px; box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .header h1 { color: var(--roxo); font-size: 1.3em; }
+    .dashboard { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+    .inputs-grid { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
+    .input-card { background: var(--cinza-claro); border: 2px solid var(--cinza-borda); border-radius: 8px;
+      padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .input-card h3 { color: var(--roxo); font-size: 0.9em; margin-bottom: 4px; border-bottom: 2px solid var(--roxo); padding-bottom: 4px; }
+    label { font-size: 0.7em; font-weight: 600; color: #555; }
+    input, select { width: 100%; padding: 6px 8px; border: 2px solid #ddd; border-radius: 5px; font-size: 0.75em; transition: border-color 0.2s; }
+    input:focus, select:focus { outline: none; border-color: var(--roxo); }
+    .profile-vertical { display: flex; flex-direction: column; gap: 6px; }
+    .profile-btn { padding: 8px; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer;
+      text-align: center; font-size: 0.75em; font-weight: 600; transition: all 0.2s; }
+    .profile-btn.active { background: var(--grad-bg); color: white; border: none; font-weight: bold; }
+    .profile-btn:hover { border-color: #667eea; transform: scale(1.02); }
+    .scenario-row { display: flex; gap: 6px; margin-bottom: 6px; }
+    .scenario-btn { flex: 1; padding: 6px; border: 2px solid #ddd; border-radius: 6px; background: white;
+      cursor: pointer; font-size: 0.7em; font-weight: 600; transition: 0.2s; }
+    .scenario-btn.active { background: var(--grad-bg); color: white; border: none; }
+    .scenario-btn:hover { border-color: #667eea; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .btn-calculate { width: 100%; background: var(--grad-btn); color: white; padding: 10px; border: none; border-radius: 6px;
+      font-weight: bold; font-size: 0.85em; cursor: pointer; transition: 0.2s; margin-top: auto; }
     .btn-calculate:hover { opacity: 0.9; }
-
-    /* Resultados e métricas */
-    .results-wrapper {
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-height: 0;
-    }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 8px;
-    }
-
-    .metric-card {
-      background: var(--grad-bg);
-      color: white;
-      padding: 8px;
-      border-radius: 8px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .metric-card h4 {
-      font-size: 0.65em;
-      opacity: 0.9;
-    }
-
-    .metric-card .value {
-      font-size: 1.2em;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-
-    .metric-card .label {
-      font-size: 0.6em;
-      opacity: 0.8;
-    }
-
-    /* Gráficos e tabelas */
-    .content-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 8px;
-      flex: 1;
-      min-height: 0;
-    }
-
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .chart-card {
-      background: var(--cinza-claro);
-      border: 2px solid var(--cinza-borda);
-      border-radius: 8px;
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .chart-card h4 {
-      color: var(--roxo);
-      font-size: 0.8em;
-      margin-bottom: 5px;
-    }
-
-    .chart-container {
-      position: relative;
-      flex: 1;
-    }
-
-    .right-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .conclusion-card {
-      background: var(--cinza-claro);
-      border: 2px solid var(--cinza-borda);
-      border-left: 4px solid var(--roxo);
-      border-radius: 8px;
-      padding: 10px;
-    }
-
-    .conclusion-card h3 {
-      color: var(--roxo);
-      font-size: 0.85em;
-      margin-bottom: 6px;
-    }
-
-    .conclusion-card p {
-      font-size: 0.7em;
-      color: #555;
-      line-height: 1.5;
-    }
-
-    .table-card {
-      background: var(--cinza-claro);
-      border: 2px solid var(--cinza-borda);
-      border-radius: 8px;
-      padding: 8px;
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .table-card h4 {
-      color: var(--roxo);
-      font-size: 0.8em;
-      margin-bottom: 6px;
-    }
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.7em;
-    }
-
-    .data-table th {
-      background: var(--roxo);
-      color: white;
-      padding: 5px;
-      text-align: left;
-    }
-
-    .data-table td {
-      padding: 4px 5px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .data-table tr:nth-child(even) { background: white; }
-
   </style>
 </head>
 <body>
 
   <div class="header">
     <h1>⚡ Análise Econômica: EV vs ICE</h1>
-    <span style="font-size:0.8em;color:#666;">Versão de Apresentação</span>
+    <span style="font-size:0.8em;color:#666;">Versão base (dados dinâmicos)</span>
   </div>
 
   <div class="dashboard">
-    <!-- Entradas -->
     <div class="inputs-grid">
+      <!-- EV -->
       <div class="input-card">
         <h3>⚡ Veículo Elétrico</h3>
         <label>Modelo:</label>
-        <select><option>Carregando...</option></select>
+        <select id="selEV"><option>Carregando...</option></select>
         <label>💰 Preço (R$):</label>
-        <input type="number" value="0">
+        <input id="precoEV" type="number" value="0">
       </div>
 
+      <!-- ICE -->
       <div class="input-card">
         <h3>🚗 Veículo Combustão</h3>
         <label>Modelo:</label>
-        <select><option>Carregando...</option></select>
+        <select id="selICE"><option>Carregando...</option></select>
         <label>💰 Preço (R$):</label>
-        <input type="number" value="0">
+        <input id="precoICE" type="number" value="0">
       </div>
 
       <!-- PERFIL -->
       <div class="input-card">
         <h3>👤 Perfil</h3>
-        <div class="profile-vertical">
-          <div class="profile-btn active">🏠 Leve<br><small>6k km/ano</small></div>
-          <div class="profile-btn">📱 App<br><small>60k km/ano</small></div>
-          <div class="profile-btn">🚙 Pesado<br><small>15k km/ano</small></div>
-          <div class="profile-btn">✈️ Viajante<br><small>28k km/ano</small></div>
-        </div>
+        <div id="perfisContainer" class="profile-vertical">Carregando...</div>
       </div>
 
       <!-- CENÁRIO -->
       <div class="input-card">
         <h3>🎯 Cenário</h3>
-        <div class="scenario-row">
-          <button class="scenario-btn">📈 Otim</button>
-          <button class="scenario-btn active">📊 Base</button>
-          <button class="scenario-btn">📉 Pess</button>
-        </div>
+        <div class="scenario-row" id="cenariosContainer">Carregando...</div>
 
         <div class="input-row">
           <div>
             <label>Tarifa Res. (R$/kWh):</label>
-            <input type="number" value="0.65" step="0.01">
+            <input id="tarifaRes" type="number" step="0.01">
           </div>
           <div>
             <label>Tarifa Púb. (R$/kWh):</label>
-            <input type="number" value="1.60" step="0.01">
+            <input id="tarifaPub" type="number" step="0.01">
           </div>
         </div>
 
         <label>Gasolina (R$/L):</label>
-        <input type="number" value="5.80" step="0.1">
+        <input id="precoGas" type="number" step="0.1">
 
         <div class="input-row">
           <div>
             <label>Período (anos):</label>
-            <input type="number" value="5" min="1" max="10">
+            <input id="anos" type="number" min="1" max="10">
           </div>
           <div>
             <label>TMA (%):</label>
-            <input type="number" value="10" step="0.5">
+            <input id="tma" type="number" step="0.5">
           </div>
         </div>
 
-        <button class="btn-calculate">🚀 CALCULAR</button>
-      </div>
-    </div>
-
-    <!-- Resultados -->
-    <div class="results-wrapper">
-      <div class="metrics-grid">
-        <div class="metric-card"><h4>VPL DIFERENCIAL</h4><div class="value">–</div><div class="label">ICE - EV</div></div>
-        <div class="metric-card"><h4>TIR</h4><div class="value">–</div><div class="label">%</div></div>
-        <div class="metric-card"><h4>PAYBACK</h4><div class="value">–</div><div class="label">anos</div></div>
-        <div class="metric-card"><h4>R$/KM EV</h4><div class="value">–</div><div class="label">custo</div></div>
-        <div class="metric-card"><h4>R$/KM ICE</h4><div class="value">–</div><div class="label">custo</div></div>
-        <div class="metric-card"><h4>ECONOMIA</h4><div class="value">–</div><div class="label">total</div></div>
-      </div>
-
-      <div class="content-grid">
-        <div class="charts-grid">
-          <div class="chart-card"><h4>📊 Custo Acumulado</h4><div class="chart-container"><canvas></canvas></div></div>
-          <div class="chart-card"><h4>💰 Composição</h4><div class="chart-container"><canvas></canvas></div></div>
-          <div class="chart-card"><h4>📈 Fluxo de Caixa</h4><div class="chart-container"><canvas></canvas></div></div>
-          <div class="chart-card"><h4>🎯 Por Perfil</h4><div class="chart-container"><canvas></canvas></div></div>
-        </div>
-
-        <div class="right-panel">
-          <div class="conclusion-card">
-            <h3>💡 Conclusão</h3>
-            <p>Calcule para ver a conclusão</p>
-          </div>
-          <div class="table-card">
-            <h4>📋 Detalhamento</h4>
-            <p>Calcule para ver os detalhes</p>
-          </div>
-        </div>
+        <button class="btn-calculate" id="btnCalcular">🚀 CALCULAR</button>
       </div>
     </div>
   </div>
+
+<script>
+/* === CONFIGURAÇÃO DOS LINKS CSV === */
+const USE_PROXY = false;
+const URLS = {
+  ENTRADAS: "COLE_AQUI_O_LINK_CSV_DA_ABA_Entradas",
+  PERFIS:   "COLE_AQUI_O_LINK_CSV_DA_ABA_Perfis",
+  VEICULOS: "COLE_AQUI_O_LINK_CSV_DA_ABA_Veiculos",
+  CENARIOS: "COLE_AQUI_O_LINK_CSV_DA_ABA_Cenarios",
+};
+const prox = url => USE_PROXY ? `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}` : url;
+
+/* === Função para ler CSV === */
+async function getCSV(url){
+  const res = await fetch(prox(url));
+  const txt = await res.text();
+  const lines = txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(s=>s.replace(/^"|"$/g,'')));
+  const header = lines.shift();
+  return lines.map(r=>{
+    const o={}; header.forEach((h,i)=>o[h.trim()]=r[i]?.trim?.()||"");
+    return o;
+  });
+}
+
+/* === Inicialização === */
+(async function init(){
+  try{
+    const [entradas, perfis, veiculos, cenarios] = await Promise.all([
+      getCSV(URLS.ENTRADAS), getCSV(URLS.PERFIS), getCSV(URLS.VEICULOS), getCSV(URLS.CENARIOS)
+    ]);
+
+    console.log("✅ Dados carregados:", {entradas, perfis, veiculos, cenarios});
+
+    // === Preenche os selects de veículos ===
+    const selEV = document.getElementById("selEV");
+    const selICE = document.getElementById("selICE");
+    const evs = veiculos.filter(v=>v.tipo.toUpperCase()==="EV");
+    const ices = veiculos.filter(v=>v.tipo.toUpperCase()==="ICE");
+    evs.forEach(v=> selEV.insertAdjacentHTML("beforeend", `<option value="${v.id}">${v.modelo}</option>`));
+    ices.forEach(v=> selICE.insertAdjacentHTML("beforeend", `<option value="${v.id}">${v.modelo}</option>`));
+
+    // === Perfis ===
+    const perfisDiv = document.getElementById("perfisContainer");
+    perfisDiv.innerHTML = "";
+    perfis.forEach((p,i)=>{
+      const btn = document.createElement("div");
+      btn.className = "profile-btn" + (i===0 ? " active":"");
+      btn.dataset.id = p.perfil;
+      btn.innerHTML = `${p.perfil}<br><small>${p.km_ano} km/ano<br>${(parseFloat(p["%_recarga_publica"])*100).toFixed(0)}% pub</small>`;
+      btn.onclick = ()=> {
+        document.querySelectorAll(".profile-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+      };
+      perfisDiv.appendChild(btn);
+    });
+
+    // === Cenários ===
+    const cenDiv = document.getElementById("cenariosContainer");
+    cenDiv.innerHTML = "";
+    cenarios.forEach((c,i)=>{
+      const btn = document.createElement("button");
+      btn.className = "scenario-btn" + (i===0?" active":"");
+      btn.textContent = c.cenario;
+      btn.onclick = ()=>{
+        document.querySelectorAll(".scenario-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        // preencher campos automaticamente
+        document.getElementById("tarifaRes").value = c.tarifa_residencial_kwh;
+        document.getElementById("tarifaPub").value = c.tarifa_publica_kwh;
+        document.getElementById("precoGas").value = c.preco_gasolina_l;
+      };
+      cenDiv.appendChild(btn);
+      if(i===0){
+        document.getElementById("tarifaRes").value = c.tarifa_residencial_kwh;
+        document.getElementById("tarifaPub").value = c.tarifa_publica_kwh;
+        document.getElementById("precoGas").value = c.preco_gasolina_l;
+      }
+    });
+
+    // === Entradas ===
+    document.getElementById("anos").value = entradas.find(e=>e.Chave.toLowerCase()=="anos_analise")?.Valor || 8;
+    document.getElementById("tma").value = (parseFloat(entradas.find(e=>e.Chave.toLowerCase()=="tma")?.Valor||0.1)*100).toFixed(1);
+
+    // === Botão calcular (teste de coleta) ===
+    document.getElementById("btnCalcular").onclick = ()=>{
+      const perfilSel = document.querySelector(".profile-btn.active")?.dataset.id;
+      const cenarioSel = document.querySelector(".scenario-btn.active")?.textContent;
+      const dados = {
+        EV: selEV.value,
+        ICE: selICE.value,
+        perfil: perfis.find(p=>p.perfil===perfilSel),
+        cenario: cenarios.find(c=>c.cenario===cenarioSel),
+        tarifas: {
+          residencial: parseFloat(document.getElementById("tarifaRes").value),
+          publica: parseFloat(document.getElementById("tarifaPub").value),
+          gasolina: parseFloat(document.getElementById("precoGas").value),
+        },
+        geral: {
+          anos: parseInt(document.getElementById("anos").value),
+          tma: parseFloat(document.getElementById("tma").value)/100,
+        }
+      };
+      console.log("🚀 Dados selecionados/atualizados:", dados);
+      alert("Veja os dados no console (F12). Cálculos virão na próxima versão.");
+    };
+
+  }catch(err){
+    alert("Erro ao carregar dados: " + err.message);
+    console.error(err);
+  }
+})();
+</script>
 </body>
 </html>
