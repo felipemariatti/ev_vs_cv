@@ -275,7 +275,9 @@
     const CUSTOS_LINK = "https://api.allorigins.win/raw?url=" +
       encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?gid=1420517667&single=true&output=csv");
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBH19Cg3xzJf1WhYC9xePhzdMIkbmELpjO3ZyZQ9xjRzJv8Rr9ZELORnZvlKBIE1z1hQ/exec";
+    // 🔁 Apps Script via proxy para evitar CORS
+    const SCRIPT_URL = "https://api.allorigins.win/raw?url=" +
+      encodeURIComponent("https://script.google.com/macros/s/AKfycbyBH19Cg3xzJf1WhYC9xePhzdMIkbmELpjO3ZyZQ9xjRzJv8Rr9ZELORnZvlKBIE1z1hQ/exec");
 
     // === BOTÕES DE PERFIL ===
     document.querySelectorAll('.profile-btn').forEach(btn => {
@@ -310,14 +312,10 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(custos)
         });
-        const json = await resp.json();
-        if (json.success) {
-          document.getElementById("status").textContent = "✅ Dados gravados na aba CALCULOS.";
-        } else {
-          document.getElementById("status").textContent = "⚠️ Erro ao gravar: " + (json.error || "");
-        }
+        const text = await resp.text();
+        document.getElementById("status").textContent = "📤 Dados enviados (proxy ativo). Resposta: " + text.slice(0, 60) + "...";
       } catch (err) {
-        document.getElementById("status").textContent = "❌ Erro de rede ou CORS.";
+        document.getElementById("status").textContent = "❌ Erro de rede (ver console).";
         console.error(err);
       }
     }
