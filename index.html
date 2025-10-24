@@ -1,296 +1,341 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!doctype html>
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard EV vs ICE</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <meta charset="utf-8" />
+  <title>EV vs ICE • Dashboard Interativa</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Fonte e estilos simples -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --grad-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --grad-btn: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      --roxo: #667eea;
-      --cinza-claro: #f8f9fa;
-      --cinza-borda: #e0e0e0;
-      --texto: #333;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--grad-bg);
-      height: 100vh;
-      overflow: hidden;
-      color: var(--texto);
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .header {
-      background: white;
-      padding: 8px 20px;
-      border-radius: 8px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .header h1 {
-      color: var(--roxo);
-      font-size: 1.3em;
-    }
-
-    .dashboard {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-height: 0;
-    }
-
-    .inputs-grid {
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 10px;
-    }
-
-    .input-card {
-      background: var(--cinza-claro);
-      border: 2px solid var(--cinza-borda);
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .input-card h3 {
-      color: var(--roxo);
-      font-size: 0.9em;
-      margin-bottom: 4px;
-      border-bottom: 2px solid var(--roxo);
-      padding-bottom: 4px;
-    }
-
-    label {
-      font-size: 0.7em;
-      font-weight: 600;
-      color: #555;
-    }
-
-    input {
-      width: 100%;
-      padding: 6px 8px;
-      border: 2px solid #ddd;
-      border-radius: 5px;
-      font-size: 0.75em;
-      transition: border-color 0.2s;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--roxo);
-    }
-
-    /* PERFIL */
-    .profile-vertical {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .profile-btn {
-      padding: 8px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      background: white;
-      cursor: pointer;
-      text-align: center;
-      font-size: 0.75em;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .profile-btn.active {
-      background: var(--grad-bg);
-      color: white;
-      border: none;
-      font-weight: bold;
-    }
-
-    /* CUSTOS */
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    .btn-calculate {
-      width: 100%;
-      background: var(--grad-btn);
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 0.85em;
-      cursor: pointer;
-      transition: 0.2s;
-      margin-top: auto;
-    }
-
-    .btn-calculate:hover { opacity: 0.9; }
-
-    #status {
-      margin-top: 6px;
-      font-size: 0.8em;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .success { color: green; }
-    .error { color: red; }
-
+    :root { --bg:#0f172a; --panel:#111827; --muted:#94a3b8; --fg:#e5e7eb; --accent:#10b981; --accent2:#22d3ee; }
+    *{box-sizing:border-box} body{margin:0;padding:24px;background:#0b1020;color:var(--fg);font-family:Inter,system-ui,Arial}
+    h1{font-size:20px;margin:0 0 16px;font-weight:800;letter-spacing:.3px}
+    .grid{display:grid;gap:14px}
+    .controls{grid-template-columns: repeat(5,minmax(180px,1fr));}
+    .cards{grid-template-columns: repeat(5,minmax(180px,1fr));}
+    .row{grid-template-columns: 2fr 1.3fr 1.3fr}
+    .panel{background:linear-gradient(180deg,#0f172a,#0b1222);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    select{width:100%;padding:10px;border-radius:10px;border:1px solid #243041;background:#0a1324;color:var(--fg)}
+    .kpi{display:flex;flex-direction:column;gap:6px}
+    .kpi .title{font-size:12px;color:var(--muted)}
+    .kpi .value{font-size:22px;font-weight:800}
+    .footer{margin-top:16px;color:#94a3b8;font-size:12px}
+    .brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .badge{background:#0a1324;border:1px solid #1f2937;border-radius:999px;padding:6px 10px;font-size:12px;color:#a7f3d0}
+    canvas{width:100% !important;height:320px !important}
+    @media (max-width:1100px){ .controls,.cards,.row{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>⚡ Análise Econômica: EV vs ICE</h1>
-    <span style="font-size:0.8em;color:#666;">Linkado ao Google Sheets</span>
+  <div class="brand">
+    <h1>Gestão de Custos • EV x ICE</h1>
+    <span class="badge">Google Sheets → CSV</span>
+    <span class="badge">GitHub Pages</span>
   </div>
 
-  <div class="dashboard">
-    <div class="inputs-grid">
-
-      <!-- PERFIL -->
-      <div class="input-card">
-        <h3>👤 Perfil</h3>
-        <div class="profile-vertical" id="perfilContainer">
-          <div class="profile-btn active" data-perfil="Leve">🏠 Leve<br><small>—</small></div>
-          <div class="profile-btn" data-perfil="App">📱 App<br><small>—</small></div>
-          <div class="profile-btn" data-perfil="Pesado">🚙 Pesado<br><small>—</small></div>
-          <div class="profile-btn" data-perfil="Viajante">✈️ Viajante<br><small>—</small></div>
-        </div>
-      </div>
-
-      <!-- CUSTOS -->
-      <div class="input-card">
-        <h3>💰 Custos</h3>
-
-        <div class="input-row">
-          <div>
-            <label>Tarifa Res. (R$/kWh):</label>
-            <input id="tarifaRes" type="number" step="0.01" value="0.65">
-          </div>
-          <div>
-            <label>Tarifa Púb. (R$/kWh):</label>
-            <input id="tarifaPub" type="number" step="0.01" value="1.60">
-          </div>
-        </div>
-
-        <label>Gasolina (R$/L):</label>
-        <input id="gasolina" type="number" step="0.1" value="5.80">
-
-        <div class="input-row">
-          <div>
-            <label>Período (anos):</label>
-            <input id="periodo" type="number" value="5">
-          </div>
-          <div>
-            <label>TMA (%):</label>
-            <input id="tma" type="number" step="0.5" value="10">
-          </div>
-        </div>
-
-        <button class="btn-calculate" id="btnCalcular">🚀 CALCULAR</button>
-        <div id="status"></div>
-      </div>
-
+  <!-- CONTROLES -->
+  <div class="grid controls">
+    <div class="panel">
+      <label>Perfil de uso</label>
+      <select id="selPerfil"></select>
+    </div>
+    <div class="panel">
+      <label>Cenário</label>
+      <select id="selCenario"></select>
+    </div>
+    <div class="panel">
+      <label>Veículo Elétrico (EV)</label>
+      <select id="selEV"></select>
+    </div>
+    <div class="panel">
+      <label>Veículo a Combustão (ICE)</label>
+      <select id="selICE"></select>
+    </div>
+    <div class="panel">
+      <label>Anos da análise</label>
+      <select id="selAnos"></select>
     </div>
   </div>
 
-  <script>
-    // === LINKS ===
-    const PERFIS_LINK = "https://api.allorigins.win/raw?url=" + encodeURIComponent(
-      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?gid=1368562155&single=true&output=csv"
-    );
+  <!-- KPIs -->
+  <div class="grid cards" style="margin-top:10px">
+    <div class="panel kpi"><div class="title">Custo Total EV</div><div id="kpi_ev_total" class="value">–</div></div>
+    <div class="panel kpi"><div class="title">Custo Total ICE</div><div id="kpi_ice_total" class="value">–</div></div>
+    <div class="panel kpi"><div class="title">Diferença (ICE − EV)</div><div id="kpi_delta_total" class="value">–</div></div>
+    <div class="panel kpi"><div class="title">Custo por km (EV / ICE)</div><div id="kpi_cpkm" class="value">–</div></div>
+    <div class="panel kpi"><div class="title">Payback / VPL / TIR (diferença)</div><div id="kpi_fin" class="value">–</div></div>
+  </div>
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyTKIegrTI9Sobui2nfO-vTKhuyG18xN-iOENlx8GiqAsm4RJznnk-6Ppp9GPgvS1bpA/exec";
+  <!-- GRÁFICOS -->
+  <div class="grid row" style="margin-top:10px">
+    <div class="panel"><canvas id="chartFluxo"></canvas></div>
+    <div class="panel"><canvas id="chartBarras"></canvas></div>
+    <div class="panel"><canvas id="chartPizza"></canvas></div>
+  </div>
 
-    // === Carregar perfis da planilha ===
-    async function carregarPerfis() {
-      try {
-        const resp = await fetch(PERFIS_LINK);
-        const text = await resp.text();
-        const linhas = text.trim().split("\n").slice(1);
-        const perfis = linhas.map(l => l.split(","));
-        const botoes = document.querySelectorAll(".profile-btn");
+  <div class="footer">
+    Dica: edite a planilha e recarregue a página. Os cálculos consideram t=0 (preço) + custos anuais,
+    valor residual no último ano, VPL/TIR/Payback da diferença (ICE − EV).
+  </div>
 
-        botoes.forEach(btn => {
-          const perfil = perfis.find(p => p[1].toLowerCase() === btn.dataset.perfil.toLowerCase());
-          if (perfil) {
-            btn.querySelector("small").textContent = `${perfil[2]} km/ano`;
-          }
-        });
-      } catch {
-        console.warn("Falha ao carregar perfis.");
-      }
+<script>
+/* ============================== CONFIGURÁVEIS ============================== */
+const USE_PROXY = false; // Se der CORS, troque para true (usa AllOrigins)
+const URLS = {
+  ENTRADAS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=637003117&single=true&output=csv",
+  PERFIS:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=0&single=true&output=csv",
+  VEICULOS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=155387580&single=true&output=csv",
+  CENARIOS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=1970963524&single=true&output=csv",
+};
+/* ========================================================================== */
+
+// proxy AllOrigins (evita CORS em alguns navegadores)
+const prox = url => USE_PROXY
+  ? `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+  : url;
+
+// CSV simples → array de objetos
+async function getCSV(url){
+  const res = await fetch(prox(url));
+  if(!res.ok) throw new Error("Falha ao baixar CSV");
+  const txt = await res.text();
+  const lines = txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(s=>s.replace(/^"|"$/g,'')));
+  const header = lines.shift().map(h=>h.trim());
+  return lines.map(row=>{
+    const o={}; header.forEach((h,i)=> o[h]=row[i]?.trim?.() ?? "");
+    return o;
+  });
+}
+
+// Helpers numéricos (aceita vírgula decimal)
+const toNum = v => {
+  if(v===undefined || v===null || v==="") return 0;
+  if(typeof v==="number") return v;
+  return Number(String(v).replace(/\./g,'').replace(',','.'));
+};
+const brl = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+
+// VPL / IRR / Payback (diferença ICE−EV)
+function npv(rate, cashflows){
+  return cashflows.reduce((acc,cf,t)=> acc + cf/Math.pow(1+rate,t), 0);
+}
+function irr(cashflows, guess=0.1){
+  // Busca dicotômica simples
+  let low=-0.9, high=1.0, mid=guess, iter=0;
+  while(iter++<80){
+    mid=(low+high)/2;
+    const v=npv(mid,cashflows);
+    if(Math.abs(v)<1e-6) return mid;
+    if(v>0) low=mid; else high=mid;
+  }
+  return mid;
+}
+function paybackDescontado(rate, cashflows){
+  let acc=0;
+  for(let t=0;t<cashflows.length;t++){
+    acc += cashflows[t]/Math.pow(1+rate,t);
+    if(acc>=0) return t; // retorna o ano inteiro onde zera
+  }
+  return null;
+}
+
+// Gráficos
+let gFluxo, gBarras, gPizza;
+function upsertChart(ctx, cfg, ref){
+  if(ref && ref.destroy) ref.destroy();
+  return new Chart(ctx, cfg);
+}
+
+(async function init(){
+  try{
+    const [entradas, perfis, veiculos, cenarios] = await Promise.all([
+      getCSV(URLS.ENTRADAS), getCSV(URLS.PERFIS), getCSV(URLS.VEICULOS), getCSV(URLS.CENARIOS)
+    ]);
+
+    // Entradas -> dict
+    const ENT = {};
+    entradas.forEach(r => ENT[r.Chave?.toLowerCase?.()] = toNum(r.Valor));
+
+    // Popular selects
+    const selPerfil = document.getElementById('selPerfil');
+    perfis.forEach(p=>{
+      const opt=document.createElement('option');
+      opt.value=p.perfil; opt.textContent=`${p.perfil} (${p.km_ano} km/ano)`;
+      selPerfil.appendChild(opt);
+    });
+
+    const selCenario = document.getElementById('selCenario');
+    cenarios.forEach(c=>{
+      const opt=document.createElement('option');
+      opt.value=c.cenario; opt.textContent=c.cenario;
+      selCenario.appendChild(opt);
+    });
+
+    const evs = veiculos.filter(v=> (v.tipo||"").toUpperCase()==="EV");
+    const ices = veiculos.filter(v=> (v.tipo||"").toUpperCase()==="ICE");
+
+    const selEV = document.getElementById('selEV');
+    evs.forEach(v=>{
+      const opt=document.createElement('option');
+      opt.value=v.id; opt.textContent=`${v.modelo}`;
+      selEV.appendChild(opt);
+    });
+
+    const selICE = document.getElementById('selICE');
+    ices.forEach(v=>{
+      const opt=document.createElement('option');
+      opt.value=v.id; opt.textContent=`${v.modelo}`;
+      selICE.appendChild(opt);
+    });
+
+    const selAnos = document.getElementById('selAnos');
+    const anosDefault = ENT["anos_analise"]>0 ? ENT["anos_analise"] : 8;
+    for(let n=3;n<=12;n++){
+      const opt=document.createElement('option');
+      opt.value=n; opt.textContent=`${n} anos`;
+      if(n===anosDefault) opt.selected=true;
+      selAnos.appendChild(opt);
     }
 
-    carregarPerfis();
+    // Estado
+    function getPerfil(){ return perfis.find(p=>p.perfil===selPerfil.value) || perfis[0]; }
+    function getCenario(){ return cenarios.find(c=>c.cenario===selCenario.value) || cenarios[0]; }
+    function getEV(){ return evs.find(v=>v.id===selEV.value) || evs[0]; }
+    function getICE(){ return ices.find(v=>v.id===selICE.value) || ices[0]; }
+    function anos(){ return Number(selAnos.value)||anosDefault; }
 
-    // === Seleção dos botões de perfil ===
-    document.querySelectorAll(".profile-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".profile-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+    // Cálculos anuais
+    function custosAnuaisEV(v, kmAno, cen){
+      const pub = toNum(cen["%_recarga_publica"]) || ENT["%_recarga_publica"] || 0.3;
+      const tarifaR = toNum(cen["tarifa_residencial_kwh"]) || ENT["tarifa_residencial_kwh"] || 0.9;
+      const tarifaP = toNum(cen["tarifa_publica_kwh"]) || ENT["tarifa_publica_kwh"] || 2.5;
+      const kwhNec = kmAno / toNum(v.consumo); // km/kWh
+      const custoEnergia = kwhNec * ((1-pub)*tarifaR + pub*tarifaP);
+      const manut = toNum(v.manutencao_anual);
+      const seguro = toNum(v.seguro_anual);
+      const ipva = toNum(v.ipva_anual);
+      const pneus = toNum(v.pneus_ano);
+      return { energia:custoEnergia, manut, seguro, ipva, pneus,
+               total: custoEnergia+manut+seguro+ipva+pneus };
+    }
+    function custosAnuaisICE(v, kmAno, cen){
+      const precoGas = toNum(cen["preco_gasolina_l"]) || ENT["preco_gasolina_l"] || 6.0;
+      const litros = kmAno / toNum(v.consumo); // km/L
+      const combustivel = litros * precoGas;
+      const manut = toNum(v.manutencao_anual);
+      const seguro = toNum(v.seguro_anual);
+      const ipva = toNum(v.ipva_anual);
+      const pneus = toNum(v.pneus_ano);
+      return { combustivel, manut, seguro, ipva, pneus,
+               total: combustivel+manut+seguro+ipva+pneus };
+    }
+
+    // Fluxo, VPL, TIR, Payback
+    function simular(){
+      const perfil = getPerfil();
+      const cenario = getCenario();
+      const vEV = getEV();
+      const vICE = getICE();
+      const N = anos();
+      const kmAno = toNum(perfil.km_ano);
+      const taxa = ENT["taxa_desconto_anual"] || 0.1;
+
+      // custos anuais + preço + residual
+      const cEV = custosAnuaisEV(vEV, kmAno, cenario);
+      const cICE = custosAnuaisICE(vICE, kmAno, cenario);
+
+      const precoEV = toNum(vEV.preco_inicial);
+      const precoICE = toNum(vICE.preco_inicial);
+      const resEV = precoEV * (toNum(vEV["residual_%"])||0.5);
+      const resICE = precoICE * (toNum(vICE["residual_%"])||0.5);
+
+      // Fluxo individual EV/ICE (t=0..N)
+      const fluxoEV = Array.from({length:N+1}, (_,t)=>{
+        if(t===0) return -precoEV;
+        if(t===N) return -cEV.total + resEV;
+        return -cEV.total;
       });
+      const fluxoICE = Array.from({length:N+1}, (_,t)=>{
+        if(t===0) return -precoICE;
+        if(t===N) return -cICE.total + resICE;
+        return -cICE.total;
+      });
+
+      // Diferença ICE−EV (positivo = ICE mais caro → EV compensa)
+      const fluxoDif = fluxoICE.map((v,i)=> v - fluxoEV[i]);
+
+      // métricas
+      const vpl = npv(taxa, fluxoDif);
+      const tir = irr(fluxoDif);
+      const pb = paybackDescontado(taxa, fluxoDif);
+
+      // custos totais e c/km
+      const totalEV = -fluxoEV.reduce((a,b)=>a+b,0);
+      const totalICE = -fluxoICE.reduce((a,b)=>a+b,0);
+      const kmTotais = kmAno * N;
+      const cpkmEV = totalEV / kmTotais;
+      const cpkmICE = totalICE / kmTotais;
+
+      // KPIs
+      document.getElementById('kpi_ev_total').textContent = brl(totalEV);
+      document.getElementById('kpi_ice_total').textContent = brl(totalICE);
+      document.getElementById('kpi_delta_total').textContent = brl(totalICE - totalEV);
+      document.getElementById('kpi_cpkm').textContent = `${brl(cpkmEV)} / ${brl(cpkmICE)}`;
+      document.getElementById('kpi_fin').textContent =
+        `${pb!==null? (pb+' anos') : 'sem payback'} • VPL ${brl(vpl)} • TIR ${(tir*100).toFixed(1)}%`;
+
+      // GRÁFICO Fluxo da Diferença
+      const anosLbl = Array.from({length:N+1},(_,t)=> "t="+t);
+      gFluxo = upsertChart(document.getElementById('chartFluxo'), {
+        type:'bar',
+        data:{ labels: anosLbl,
+               datasets:[{label:'Fluxo ICE − EV (R$)', data: fluxoDif}] },
+        options:{ responsive:true, plugins:{legend:{display:false}}, scales:{x:{}, y:{beginAtZero:true}}}
+      }, gFluxo);
+
+      // GRÁFICO Barras (custos anuais médios)
+      gBarras = upsertChart(document.getElementById('chartBarras'), {
+        type:'bar',
+        data:{ labels:['Energia/Combustível','Manutenção','Seguro','IPVA','Pneus'],
+               datasets:[
+                 {label:'EV', data:[cEV.energia||0, cEV.manut, cEV.seguro, cEV.ipva, cEV.pneus]},
+                 {label:'ICE', data:[cICE.combustivel||0, cICE.manut, cICE.seguro, cICE.ipva, cICE.pneus]},
+               ]},
+        options:{ responsive:true, scales:{y:{beginAtZero:true}} }
+      }, gBarras);
+
+      // GRÁFICO Pizza (participação custo anual EV)
+      gPizza = upsertChart(document.getElementById('chartPizza'), {
+        type:'pie',
+        data:{ labels:['Energia','Manut.','Seguro','IPVA','Pneus'],
+               datasets:[{ data:[cEV.energia||0, cEV.manut, cEV.seguro, cEV.ipva, cEV.pneus]}] },
+        options:{ responsive:true }
+      }, gPizza);
+    }
+
+    // Eventos
+    ['selPerfil','selCenario','selEV','selICE','selAnos'].forEach(id=>{
+      document.getElementById(id).addEventListener('change', simular);
     });
 
-    // === Envio de dados ===
-    document.getElementById("btnCalcular").addEventListener("click", async () => {
-      const custos = {
-        ID_temp: 1,
-        Gasolina_temp: +document.getElementById("gasolina").value,
-        Tarifa_Res_temp: +document.getElementById("tarifaRes").value,
-        Tarifa_Pub_temp: +document.getElementById("tarifaPub").value,
-        Periodo_temp: +document.getElementById("periodo").value,
-        TMA_temp: +document.getElementById("tma").value,
-      };
+    // Seleções padrão
+    selPerfil.selectedIndex = 0;
+    selCenario.selectedIndex = 0;
+    if(evs.length) selEV.value = evs[0].id;
+    if(ices.length) selICE.value = ices[0].id;
 
-      const status = document.getElementById("status");
-      status.textContent = "📤 Enviando dados...";
-      status.className = "";
+    simular();
 
-      try {
-        const resp = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(custos),
-        });
-        const json = await resp.json();
-        if (json.success) {
-          status.textContent = "✅ Dados gravados com sucesso!";
-          status.className = "success";
-        } else {
-          status.textContent = "⚠️ Erro: " + json.error;
-          status.className = "error";
-        }
-      } catch (err) {
-        status.textContent = "❌ Falha ao conectar ao servidor.";
-        status.className = "error";
-      }
-    });
-  </script>
+  }catch(e){
+    alert("Erro ao iniciar dashboard: " + e.message);
+    console.error(e);
+  }
+})();
+</script>
 </body>
 </html>
