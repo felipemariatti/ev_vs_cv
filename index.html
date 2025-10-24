@@ -1,48 +1,326 @@
-<script>
-  // === LINKS DAS PLANILHAS ===
-  const PERFIS_LINK = "https://api.allorigins.win/raw?url=" +
-    encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?gid=1368562155&single=true&output=csv");
-
-  const CUSTOS_LINK = "https://api.allorigins.win/raw?url=" +
-    encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?gid=1420517667&single=true&output=csv");
-
-  // === URL DIRETA DO SEU GOOGLE APPS SCRIPT ===
-  // Substitua este link pelo SEU que termina com /exec
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBH19Cg3xzJf1WhYC9xePhzdMIkbmELpjO3ZyZQ9xjRzJv8Rr9ZELORnZvlKBIE1z1hQ/exec
-";
-
-  // === ENVIO DOS DADOS AO CLICAR EM CALCULAR ===
-  async function calcular() {
-    const custos = {
-      ID_temp: 1,
-      Gasolina_temp: +document.getElementById("gasolina").value || 0,
-      Tarifa_Res_temp: +document.getElementById("tarifaRes").value || 0,
-      Tarifa_Pub_temp: +document.getElementById("tarifaPub").value || 0,
-      Periodo_temp: +document.getElementById("periodo").value || 5,
-      TMA_temp: +document.getElementById("tma").value || 10,
-    };
-
-    document.getElementById("detalhamento").innerHTML = `
-      <strong>Valores enviados:</strong><br>
-      Gasolina: <b>${custos.Gasolina_temp}</b> | Tarifa Res: <b>${custos.Tarifa_Res_temp}</b> | Tarifa Pub: <b>${custos.Tarifa_Pub_temp}</b><br>
-      Período: <b>${custos.Periodo_temp}</b> | TMA: <b>${custos.TMA_temp}%</b>
-    `;
-
-    try {
-      const resp = await fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(custos)
-      });
-      const json = await resp.json();
-      if (json.success) {
-        document.getElementById("status").textContent = "✅ Dados gravados na aba CALCULOS.";
-      } else {
-        document.getElementById("status").textContent = "⚠️ Erro ao gravar: " + (json.error || "");
-      }
-    } catch (err) {
-      document.getElementById("status").textContent = "❌ Erro de rede ou CORS.";
-      console.error(err);
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard EV vs ICE</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    :root {
+      --grad-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --grad-btn: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --roxo: #667eea;
+      --cinza-claro: #f8f9fa;
+      --cinza-borda: #e0e0e0;
+      --texto: #333;
     }
-  }
-</script>
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--grad-bg);
+      height: 100vh;
+      overflow: hidden;
+      color: var(--texto);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header {
+      background: white;
+      padding: 8px 20px;
+      border-radius: 8px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .header h1 { color: var(--roxo); font-size: 1.3em; }
+
+    .dashboard {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .inputs-grid {
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 10px;
+    }
+
+    .input-card {
+      background: var(--cinza-claro);
+      border: 2px solid var(--cinza-borda);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-card h3 {
+      color: var(--roxo);
+      font-size: 0.9em;
+      margin-bottom: 4px;
+      border-bottom: 2px solid var(--roxo);
+      padding-bottom: 4px;
+    }
+
+    label { font-size: 0.7em; font-weight: 600; color: #555; }
+
+    input, select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 0.75em;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus { outline: none; border-color: var(--roxo); }
+
+    /* PERFIL */
+    .profile-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .profile-btn {
+      padding: 8px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.75em;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .profile-btn.active {
+      background: var(--grad-bg);
+      color: white;
+      border: none;
+      font-weight: bold;
+    }
+
+    .profile-btn:hover { border-color: #667eea; transform: scale(1.02); }
+
+    /* CUSTOS */
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .btn-calculate {
+      width: 100%;
+      background: var(--grad-btn);
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: auto;
+    }
+
+    .btn-calculate:hover { opacity: 0.9; }
+
+    /* Resultados */
+    .results-wrapper {
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
+    .metric-card {
+      background: var(--grad-bg);
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .metric-card h4 { font-size: 0.65em; opacity: 0.9; }
+    .metric-card .value { font-size: 1.2em; font-weight: bold; line-height: 1.2; }
+    .metric-card .label { font-size: 0.6em; opacity: 0.8; }
+
+    #status {
+      font-size: 0.8em;
+      margin-top: 5px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>⚡ Análise Econômica: EV vs ICE</h1>
+    <span style="font-size:0.8em;color:#666;">Versão de Apresentação</span>
+  </div>
+
+  <div class="dashboard">
+    <div class="inputs-grid">
+      <div class="input-card">
+        <h3>⚡ Veículo Elétrico</h3>
+        <label>Modelo:</label>
+        <select><option>Carregando...</option></select>
+        <label>💰 Preço (R$):</label>
+        <input type="number" value="0">
+      </div>
+
+      <div class="input-card">
+        <h3>🚗 Veículo Combustão</h3>
+        <label>Modelo:</label>
+        <select><option>Carregando...</option></select>
+        <label>💰 Preço (R$):</label>
+        <input type="number" value="0">
+      </div>
+
+      <!-- PERFIL -->
+      <div class="input-card">
+        <h3>👤 Perfil</h3>
+        <div class="profile-vertical" id="perfisContainer">
+          <div class="profile-btn active">🏠 Leve<br><small>6k km/ano</small></div>
+          <div class="profile-btn">📱 App<br><small>60k km/ano</small></div>
+          <div class="profile-btn">🚙 Pesado<br><small>15k km/ano</small></div>
+          <div class="profile-btn">✈️ Viajante<br><small>28k km/ano</small></div>
+        </div>
+      </div>
+
+      <!-- CUSTOS -->
+      <div class="input-card">
+        <h3>💰 Custos</h3>
+        <div class="input-row">
+          <div>
+            <label>Tarifa Res. (R$/kWh):</label>
+            <input id="tarifaRes" type="number" value="0.65" step="0.01">
+          </div>
+          <div>
+            <label>Tarifa Púb. (R$/kWh):</label>
+            <input id="tarifaPub" type="number" value="1.60" step="0.01">
+          </div>
+        </div>
+
+        <label>Gasolina (R$/L):</label>
+        <input id="gasolina" type="number" value="5.80" step="0.1">
+
+        <div class="input-row">
+          <div>
+            <label>Período (anos):</label>
+            <input id="periodo" type="number" value="5" min="1" max="10">
+          </div>
+          <div>
+            <label>TMA (%):</label>
+            <input id="tma" type="number" value="10" step="0.5">
+          </div>
+        </div>
+
+        <button class="btn-calculate" id="btnCalcular">🚀 CALCULAR</button>
+        <div id="status">Aguardando...</div>
+      </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="results-wrapper">
+      <div class="metrics-grid">
+        <div class="metric-card"><h4>VPL DIFERENCIAL</h4><div class="value">–</div><div class="label">ICE - EV</div></div>
+        <div class="metric-card"><h4>TIR</h4><div class="value">–</div><div class="label">%</div></div>
+        <div class="metric-card"><h4>PAYBACK</h4><div class="value">–</div><div class="label">anos</div></div>
+        <div class="metric-card"><h4>R$/KM EV</h4><div class="value">–</div><div class="label">custo</div></div>
+        <div class="metric-card"><h4>R$/KM ICE</h4><div class="value">–</div><div class="label">custo</div></div>
+        <div class="metric-card"><h4>ECONOMIA</h4><div class="value">–</div><div class="label">total</div></div>
+      </div>
+
+      <div id="detalhamento" style="font-size:0.8em; margin-top:10px; color:#333;">Pronto para cálculo.</div>
+    </div>
+  </div>
+
+  <script>
+    // === LINKS DAS PLANILHAS ===
+    const PERFIS_LINK = "https://api.allorigins.win/raw?url=" +
+      encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?gid=1368562155&single=true&output=csv");
+
+    const CUSTOS_LINK = "https://api.allorigins.win/raw?url=" +
+      encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vTieSyzAPyQ1TQ_IfwWX3tjBfEkGFgROxgcg9RMsspK9OBIDxZSjyE1I6XW12fIDJqIlqxYpaDzJ4pS/pub?gid=1420517667&single=true&output=csv");
+
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBH19Cg3xzJf1WhYC9xePhzdMIkbmELpjO3ZyZQ9xjRzJv8Rr9ZELORnZvlKBIE1z1hQ/exec";
+
+    // === BOTÕES DE PERFIL ===
+    document.querySelectorAll('.profile-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // === CALCULAR ===
+    document.getElementById('btnCalcular').addEventListener('click', calcular);
+
+    async function calcular() {
+      const custos = {
+        ID_temp: 1,
+        Gasolina_temp: +document.getElementById("gasolina").value || 0,
+        Tarifa_Res_temp: +document.getElementById("tarifaRes").value || 0,
+        Tarifa_Pub_temp: +document.getElementById("tarifaPub").value || 0,
+        Periodo_temp: +document.getElementById("periodo").value || 5,
+        TMA_temp: +document.getElementById("tma").value || 10,
+      };
+
+      document.getElementById("detalhamento").innerHTML = `
+        <strong>Valores enviados:</strong><br>
+        Gasolina: <b>${custos.Gasolina_temp}</b> | Tarifa Res: <b>${custos.Tarifa_Res_temp}</b> | Tarifa Pub: <b>${custos.Tarifa_Pub_temp}</b><br>
+        Período: <b>${custos.Periodo_temp}</b> | TMA: <b>${custos.TMA_temp}%</b>
+      `;
+
+      try {
+        const resp = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(custos)
+        });
+        const json = await resp.json();
+        if (json.success) {
+          document.getElementById("status").textContent = "✅ Dados gravados na aba CALCULOS.";
+        } else {
+          document.getElementById("status").textContent = "⚠️ Erro ao gravar: " + (json.error || "");
+        }
+      } catch (err) {
+        document.getElementById("status").textContent = "❌ Erro de rede ou CORS.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
