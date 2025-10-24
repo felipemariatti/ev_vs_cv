@@ -6,7 +6,6 @@
   <title>Dashboard EV vs ICE</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <style>
-    /* === ESTILOS DO SEU LAYOUT ORIGINAL (SEM MUDANÇAS) === */
     :root {
       --grad-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       --grad-btn: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -16,33 +15,122 @@
       --texto: #333;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--grad-bg);
-      height: 100vh; overflow: hidden; color: var(--texto); padding: 8px; display: flex; flex-direction: column; gap: 6px; }
-    .header { background: white; padding: 8px 20px; border-radius: 8px; box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--grad-bg);
+      height: 100vh;
+      overflow: hidden;
+      color: var(--texto);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .header {
+      background: white;
+      padding: 8px 20px;
+      border-radius: 8px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
     .header h1 { color: var(--roxo); font-size: 1.3em; }
-    .dashboard { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-    .inputs-grid { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
-    .input-card { background: var(--cinza-claro); border: 2px solid var(--cinza-borda); border-radius: 8px;
-      padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-    .input-card h3 { color: var(--roxo); font-size: 0.9em; margin-bottom: 4px; border-bottom: 2px solid var(--roxo); padding-bottom: 4px; }
+    .dashboard {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .inputs-grid {
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 10px;
+    }
+    .input-card {
+      background: var(--cinza-claro);
+      border: 2px solid var(--cinza-borda);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .input-card h3 {
+      color: var(--roxo);
+      font-size: 0.9em;
+      margin-bottom: 4px;
+      border-bottom: 2px solid var(--roxo);
+      padding-bottom: 4px;
+    }
     label { font-size: 0.7em; font-weight: 600; color: #555; }
-    input, select { width: 100%; padding: 6px 8px; border: 2px solid #ddd; border-radius: 5px; font-size: 0.75em; transition: border-color 0.2s; }
+    input, select {
+      width: 100%; padding: 6px 8px; border: 2px solid #ddd; border-radius: 5px;
+      font-size: 0.75em; transition: border-color 0.2s;
+    }
     input:focus, select:focus { outline: none; border-color: var(--roxo); }
-    .profile-vertical { display: flex; flex-direction: column; gap: 6px; }
-    .profile-btn { padding: 8px; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer;
-      text-align: center; font-size: 0.75em; font-weight: 600; transition: all 0.2s; }
-    .profile-btn.active { background: var(--grad-bg); color: white; border: none; font-weight: bold; }
-    .profile-btn:hover { border-color: #667eea; transform: scale(1.02); }
+
+    /* === PERFIS (reestilizado) === */
+    .profile-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .profile-btn {
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .profile-btn:hover { transform: scale(1.02); border-color: var(--roxo); }
+    .profile-btn.active {
+      background: var(--grad-bg);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .profile-icon {
+      font-size: 1.8em;
+      flex-shrink: 0;
+    }
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    .profile-info .name {
+      font-weight: bold;
+      font-size: 0.85em;
+    }
+    .profile-info .details {
+      font-size: 0.7em;
+      opacity: 0.9;
+    }
+
+    /* Botões de cenário e cálculo */
     .scenario-row { display: flex; gap: 6px; margin-bottom: 6px; }
-    .scenario-btn { flex: 1; padding: 6px; border: 2px solid #ddd; border-radius: 6px; background: white;
-      cursor: pointer; font-size: 0.7em; font-weight: 600; transition: 0.2s; }
+    .scenario-btn {
+      flex: 1; padding: 6px; border: 2px solid #ddd; border-radius: 6px;
+      background: white; cursor: pointer; font-size: 0.7em; font-weight: 600; transition: 0.2s;
+    }
     .scenario-btn.active { background: var(--grad-bg); color: white; border: none; }
     .scenario-btn:hover { border-color: #667eea; }
     .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .btn-calculate { width: 100%; background: var(--grad-btn); color: white; padding: 10px; border: none; border-radius: 6px;
-      font-weight: bold; font-size: 0.85em; cursor: pointer; transition: 0.2s; margin-top: auto; }
+    .btn-calculate {
+      width: 100%; background: var(--grad-btn); color: white; padding: 10px;
+      border: none; border-radius: 6px; font-weight: bold; font-size: 0.85em;
+      cursor: pointer; transition: 0.2s; margin-top: auto;
+    }
     .btn-calculate:hover { opacity: 0.9; }
   </style>
 </head>
@@ -50,12 +138,11 @@
 
   <div class="header">
     <h1>⚡ Análise Econômica: EV vs ICE</h1>
-    <span style="font-size:0.8em;color:#666;">Versão base (dados dinâmicos)</span>
+    <span style="font-size:0.8em;color:#666;">Versão Base Dinâmica</span>
   </div>
 
   <div class="dashboard">
     <div class="inputs-grid">
-      <!-- EV -->
       <div class="input-card">
         <h3>⚡ Veículo Elétrico</h3>
         <label>Modelo:</label>
@@ -64,7 +151,6 @@
         <input id="precoEV" type="number" value="0">
       </div>
 
-      <!-- ICE -->
       <div class="input-card">
         <h3>🚗 Veículo Combustão</h3>
         <label>Modelo:</label>
@@ -73,7 +159,7 @@
         <input id="precoICE" type="number" value="0">
       </div>
 
-      <!-- PERFIL -->
+      <!-- PERFIL (atualizado) -->
       <div class="input-card">
         <h3>👤 Perfil</h3>
         <div id="perfisContainer" class="profile-vertical">Carregando...</div>
@@ -115,17 +201,15 @@
   </div>
 
 <script>
-/* === CONFIGURAÇÃO DOS LINKS CSV === */
 const USE_PROXY = false;
 const URLS = {
   ENTRADAS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=637003117&single=true&output=csv",
   PERFIS:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=155387580&single=true&output=csv",
   VEICULOS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=0&single=true&output=csv",
-  CENARIOS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=1970963524&single=true&output=csv",
+  CENARIOS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=1970963524&single=true&output=csv"
 };
 const prox = url => USE_PROXY ? `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}` : url;
 
-/* === Função para ler CSV === */
 async function getCSV(url){
   const res = await fetch(prox(url));
   const txt = await res.text();
@@ -137,88 +221,38 @@ async function getCSV(url){
   });
 }
 
-/* === Inicialização === */
 (async function init(){
   try{
     const [entradas, perfis, veiculos, cenarios] = await Promise.all([
       getCSV(URLS.ENTRADAS), getCSV(URLS.PERFIS), getCSV(URLS.VEICULOS), getCSV(URLS.CENARIOS)
     ]);
 
-    console.log("✅ Dados carregados:", {entradas, perfis, veiculos, cenarios});
-
-    // === Preenche os selects de veículos ===
-    const selEV = document.getElementById("selEV");
-    const selICE = document.getElementById("selICE");
-    const evs = veiculos.filter(v=>v.tipo.toUpperCase()==="EV");
-    const ices = veiculos.filter(v=>v.tipo.toUpperCase()==="ICE");
-    evs.forEach(v=> selEV.insertAdjacentHTML("beforeend", `<option value="${v.id}">${v.modelo}</option>`));
-    ices.forEach(v=> selICE.insertAdjacentHTML("beforeend", `<option value="${v.id}">${v.modelo}</option>`));
-
-    // === Perfis ===
+    // === Popula PERFIS bonitos ===
     const perfisDiv = document.getElementById("perfisContainer");
     perfisDiv.innerHTML = "";
     perfis.forEach((p,i)=>{
+      const icon = p.perfil.toLowerCase().includes("app") ? "📱"
+                 : p.perfil.toLowerCase().includes("via") ? "✈️"
+                 : p.perfil.toLowerCase().includes("pes") ? "🚙"
+                 : "🏠";
       const btn = document.createElement("div");
       btn.className = "profile-btn" + (i===0 ? " active":"");
       btn.dataset.id = p.perfil;
-      btn.innerHTML = `${p.perfil}<br><small>${p.km_ano} km/ano<br>${(parseFloat(p["%_recarga_publica"])*100).toFixed(0)}% pub</small>`;
-      btn.onclick = ()=> {
+      btn.innerHTML = `
+        <div class="profile-icon">${icon}</div>
+        <div class="profile-info">
+          <span class="name">${p.perfil}</span>
+          <span class="details">${p.km_ano} km/ano</span>
+          <span class="details">${(parseFloat(p["%_recarga_publica"])*100).toFixed(0)}% pub</span>
+        </div>`;
+      btn.onclick = ()=>{
         document.querySelectorAll(".profile-btn").forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
       };
       perfisDiv.appendChild(btn);
     });
 
-    // === Cenários ===
-    const cenDiv = document.getElementById("cenariosContainer");
-    cenDiv.innerHTML = "";
-    cenarios.forEach((c,i)=>{
-      const btn = document.createElement("button");
-      btn.className = "scenario-btn" + (i===0?" active":"");
-      btn.textContent = c.cenario;
-      btn.onclick = ()=>{
-        document.querySelectorAll(".scenario-btn").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        // preencher campos automaticamente
-        document.getElementById("tarifaRes").value = c.tarifa_residencial_kwh;
-        document.getElementById("tarifaPub").value = c.tarifa_publica_kwh;
-        document.getElementById("precoGas").value = c.preco_gasolina_l;
-      };
-      cenDiv.appendChild(btn);
-      if(i===0){
-        document.getElementById("tarifaRes").value = c.tarifa_residencial_kwh;
-        document.getElementById("tarifaPub").value = c.tarifa_publica_kwh;
-        document.getElementById("precoGas").value = c.preco_gasolina_l;
-      }
-    });
-
-    // === Entradas ===
-    document.getElementById("anos").value = entradas.find(e=>e.Chave.toLowerCase()=="anos_analise")?.Valor || 8;
-    document.getElementById("tma").value = (parseFloat(entradas.find(e=>e.Chave.toLowerCase()=="tma")?.Valor||0.1)*100).toFixed(1);
-
-    // === Botão calcular (teste de coleta) ===
-    document.getElementById("btnCalcular").onclick = ()=>{
-      const perfilSel = document.querySelector(".profile-btn.active")?.dataset.id;
-      const cenarioSel = document.querySelector(".scenario-btn.active")?.textContent;
-      const dados = {
-        EV: selEV.value,
-        ICE: selICE.value,
-        perfil: perfis.find(p=>p.perfil===perfilSel),
-        cenario: cenarios.find(c=>c.cenario===cenarioSel),
-        tarifas: {
-          residencial: parseFloat(document.getElementById("tarifaRes").value),
-          publica: parseFloat(document.getElementById("tarifaPub").value),
-          gasolina: parseFloat(document.getElementById("precoGas").value),
-        },
-        geral: {
-          anos: parseInt(document.getElementById("anos").value),
-          tma: parseFloat(document.getElementById("tma").value)/100,
-        }
-      };
-      console.log("🚀 Dados selecionados/atualizados:", dados);
-      alert("Veja os dados no console (F12). Cálculos virão na próxima versão.");
-    };
-
+    console.log("✅ Perfis carregados:", perfis);
   }catch(err){
     alert("Erro ao carregar dados: " + err.message);
     console.error(err);
