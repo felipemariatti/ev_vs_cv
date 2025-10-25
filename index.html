@@ -236,12 +236,12 @@
         <div class="result-grid">
             <div class="result-col">
                 <div class="result-box"><h4>⚡ R$/KM EV</h4><span class="value" id="resEV">—</span></div>
-                <div class="result-box"><h4>🌿 Custo Total EV</h4><span class="value" id="custoEV">—</span></div>
+                <div class="result-box"><h4>🌿 Custo Anual EV</h4><span class="value" id="custoEV">—</span></div>
                 <div class="result-box"><h4>📉 VPL Diferença</h4><span class="value" id="vpl">—</span></div>
             </div>
             <div class="result-col">
                 <div class="result-box"><h4>⛽ R$/KM ICE</h4><span class="value" id="resICE">—</span></div>
-                <div class="result-box"><h4>🔥 Custo Total ICE</h4><span class="value" id="custoICE">—</span></div>
+                <div class="result-box"><h4>🔥 Custo Anual ICE</h4><span class="value" id="custoICE">—</span></div>
                 <div class="result-box"><h4>📈 TIR Diferença</h4><span class="value" id="tir">—</span></div>
             </div>
             <div class="result-box result-payback">
@@ -407,27 +407,25 @@
         const custoKmEV=consumoMedioEV>0?(custoEnergiaEV/consumoMedioEV):0;
         const custoKmICE=consumoMedioICE>0?(precoGas/consumoMedioICE):0;
 
-        // === CUSTO TOTAL EV ===
-        const custoTotalEV = preco_ev
-            + toNumBR(selecionadoEV.manutencao_anual)
+        // === CUSTO ANUAL EV ===
+        const custoAnualEV = +toNumBR(selecionadoEV.manutencao_anual)
             + toNumBR(selecionadoEV.seguro_anual)
             + toNumBR(selecionadoEV.ipva_anual)
             + toNumBR(selecionadoEV.pneus_ano)
             + (custoKmEV * kmAno);
 
-        // === CUSTO TOTAL ICE ===
-        const custoTotalICE = preco_ice
-            + toNumBR(selecionadoICE.manutencao_anual)
+        // === CUSTO ANUAL ICE ===
+        const custoAnualICE = +toNumBR(selecionadoICE.manutencao_anual)
             + toNumBR(selecionadoICE.seguro_anual)
             + toNumBR(selecionadoICE.ipva_anual)
             + toNumBR(selecionadoICE.pneus_ano)
-            + (custoKmICE * kmAno);
+            + (custoKmICE * kmAno); //combustivel gasto para rodar x km
 
         // Exibe resultados
         document.getElementById('resEV').textContent = moneyBR4(custoKmEV);
         document.getElementById('resICE').textContent = moneyBR4(custoKmICE);
-        document.getElementById('custoEV').textContent = moneyBR(custoTotalEV);
-        document.getElementById('custoICE').textContent = moneyBR(custoTotalICE);
+        document.getElementById('custoEV').textContent = moneyBR(custoAnualEV);
+        document.getElementById('custoICE').textContent = moneyBR(custoAnualICE);
 
         // (opcional para depuração)
         // console.log("preco_ev:", preco_ev, "preco_ice:", preco_ice, "custoTotalEV:", custoTotalEV, "custoTotalICE:", custoTotalICE);
