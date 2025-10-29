@@ -3,73 +3,51 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard EV vs ICE</title>
+    <title>Dashboard EV vs ICE - VERSÃO FINAL</title>
 
     <style>
-        /* =========================================================
-           VARIÁVEIS E CONFIGURAÇÃO GLOBAL
-           ========================================================= */
-        :root {
-            --grad-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --grad-btn: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        /* ====== VARIÁVEIS E CONFIG GLOBAL (inalterado) ====== */
+        :root{
+            --grad-bg: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            --grad-btn: linear-gradient(135deg,#10b981 0%,#059669 100%);
             --borda: rgba(255,255,255,0.25);
         }
-        * {margin:0;padding:0;box-sizing:border-box;}
-        html, body {height:100%;overflow:hidden;}
-        body {
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html,body{height:100%;overflow:hidden;}
+        body{
             font-family:"Segoe UI",Tahoma,sans-serif;
             background:var(--grad-bg);color:#fff;
-            display:flex;flex-direction:column;
-            justify-content:center;align-items:center;
+            display:flex;flex-direction:column;justify-content:center;align-items:center;
             padding:24px;
         }
 
-        /* =========================================================
-           CABEÇALHO
-           ========================================================= */
-        .header {
-            width:100%;
-            max-width:1400px;
-            background:rgba(255,255,255,0.2);
-            border-radius:10px;
-            padding:8px 18px;margin-bottom:10px;
+        /* ====== CABEÇALHO ====== */
+        .header{
+            width:100%;max-width:1400px;background:rgba(255,255,255,0.2);
+            border-radius:10px;padding:8px 18px;margin-bottom:10px;
             display:flex;justify-content:space-between;align-items:center;
             box-shadow:0 3px 10px rgba(0,0,0,0.2);
         }
         .header h1{font-size:1.2rem;}
 
-        /* =========================================================
-           GRID PRINCIPAL
-           ========================================================= */
-        .dashboard {
-            display:grid;
-            grid-template-columns: 1fr 1fr 1fr; /* 3 colunas */
-            grid-template-rows:auto auto;
-            gap:8px;
-            width:100%;
-            max-width:1400px;
+        /* ====== GRID PRINCIPAL ====== */
+        .dashboard{
+            display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto;
+            gap:8px;width:100%;max-width:1400px;
         }
 
-        /* =========================================================
-           CARDS PADRÃO
-           ========================================================= */
-        .card {
-            background:rgba(255,255,255,0.15);
-            border:1px solid var(--borda);
-            border-radius:12px;
-            padding:8px;
-            backdrop-filter:blur(6px);
+        /* ====== CARDS PADRÃO ====== */
+        .card{
+            background:rgba(255,255,255,0.15);border:1px solid var(--borda);
+            border-radius:12px;padding:8px;backdrop-filter:blur(6px);
             box-shadow:0 3px 8px rgba(0,0,0,0.15);
         }
-        .card h3 {
-            font-size:0.9rem;font-weight:700;
-            border-bottom:1.5px solid rgba(255,255,255,0.3);
+        .card h3{
+            font-size:0.9rem;font-weight:700;border-bottom:1.5px solid rgba(255,255,255,0.3);
             padding-bottom:3px;margin-bottom:6px;
         }
 
-        /* =========================================================
-           FORMULÁRIOS GERAIS
-           ========================================================= */
+        /* ====== FORM ====== */
         label{font-size:0.75rem;font-weight:600;color:#fff;}
         input,select{
             width:100%;padding:5px 7px;border-radius:8px;
@@ -77,35 +55,26 @@
             background:rgba(255,255,255,0.4);color:#111;font-size:0.85rem;
         }
 
-        /* =========================================================
-           VEÍCULOS
-           ========================================================= */
-        .vehicle-img{
-            width:100%;height:120px;object-fit:contain;
-            border-radius:8px;background:#fff;margin:6px 0;
-        }
+        /* ====== VEÍCULOS ====== */
+        .vehicle-img{width:100%;height:120px;object-fit:contain;border-radius:8px;background:#fff;margin:6px 0;}
         .vehicle-info{
             display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
             gap:6px;min-height:85px;
         }
         .v-card{
-            background:rgba(255,255,255,0.5);border-radius:8px;
-            text-align:center;padding:6px;color:#111;font-size:0.7rem;
+            background:rgba(255,255,255,0.5);border-radius:8px;text-align:center;padding:6px;color:#111;font-size:0.7rem;
             height:70px;display:flex;flex-direction:column;justify-content:center;
         }
         .v-card img{width:20px;height:20px;margin:0 auto 2px;display:block;}
         .v-card .emoji{display:block;font-size:1.1rem;}
         .v-card .value{font-weight:bold;}
 
-        /* =========================================================
-           PERFIL
-           ========================================================= */
+        /* ====== PERFIL ====== */
         .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
         .profile-pill{
             background:rgba(255,255,255,0.4);
             border:1.5px solid rgba(255,255,255,0.5);
-            border-radius:10px;padding:8px;
-            display:flex;align-items:center;gap:10px;
+            border-radius:10px;padding:8px;display:flex;align-items:center;gap:10px;
             color:#111;cursor:pointer;transition:0.25s;
         }
         .profile-pill:hover{background:rgba(255,255,255,0.65);}
@@ -115,109 +84,65 @@
         .profile-info .name{font-weight:700;font-size:0.85rem;}
         .profile-info .details{font-size:0.72rem;}
 
-        /* =========================================================
-           CENÁRIOS
-           ========================================================= */
+        /* ====== CENÁRIOS ====== */
         .scenario-row{display:flex;gap:6px;margin-bottom:6px;}
         .scenario-btn{
-            flex:1;border-radius:8px;padding:5px 6px;
-            border:1.5px solid rgba(255,255,255,0.5);
-            background:rgba(255,255,255,0.4);color:#111;
-            font-weight:700;font-size:0.75rem;cursor:pointer;transition:0.25s;
+            flex:1;border-radius:8px;padding:5px 6px;border:1.5px solid rgba(255,255,255,0.5);
+            background:rgba(255,255,255,0.4);color:#111;font-weight:700;font-size:0.75rem;cursor:pointer;transition:0.25s;
             display:flex;justify-content:center;align-items:center;gap:5px;
         }
         .scenario-btn.active{background:var(--grad-btn);color:#fff;border:none;}
         .inputs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px;}
         .inputs-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;}
-        .btn-calc{width:100%;background:var(--grad-btn);color:#fff;border:none;
-            border-radius:8px;font-weight:700;padding:8px;cursor:pointer;}
+        .btn-calc{width:100%;background:var(--grad-btn);color:#fff;border:none;border-radius:8px;font-weight:700;padding:8px;cursor:pointer;}
 
-        /* =========================================================
-           RESULTADOS
-           ========================================================= */
+        /* ====== RESULTADOS ====== */
         .result-card{
-            grid-column:2/3;grid-row:2/span 2;
-            background:rgba(255,255,255,0.15);
-            border:1px solid var(--borda);border-radius:12px;padding:8px;
-            backdrop-filter:blur(6px);box-shadow:0 3px 10px rgba(0,0,0,0.25);
-            display:flex;flex-direction:column;justify-content:flex-start;
+            grid-column:2/3;grid-row:2/span 2;background:rgba(255,255,255,0.15);
+            border:1px solid var(--borda);border-radius:12px;padding:8px;backdrop-filter:blur(6px);
+            box-shadow:0 3px 10px rgba(0,0,0,0.25);display:flex;flex-direction:column;justify-content:flex-start;
         }
-        .result-card h3{
-            font-size:0.9rem;font-weight:700;
-            border-bottom:1.5px solid rgba(255,255,255,0.3);
-            padding-bottom:3px;margin-bottom:8px;
-        }
+        .result-card h3{font-size:0.9rem;font-weight:700;border-bottom:1.5px solid rgba(255,255,255,0.3);padding-bottom:3px;margin-bottom:8px;}
         .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
         .result-col{display:flex;flex-direction:column;gap:8px;}
         .result-box{
             background:linear-gradient(135deg,#6b73ff 0%,#8b5cf6 100%);
-            border-radius:12px;text-align:center;padding:12px 10px;
-            color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.25);
+            border-radius:12px;text-align:center;padding:12px 10px;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.25);
             height:73px;display:flex;flex-direction:column;justify-content:center;
         }
         .result-box h4{margin:0;font-size:0.9rem;font-weight:600;}
         .result-box .value{font-weight:bold;font-size:1.05rem;margin-top:5px;}
         .result-payback{grid-column:1/span 2;margin-top:6px;}
 
-        /* =========================================================
-           NOVA COLUNA - PAINEL RESERVADO DIVIDIDO (VISUAL)
-           ========================================================= */
-        .card-reservado {
-            grid-column: 3/4;
-            grid-row: 1 / span 3;
-            display: grid;
-            grid-template-rows: 0.5fr 1fr 1fr 1fr; /* 1 menor + 3 iguais */
-            gap: 8px;
+        /* ====== COLUNA DIREITA (gráficos) ====== */
+        .card-reservado{
+            grid-column:3/4;grid-row:1 / span 3;display:grid;grid-template-rows:0.5fr 1fr 1fr 1fr;gap:8px;
         }
-        .card-reservado .subcard {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid var(--borda);
-            border-radius: 12px;
-            padding: 10px;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 700;
-            font-size: 1rem;
-            color: #fff;
-            text-align:center;
+        .card-reservado .subcard{
+            background:rgba(255,255,255,0.12);border:1px solid var(--borda);border-radius:12px;padding:10px;backdrop-filter:blur(6px);
+            box-shadow:0 3px 10px rgba(0,0,0,0.25);display:flex;flex-direction:column;justify-content:center;align-items:center;
+            font-weight:700;font-size:1rem;color:#fff;text-align:center;overflow:hidden;position:relative;
         }
 
-        /* =========================================================
-           ESTILO DO CARD DE CONCLUSÃO (EMOJI GRANDE + TEXTO)
-           ========================================================= */
-        #conclusaoBox {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: 600;
-            padding: 14px;
-        }
-        #conclusaoBox .emoji-top {
-            font-size: 2.2rem;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-        #conclusaoBox .texto {
-            font-size: 0.9rem;
-            line-height: 1.3rem;
-        }
+        /* ====== CONCLUSÃO ====== */
+        #conclusaoBox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:600;padding:14px;}
+        #conclusaoBox .emoji-top{font-size:2.2rem;line-height:1;margin-bottom:4px;}
+        #conclusaoBox .texto{font-size:0.9rem;line-height:1.3rem;}
 
+        /* ====== GRÁFICOS ====== */
+        #grafico1,#grafico2,#grafico3{padding:8px!important;}
     </style>
 </head>
 
 <body>
 <div class="header">
-    <h1>⚡ Análise Econômica: EV vs ICE</h1>
-    <span style="font-size:0.8rem;opacity:0.8;">Versão conectada à planilha</span>
+    <h1>⚡ Análise Econômica: EV vs ICE - VERSÃO FINAL</h1>
+    <span style="font-size:0.8rem;opacity:0.8;">Fluxo de caixa completo</span>
 </div>
 
+
 <div class="dashboard">
-    <!-- ⚡ VEÍCULO ELÉTRICO -->
+    <!-- EV -->
     <div class="card" id="cardEV">
         <h3>⚡ Veículo Elétrico</h3>
         <label>Modelo:</label>
@@ -225,45 +150,27 @@
         <label>💰 Preço (R$):</label>
         <input id="precoEV">
         <img id="imgEV" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png" alt="EV">
-        <div id="infoEV" class="vehicle-info">
-            <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">⚡</span>Consumo Urb.<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">⚡</span>Consumo Rod.<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
-            <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>
-        </div>
+        <div id="infoEV" class="vehicle-info"></div>
     </div>
 
-    <!-- 🚗 VEÍCULO COMBUSTÃO -->
+    <!-- ICE -->
     <div class="card" id="cardICE">
-        <h3>🚗 Veículo Combustão</h3>
+        <h3>⛽ Veículo Combustão</h3>
         <label>Modelo:</label>
         <select id="selICE"><option>Selecione um modelo</option></select>
         <label>💰 Preço (R$):</label>
         <input id="precoICE">
         <img id="imgICE" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png" alt="ICE">
-        <div id="infoICE" class="vehicle-info">
-            <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">⛽</span>Consumo Urb.<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">⛽</span>Consumo Rod.<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
-            <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>
-        </div>
+        <div id="infoICE" class="vehicle-info"></div>
     </div>
 
-    <!-- 👤 PERFIL -->
+    <!-- PERFIL -->
     <div class="card" style="grid-column:1/2;">
         <h3>👤 Perfil</h3>
         <div id="perfisContainer" class="profile-grid">Carregando...</div>
     </div>
 
-    <!-- 🎯 CENÁRIO -->
+    <!-- CENÁRIO -->
     <div class="card" style="grid-column:1/2;">
         <h3>🎯 Cenário</h3>
         <div id="cenariosContainer" class="scenario-row"></div>
@@ -273,13 +180,13 @@
             <div><label>Gasolina (R$/L):</label><input id="precoGas"></div>
         </div>
         <div class="inputs-grid-2">
-            <div><label>Período (anos):</label><input id="anos" type="number"></div>
+            <div><label>Período (anos):</label><input id="anos" type="text" inputmode="decimal" placeholder="ex: 1,5"></div>
             <div><label>TMA (%):</label><input id="tma"></div>
         </div>
         <button class="btn-calc" id="btnCalcular">🚀 CALCULAR</button>
     </div>
 
-    <!-- 📊 RESULTADOS -->
+    <!-- RESULTADOS -->
     <div class="result-card">
         <h3>📊 Resultados</h3>
         <div class="result-grid">
@@ -301,89 +208,103 @@
         </div>
     </div>
 
-    <!-- 🧱 PAINEL RESERVADO (VISUAL APENAS) -->
+    <!-- COLUNA DE GRÁFICOS (idêntica) -->
     <div class="card-reservado">
-        <div class="subcard" id="conclusaoBox">
-            ✅ Conclusão
-        </div>
-        <div class="subcard" id="grafico1"> 📊 Grafico 1</div>
-        <div class="subcard">📈 Gráfico 2</div>
-        <div class="subcard">📉 Gráfico 3</div>
+        <div class="subcard" id="conclusaoBox">✅ Conclusão</div>
+        <div class="subcard" id="grafico1">📊 Fluxo de Caixa</div>
+        <div class="subcard" id="grafico2">⏳ Payback</div>
+        <div class="subcard" id="grafico3">💰 Custos</div>
     </div>
 </div>
 
-
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    // === LINKS DAS PLANILHAS ===
-    const URLS = {
-        VEICULOS: "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=0&single=true&output=csv"),
-        PERFIS: "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=155387580&single=true&output=csv"),
-        CENARIOS: "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=1970963524&single=true&output=csv")
+    /* =================== UTIL =================== */
+    const URLS={
+        VEICULOS:"https://api.allorigins.win/raw?url="+encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=0&single=true&output=csv"),
+        PERFIS:"https://api.allorigins.win/raw?url="+encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=155387580&single=true&output=csv"),
+        CENARIOS:"https://api.allorigins.win/raw?url="+encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vSUihOaIXPK9JWb5tXTp3YB0ALT-YIwVdZEeUtMa_CY8chVqzBayBQpnxQTkqLhvPwLVNgddsmZXGAo/pub?gid=1970963524&single=true&output=csv")
     };
-
-    // === FORMATAÇÃO BR ===
     const toNumBR=v=>parseFloat(String(v||"").replace(/\./g,"").replace(",",".").trim())||0;
     const moneyBR=n=>"R$ "+(Number(n)||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
     const moneyBR4=n=>"R$ "+(Number(n)||0).toLocaleString("pt-BR",{minimumFractionDigits:4,maximumFractionDigits:4});
-
-    // === LER CSV ===
+    const fmtPct = n => (Number(n)||0).toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:0})+"%";
+    function formatPayback(val){
+        if(isNaN(val)) return "Sem payback";
+        if(val<1){const m=Math.max(1,Math.round(val*12));return `${m} mes${m!==1?'es':''}`;}
+        const a=Math.floor(val),m=Math.round((val-a)*12);
+        return `${a} ano${a!==1?'s':''}`+(m>0?` e ${m} mes${m!==1?'es':''}`:"");
+    }
     async function getCSV(url){
-        const res=await fetch(url);
-        const text=await res.text();
-        const lines=text.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(c=>c.replace(/^\"|\"$/g,'')));
+        const res=await fetch(url); const text=await res.text();
+        const lines=text.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$|/g,'')));
         const headers=lines.shift();
         return lines.map(row=>{
-            const o={};
-            headers.forEach((h,i)=>o[h.trim()]=(row[i]||'').trim());
-            return o;
+            const o={}; headers.forEach((h,i)=>o[h.trim()]=(row[i]||'').trim()); return o;
         });
     }
 
+    /* =================== ESTADO =================== */
     let dataVeiculos=[],dataPerfis=[],dataCenarios=[];
     let selecionadoEV=null,selecionadoICE=null,selecionadoPerfil=null,selecionadoCenario=null;
+    let chartFluxo=null, chartPayback=null, chartCustoKm=null, graficosInicializados=false;
 
-    // === POPULAR VEÍCULOS ===
+    /* objeto único de saídas para reuso */
+    const dadosAtuais = {
+        // params
+        tma: NaN, anos: 0,
+        precoEV:0, precoICE:0, custoAnualEV:0, custoAnualICE:0, resPctEV:0, resPctICE:0,
+        // fluxos
+        fluxoEV:[], fluxoICE:[],
+        // métricas
+        vplEV:NaN, vplICE:NaN, tirEV:NaN, tirICE:NaN, payback:NaN,
+        // util para gráficos de VPL por período
+        vplSerieEV:[], vplSerieICE:[],
+        // custos variáveis
+        custoKmEV:0, custoKmICE:0
+    };
+
+    /* =================== UI (listas) =================== */
     function popularVeiculos(){
         const selEV=document.getElementById('selEV');
         const selICE=document.getElementById('selICE');
         selEV.innerHTML='<option>Selecione um modelo</option>';
         selICE.innerHTML='<option>Selecione um modelo</option>';
 
-        // Garante a estrutura dos cards de info
-        const tpl = (isEV)=>`
-            <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Urb.<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Rod.<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
-            <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>`;
+        const tpl=(isEV)=>`
+    <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
+    <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Urb.<br><span class="value">—</span></div>
+    <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Rod.<br><span class="value">—</span></div>
+    <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
+    <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
+    <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
+    <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
+    <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>`;
         if(!document.querySelector('#infoEV .v-card')) document.getElementById('infoEV').innerHTML=tpl(true);
         if(!document.querySelector('#infoICE .v-card')) document.getElementById('infoICE').innerHTML=tpl(false);
 
-        dataVeiculos.filter(v=>v.tipo.toUpperCase()==='EV').forEach(v=>{
-            const o=document.createElement('option');o.value=v.modelo;o.textContent=v.modelo;selEV.appendChild(o);
-        });
-        dataVeiculos.filter(v=>v.tipo.toUpperCase()==='ICE').forEach(v=>{
-            const o=document.createElement('option');o.value=v.modelo;o.textContent=v.modelo;selICE.appendChild(o);
-        });
+        for(const v of dataVeiculos.filter(v=>v.tipo.toUpperCase()==='EV')){
+            const o=document.createElement('option'); o.value=v.modelo; o.textContent=v.modelo; selEV.appendChild(o);
+        }
+        for(const v of dataVeiculos.filter(v=>v.tipo.toUpperCase()==='ICE')){
+            const o=document.createElement('option'); o.value=v.modelo; o.textContent=v.modelo; selICE.appendChild(o);
+        }
     }
-
-    // === ATUALIZAR INFORMAÇÕES DOS VEÍCULOS ===
-    function atualizarInfoVeiculo(v,infoId,precoId,imgId,isEV){
+    function setInfoVeiculo(v, infoId, precoId, imgId, isEV){
         const infoEl=document.getElementById(infoId);
         const precoEl=document.getElementById(precoId);
         const imgEl=document.getElementById(imgId);
         if(!v){
-            precoEl.value='';imgEl.src='https://i.imgur.com/MLNARfh.png';
-            infoEl.querySelectorAll('.value').forEach(e=>e.textContent='—');
-            return;
+            precoEl.value=''; imgEl.src='https://i.imgur.com/MLNARfh.png';
+            infoEl.querySelectorAll('.value').forEach(e=>e.textContent='—'); return;
         }
-        precoEl.value = toNumBR(v.preco_inicial).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+        precoEl.value = toNumBR(v.preco_inicial).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
         imgEl.src=v.imagem||'https://i.imgur.com/MLNARfh.png';
-        const setVal=(label,val)=>{const card=[...infoEl.querySelectorAll('.v-card')].find(c=>c.textContent.includes(label));if(card)card.querySelector('.value').textContent=val;};
+
+        const setVal=(label,val)=>{
+            const card=[...infoEl.querySelectorAll('.v-card')].find(c=>c.textContent.includes(label));
+            if(card) card.querySelector('.value').textContent=val;
+        };
         setVal('Ano',v.ano||'—');
         setVal('Consumo Urb.',v.consumo_urb?toNumBR(v.consumo_urb).toLocaleString('pt-BR',{minimumFractionDigits:2})+(isEV?' km/kWh':' km/L'):'—');
         setVal('Consumo Rod.',v.consumo_rod?toNumBR(v.consumo_rod).toLocaleString('pt-BR',{minimumFractionDigits:2})+(isEV?' km/kWh':' km/L'):'—');
@@ -394,40 +315,34 @@
         const resPct=v['residual_%']?(toNumBR(v['residual_%'])*100).toFixed(0)+'%':'—';
         setVal('Residual',resPct);
     }
-
-    // === POPULAR PERFIS ===
     function popularPerfis(){
-        const box=document.getElementById('perfisContainer');
-        box.innerHTML='';
+        const box=document.getElementById('perfisContainer'); box.innerHTML='';
         dataPerfis.forEach((p,i)=>{
-            const emoji=p.perfil.toLowerCase().includes('app')?'📱':p.perfil.toLowerCase().includes('via')?'🛣️':p.perfil.toLowerCase().includes('pes')?'🚙':'🏠';
+            const perfil=p.perfil.toLowerCase();
+            const emoji=perfil.includes('app')?'📱':perfil.includes('via')?'🛣️':perfil.includes('pes')?'🚙':'🏠';
             const div=document.createElement('div');
-            div.className='profile-pill'+(i===0?' active':'');
-            if(i===0)selecionadoPerfil=p;
-            div.innerHTML=`<div class="profile-emoji">${emoji}</div>
-    <div class="profile-info">
-      <div class="name">${p.perfil}</div>
-      <div class="details">${toNumBR(p.km_ano).toLocaleString('pt-BR')} km/ano</div>
-      <div class="details">Recarga Pública: ${(toNumBR(p['%_recarga_publica'])*100).toFixed(0)}% • Rodovia: ${(toNumBR(p['%_rodovia'])*100).toFixed(0)}%</div>
-    </div>`;
+            div.className='profile-pill'+(i===0?' active':''); if(i===0) selecionadoPerfil=p;
+            div.innerHTML = `
+      <div class="profile-emoji">${emoji}</div>
+      <div class="profile-info">
+        <div class="name">${p.perfil}</div>
+        <div class="details">${toNumBR(p.km_ano).toLocaleString('pt-BR')} km/ano</div>
+        <div class="details">Recarga Pública: ${fmtPct(toNumBR(p['%_recarga_publica'])*100)} • Rodovia: ${fmtPct(toNumBR(p['%_rodovia'])*100)}</div>
+      </div>`;
             div.onclick=()=>{document.querySelectorAll('.profile-pill').forEach(b=>b.classList.remove('active'));div.classList.add('active');selecionadoPerfil=p;};
             box.appendChild(div);
         });
     }
-
-    // === POPULAR CENÁRIOS ===
     function popularCenarios(){
-        const wrap=document.getElementById('cenariosContainer');
-        wrap.innerHTML='';
+        const wrap=document.getElementById('cenariosContainer'); wrap.innerHTML='';
         dataCenarios.forEach(c=>{
-            const icon=c.cenario.toLowerCase().includes('otim')?'📈':c.cenario.toLowerCase().includes('pess')?'📉':'📊';
+            const nome=c.cenario.toLowerCase();
+            const icon=nome.includes('otim')?'📈':nome.includes('pess')?'📉':'📊';
             const btn=document.createElement('button');
-            btn.className='scenario-btn';
-            btn.innerHTML=`${icon} ${c.cenario}`;
+            btn.className='scenario-btn'; btn.innerHTML=`${icon} ${c.cenario}`;
             btn.onclick=()=>{
                 document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
-                btn.classList.add('active');
-                selecionadoCenario=c;
+                btn.classList.add('active'); selecionadoCenario=c;
                 document.getElementById('tarifaRes').value=c.tarifa_residencial_kwh;
                 document.getElementById('tarifaPub').value=c.tarifa_publica_kwh;
                 document.getElementById('precoGas').value=c.preco_gasolina;
@@ -440,238 +355,476 @@
         if(base){wrap.querySelectorAll('.scenario-btn')[dataCenarios.indexOf(base)].click();}
     }
 
-    // === FUNÇÕES DE APOIO ===
-    function gerarFluxoVeiculo(preco, custoAnual, residualPct, anos) {
-        const fluxos = [];
-        fluxos.push(-preco); // ano 0
-        for (let t = 1; t <= anos; t++) {
-            const fluxo = -custoAnual + (t === anos ? preco * residualPct : 0);
-            fluxos.push(fluxo);
-        }
-        return fluxos;
+    /* =================== CÁLCULOS =================== */
+    function gerarFluxoVeiculo(preco,custoAnual,residualPct,anos){
+        const f=[-preco];
+        for(let t=1;t<=anos;t++) f.push(-custoAnual+(t===anos?preco*residualPct:0));
+        return f;
     }
-
-    function gerarFluxoDiferencial(fluxoEV, fluxoICE) {
-        const n = Math.min(fluxoEV.length, fluxoICE.length);
-        const fluxos = [];
-        for (let i = 0; i < n; i++) fluxos.push(fluxoEV[i] - fluxoICE[i]);
-        return fluxos;
-    }
-
-    function calcularTIR(fluxos) {
-        function f(i) { return fluxos.reduce((acc, fc, t) => acc + fc / ((1 + i) ** t), 0); }
-        let low = -0.9, high = 1.0, mid, fLow = f(low), fHigh = f(high);
-        if (fLow * fHigh > 0) return NaN;
-        for (let k = 0; k < 200; k++) {
-            mid = (low + high) / 2;
-            const fMid = f(mid);
-            if (Math.abs(fMid) < 1e-8) break;
-            if (fLow * fMid < 0) { high = mid; fHigh = fMid; }
-            else { low = mid; fLow = fMid; }
+    function calcularTIR(fluxos){
+        function f(i){return fluxos.reduce((acc,fc,t)=>acc+fc/((1+i)**t),0);}
+        let low=-0.9, high=1.0, mid, fLow=f(low), fHigh=f(high);
+        if(fLow*fHigh>0) return NaN;
+        for(let k=0;k<200;k++){
+            mid=(low+high)/2; const fMid=f(mid);
+            if(Math.abs(fMid)<1e-8) break;
+            if(fLow*fMid<0){high=mid; fHigh=fMid;} else{low=mid; fLow=fMid;}
         }
         return mid;
     }
-
-    function curvaVPL(fluxos, tma) {
-        const curva = [];
-        let acumulado = 0;
-        for (let t = 0; t < fluxos.length; t++) {
-            acumulado += fluxos[t] / Math.pow(1 + tma, t);
-            curva.push(acumulado);
-        }
-        return curva;
-    }
-
-    function calcularPaybackDescontado(fluxoEV, fluxoICE, tma, vplEV, vplICE, tirEV, tirICE) {
-        let payback = NaN;
-
-        if (vplEV > vplICE && tirEV > tirICE) {
-            const vplEVcurve = curvaVPL(fluxoEV, tma);
-            const vplICEcurve = curvaVPL(fluxoICE, tma);
-
-            let prevDiff = vplEVcurve[0] - vplICEcurve[0];
-            for (let t = 1; t < vplEVcurve.length; t++) {
-                const diff = vplEVcurve[t] - vplICEcurve[t];
-                if (prevDiff < 0 && diff >= 0) {
-                    const inc = diff - prevDiff;
-                    const frac = Math.abs(prevDiff) / inc;
-                    payback = (t - 1) + frac;
-                    break;
+    function calcularPaybackDescontado(preco_ev,custoAnual_ev,residual_ev,preco_ice,custoAnual_ice,residual_ice,tma){
+        let payback=NaN, maxAnos=30;
+        for(let ano=1; ano<=maxAnos; ano++){
+            const fator=(((1+tma)**ano-1)/(tma*((1+tma)**ano)));
+            const vplEV=-preco_ev-(custoAnual_ev*fator)+((preco_ev*residual_ev)/((1+tma)**ano));
+            const vplICE=-preco_ice-(custoAnual_ice*fator)+((preco_ice*residual_ice)/((1+tma)**ano));
+            const dif=vplEV-vplICE;
+            if(dif>0){
+                if(ano===1){
+                    const difAnt=(-preco_ev)-(-preco_ice);
+                    const fracao=Math.abs(difAnt)/(dif-difAnt);
+                    payback=fracao; // < 1 ano
+                }else{
+                    const fatorAnt=(((1+tma)**(ano-1)-1)/(tma*((1+tma)**(ano-1))));
+                    const vplEV_ant=-preco_ev-(custoAnual_ev*fatorAnt)+((preco_ev*residual_ev)/((1+tma)**(ano-1)));
+                    const vplICE_ant=-preco_ice-(custoAnual_ice*fatorAnt)+((preco_ice*residual_ice)/((1+tma)**(ano-1)));
+                    const difAnt=vplEV_ant-vplICE_ant;
+                    const fracao=Math.abs(difAnt)/(dif-difAnt);
+                    payback=(ano-1)+fracao;
                 }
-                prevDiff = diff;
-            }
-        } else if (
-            (vplEV > vplICE && tirEV < tirICE) ||
-            (vplEV < vplICE && tirEV > tirICE)
-        ) {
-            const fluxoDif = gerarFluxoDiferencial(fluxoEV, fluxoICE);
-            let soma = 0;
-            for (let t = 0; t < fluxoDif.length; t++) {
-                const fluxoDesc = fluxoDif[t] / Math.pow(1 + tma, t);
-                const somaAnterior = soma;
-                soma += fluxoDesc;
-                if (somaAnterior < 0 && soma >= 0) {
-                    const frac = Math.abs(somaAnterior) / fluxoDesc;
-                    payback = (t - 1) + frac;
-                    break;
-                }
+                break;
             }
         }
         return payback;
     }
-    
-    // === CÁLCULO PRINCIPAL ===
-    function calcular() {
-
-        // Proteções
-        if (!selecionadoEV || !selecionadoICE) {
-            alert("Por favor, selecione os dois modelos de veículos (Elétrico e Combustão) antes de calcular.");
-            return;
+    /* série de VPL por período — usa mesma fórmula do card */
+    function construirSerieVPL(preco,custoAnual,residualPct,tma,anos){
+        const serie=[-preco];
+        for(let a=1;a<=anos;a++){
+            const fator=(((1+tma)**a-1)/(tma*((1+tma)**a)));
+            const vpl=-preco-(custoAnual*fator)+((preco*residualPct)/((1+tma)**a));
+            serie.push(vpl);
         }
-        if (!selecionadoPerfil || !selecionadoCenario) {
-            alert("Por favor, selecione um perfil e um cenário antes de calcular.");
-            return;
+        return serie;
+    }
+
+    /* =================== RESULTADOS -> DOM =================== */
+    function aplicarResultadosDOM() {
+        const d=dadosAtuais;
+        document.getElementById('resEV').textContent   = moneyBR4(d.custoKmEV);
+        document.getElementById('resICE').textContent  = moneyBR4(d.custoKmICE);
+        document.getElementById('custoEV').textContent = moneyBR(d.custoAnualEV);
+        document.getElementById('custoICE').textContent= moneyBR(d.custoAnualICE);
+        document.getElementById('vpl_ev').textContent  = moneyBR(d.vplEV);
+        document.getElementById('vpl_ice').textContent = moneyBR(d.vplICE);
+        document.getElementById('tir_ev').textContent  = isNaN(d.tirEV) ? "—" : (d.tirEV*100).toFixed(2)+"%";
+        document.getElementById('tir_ice').textContent = isNaN(d.tirICE)? "—" : (d.tirICE*100).toFixed(2)+"%";
+        document.getElementById('payback').textContent = formatPayback(d.payback);
+
+        // Conclusão
+        const conclusaoBox=document.getElementById("conclusaoBox");
+        let concl="", cor="";
+        const diff=Math.abs(d.vplEV-d.vplICE);
+        const media=(Math.abs(d.vplEV)+Math.abs(d.vplICE))/2;
+        const diffPct= media>0 ? (diff/media)*100 : 0;
+        if(!isNaN(d.vplEV) && !isNaN(d.vplICE)){
+            if(d.vplEV>d.vplICE && diffPct>5){ concl="🌱 Vale a pena optar pelo carro elétrico. Ele apresenta menor custo total ao longo dos anos nas condições analisadas."; cor="rgba(16,185,129,0.6)";}
+            else if(d.vplEV<d.vplICE && diffPct>5){concl="⛽ Ainda vale mais a pena manter um carro a combustão. O custo total do elétrico é maior neste cenário."; cor="rgba(239,68,68,0.6)";}
+            else {concl="⚖️ O resultado é equilibrado. O carro elétrico e o a combustão têm custos muito próximos — a decisão depende mais do uso e das preferências pessoais."; cor="rgba(234,179,8,0.6)";}
+        }else{
+            concl="⚠️ Não foi possível concluir a comparação. Verifique se todos os dados dos veículos e do cenário foram preenchidos."; cor="rgba(234,179,8,0.6)";
         }
+        const emoji=concl.slice(0,2), texto=concl.slice(2).trim();
+        conclusaoBox.innerHTML=`<div class="emoji-top">${emoji}</div><div class="texto">${texto}</div>`;
+        conclusaoBox.style.background=cor;
+    }
 
-        // Entradas do usuário
-        const tarifaRes = toNumBR(document.getElementById('tarifaRes').value);
-        const tarifaPub = toNumBR(document.getElementById('tarifaPub').value);
-        const precoGas = toNumBR(document.getElementById('precoGas').value);
-        const kmAno = toNumBR(selecionadoPerfil.km_ano);
-        const pctPub = toNumBR(selecionadoPerfil['%_recarga_publica']);
-        const pctRodovia = toNumBR(selecionadoPerfil['%_rodovia']);
+    /* =================== GRÁFICOS (usando dadosAtuais) =================== */
+    function garantirCanvas(){
+        if(graficosInicializados) return;
+        document.getElementById('grafico1').innerHTML = `
+    <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">📊 Fluxo de Caixa EV × ICE</h4>
+    <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasFluxo"></canvas></div>`;
+        document.getElementById('grafico2').innerHTML = `
+    <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">⏳ Payback Descontado</h4>
+    <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasPayback"></canvas></div>`;
+        document.getElementById('grafico3').innerHTML = `
+    <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">💰 Custo por km</h4>
+    <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasCustoKm"></canvas></div>`;
+        graficosInicializados=true;
+    }
+    function desenharGraficos() {
+        garantirCanvas();
+        const d = dadosAtuais;
 
-        // TMA e Período
-        const tma_input = document.getElementById('tma').value.trim();
-        const tma = tma_input === "" ? toNumBR(selecionadoCenario.tma) : toNumBR(tma_input) / 100;
-        const anos_input = document.getElementById('anos').value.trim();
-        const anosCalc = anos_input === "" ? toNumBR(selecionadoCenario.periodo) : toNumBR(anos_input);
+        // Fluxo
+        const ctxFluxo = document.getElementById('canvasFluxo').getContext('2d');
+        const labels = Array.from({length: d.anos + 1}, (_, i) => `Ano ${i}`);
+        if (chartFluxo) chartFluxo.destroy();
+        chartFluxo = new Chart(ctxFluxo, {
+            type: 'bar',
+            data: {
+                labels, datasets: [
+                    {
+                        label: '⚡ EV',
+                        data: d.fluxoEV,
+                        backgroundColor: 'rgba(16,185,129,0.8)',
+                        borderColor: 'rgb(16,185,129)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '🚗 ICE',
+                        data: d.fluxoICE,
+                        backgroundColor: 'rgba(239,68,68,0.8)',
+                        borderColor: 'rgb(239,68,68)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: true, aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {color: '#fff', font: {size: 9}, boxWidth: 10, padding: 5}
+                    },
+                    tooltip: {callbacks: {label: c => c.dataset.label + ': ' + moneyBR(c.parsed.y)}}
+                },
+                scales: {
+                    x: {ticks: {color: '#fff', font: {size: 8}, maxRotation: 0}, grid: {display: false}},
+                    y: {
+                        ticks: {color: '#fff', font: {size: 8}, callback: v => 'R$ ' + (v / 1000).toFixed(0) + 'k'},
+                        grid: {color: 'rgba(255,255,255,0.1)'}
+                    }
+                }
+            }
+        });
 
-        // PREÇOS (editáveis)
-        const preco_ev_str = document.getElementById('precoEV').value.trim();
-        const preco_ice_str = document.getElementById('precoICE').value.trim();
-        const preco_ev = preco_ev_str === "" ? toNumBR(selecionadoEV.preco_inicial) : toNumBR(preco_ev_str);
-        const preco_ice = preco_ice_str === "" ? toNumBR(selecionadoICE.preco_inicial) : toNumBR(preco_ice_str);
+        // Série VPL (usa mesma fórmula do card: d.vplSerieEV/ICE)
+        const ctxPayback = document.getElementById('canvasPayback').getContext('2d');
+        if (chartPayback) chartPayback.destroy();
+        chartPayback = new Chart(ctxPayback, {
+            type: 'line',
+            data: {
+                labels, datasets: [
+                    {
+                        label: 'VPL EV',
+                        data: d.vplSerieEV,
+                        borderColor: 'rgb(16,185,129)',
+                        backgroundColor: 'rgba(16,185,129,0.1)',
+                        borderWidth: 2,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'VPL ICE',
+                        data: d.vplSerieICE,
+                        borderColor: 'rgb(239,68,68)',
+                        backgroundColor: 'rgba(239,68,68,0.1)',
+                        borderWidth: 2,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: true, aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {color: '#fff', font: {size: 9}, boxWidth: 10, padding: 5}
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: c => c.dataset.label + ': ' + moneyBR(c.parsed.y),
+                            footer: (ctx) => !isNaN(d.payback) && ctx[0].dataIndex <= Math.ceil(d.payback) ? `\nPayback em ${formatPayback(d.payback)}` : ''
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {color: '#fff', font: {size: 8}, maxRotation: 0},
+                        grid: {color: 'rgba(255,255,255,0.1)'}
+                    },
+                    y: {
+                        ticks: {color: '#fff', font: {size: 8}, callback: v => 'R$ ' + (v / 1000).toFixed(0) + 'k'},
+                        grid: {color: 'rgba(255,255,255,0.1)'}
+                    }
+                }
+            }
+        });
 
-        // Dados dos veículos
-        const cuEV = toNumBR(selecionadoEV.consumo_urb);
-        const crEV = toNumBR(selecionadoEV.consumo_rod);
-        const cuICE = toNumBR(selecionadoICE.consumo_urb);
-        const crICE = toNumBR(selecionadoICE.consumo_rod);
+// ====== GRÁFICO 3 - CUSTOS COMPARATIVOS (DUAS ESCALAS MELHOR VISÍVEIS) ======
+        const ctxCustoKm = document.getElementById('canvasCustoKm').getContext('2d');
+        if (chartCustoKm) chartCustoKm.destroy();
 
-        // Consumo médio ponderado
-        const consumoMedioEV = (cuEV * (1 - pctRodovia)) + (crEV * pctRodovia);
-        const consumoMedioICE = (cuICE * (1 - pctRodovia)) + (crICE * pctRodovia);
+// cálculos
+        const custoTotalEV = d.custoAnualEV * d.anos + d.precoEV - (d.precoEV * d.resPctEV);
+        const custoTotalICE = d.custoAnualICE * d.anos + d.precoICE - (d.precoICE * d.resPctICE);
+        const diffTotal = ((custoTotalICE - custoTotalEV) / custoTotalICE * 100).toFixed(1);
 
-        // Custo de energia e combustível
-        const custoEnergiaEV = ((1 - pctPub) * tarifaRes) + (pctPub * tarifaPub);
-        const custoKmEV = consumoMedioEV > 0 ? (custoEnergiaEV / consumoMedioEV) : 0;
-        const custoKmICE = consumoMedioICE > 0 ? (precoGas / consumoMedioICE) : 0;
+// labels e valores
+        const labels3 = ['⚡ EV', '⛽ ICE'];
+        const datasetKm = [d.custoKmEV, d.custoKmICE];
+        const datasetAnual = [d.custoAnualEV, d.custoAnualICE];
+        const datasetTotal = [custoTotalEV, custoTotalICE];
 
-        // Custos anuais
-        const custoAnualEV = +toNumBR(selecionadoEV.manutencao_anual)
+// gráfico com eixos duplos e alto contraste
+        chartCustoKm = new Chart(ctxCustoKm, {
+            type: 'bar',
+            data: {
+                labels: labels3,
+                datasets: [
+                    {
+                        label: '💰 Custo por km (Eixo Esquerdo)',
+                        data: datasetKm,
+                        backgroundColor: 'rgba(255,255,255,0.8)',
+                        borderColor: '#ffffff',
+                        borderWidth: 1.5,
+                        yAxisID: 'yKm'
+                    },
+                    {
+                        label: '📆 Custo Anual (Eixo Direito)',
+                        data: datasetAnual,
+                        backgroundColor: 'rgba(59,130,246,0.8)',
+                        borderColor: 'rgb(37,99,235)',
+                        borderWidth: 1.5,
+                        yAxisID: 'yReais'
+                    },
+                    {
+                        label: '🧾 Custo Total (Eixo Direito)',
+                        data: datasetTotal,
+                        backgroundColor: 'rgba(234,179,8,0.85)',
+                        borderColor: 'rgb(202,138,4)',
+                        borderWidth: 1.5,
+                        yAxisID: 'yReais'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#fff',
+                            font: { size: 9, weight: 'bold' },
+                            padding: 10
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const label = ctx.dataset.label || '';
+                                const val = ctx.parsed.y;
+                                if (ctx.dataset.yAxisID === 'yKm') {
+                                    return `${label}: ${moneyBR4(val)} /km`;
+                                } else {
+                                    return `${label}: ${moneyBR(val)}`;
+                                }
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: `EV é ${diffTotal}% mais barato no custo total`,
+                        color: '#fff',
+                        font: { size: 10, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#fff', font: { size: 9, weight: 'bold' } },
+                        grid: { display: false }
+                    },
+                    yKm: {
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '💰 R$/km (Escala Esquerda)',
+                            color: '#ffffff',
+                            font: { size: 10, weight: 'bold' }
+                        },
+                        ticks: {
+                            color: '#ffffff',
+                            font: { size: 9, weight: '600' },
+                            callback: v => 'R$ ' + v.toFixed(3)
+                        },
+                        grid: { color: 'rgba(255,255,255,0.2)', lineWidth: 0.5 }
+                    },
+                    yReais: {
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '📆 / 🧾 Custos (R$) — Escala Direita',
+                            color: '#93c5fd',
+                            font: { size: 10, weight: 'bold' }
+                        },
+                        ticks: {
+                            color: '#93c5fd',
+                            font: { size: 9, weight: '600' },
+                            callback: v => 'R$ ' + (v / 1000).toFixed(0) + 'k'
+                        },
+                        grid: { drawOnChartArea: false }
+                    }
+                }
+            }
+        });
+
+
+    }
+    /* =================== PIPE DE CÁLCULO =================== */
+    function calcular(){
+        if(!selecionadoEV||!selecionadoICE){alert("Selecione os dois modelos (Elétrico e Combustão).");return;}
+        if(!selecionadoPerfil||!selecionadoCenario){alert("Selecione um perfil e um cenário.");return;}
+
+        const tarifaRes=toNumBR(document.getElementById('tarifaRes').value);
+        const tarifaPub=toNumBR(document.getElementById('tarifaPub').value);
+        const precoGas=toNumBR(document.getElementById('precoGas').value);
+        const kmAno=toNumBR(selecionadoPerfil.km_ano);
+        const pctPub=toNumBR(selecionadoPerfil['%_recarga_publica']);
+        const pctRodovia=toNumBR(selecionadoPerfil['%_rodovia']);
+
+        const tma_in=document.getElementById('tma').value.trim();
+        let tma = tma_in==="" ? toNumBR(selecionadoCenario.tma) : toNumBR(tma_in)/100;
+        if(tma<=0||isNaN(tma)){alert("⚠️ TMA inválida! Informe um valor > 0.");return;}
+
+        const anos_in=document.getElementById('anos').value.trim();
+        const anos= anos_in==="" ? toNumBR(selecionadoCenario.periodo) : toNumBR(anos_in);
+
+        const preco_ev_in=document.getElementById('precoEV').value.trim();
+        const preco_ice_in=document.getElementById('precoICE').value.trim();
+        const preco_ev = preco_ev_in==="" ? toNumBR(selecionadoEV.preco_inicial) : toNumBR(preco_ev_in);
+        const preco_ice= preco_ice_in===""? toNumBR(selecionadoICE.preco_inicial): toNumBR(preco_ice_in);
+
+        const cuEV=toNumBR(selecionadoEV.consumo_urb), crEV=toNumBR(selecionadoEV.consumo_rod);
+        const cuICE=toNumBR(selecionadoICE.consumo_urb), crICE=toNumBR(selecionadoICE.consumo_rod);
+
+        const consumoMedioEV=(cuEV*(1-pctRodovia))+(crEV*pctRodovia);
+        const consumoMedioICE=(cuICE*(1-pctRodovia))+(crICE*pctRodovia);
+
+        const custoEnergiaEV=((1-pctPub)*tarifaRes)+(pctPub*tarifaPub);
+        const custoKmEV=consumoMedioEV>0?(custoEnergiaEV/consumoMedioEV):0;
+        const custoKmICE=consumoMedioICE>0?(precoGas/consumoMedioICE):0;
+
+        const custoAnualEV= toNumBR(selecionadoEV.manutencao_anual)
             + toNumBR(selecionadoEV.seguro_anual)
             + toNumBR(selecionadoEV.ipva_anual)
             + toNumBR(selecionadoEV.pneus_ano)
-            + (custoKmEV * kmAno);
+            + (custoKmEV*kmAno);
 
-        const custoAnualICE = +toNumBR(selecionadoICE.manutencao_anual)
+        const custoAnualICE=toNumBR(selecionadoICE.manutencao_anual)
             + toNumBR(selecionadoICE.seguro_anual)
             + toNumBR(selecionadoICE.ipva_anual)
             + toNumBR(selecionadoICE.pneus_ano)
-            + (custoKmICE * kmAno);
+            + (custoKmICE*kmAno);
 
-        // === VPL (proteção tma=0) ===
-        const resPctEV = toNumBR(selecionadoEV['residual_%']);
-        const resPctICE = toNumBR(selecionadoICE['residual_%']);
-        const fator = (tma === 0)
-            ? anosCalc
-            : (((1 + tma) ** anosCalc - 1) / (tma * ((1 + tma) ** anosCalc)));
+        const resPctEV=toNumBR(selecionadoEV['residual_%']);
+        const resPctICE=toNumBR(selecionadoICE['residual_%']);
 
-        const vplEV =
-            -preco_ev
-            - (custoAnualEV * fator)
-            + ((preco_ev * resPctEV) / ((1 + tma) ** anosCalc));
+        const fator=(((1+tma)**anos-1)/(tma*((1+tma)**anos)));
+        const vplEV = -preco_ev - (custoAnualEV*fator) + ((preco_ev*resPctEV)/((1+tma)**anos));
+        const vplICE= -preco_ice- (custoAnualICE*fator)+ ((preco_ice*resPctICE)/((1+tma)**anos));
 
-        const vplICE =
-            -preco_ice
-            - (custoAnualICE * fator)
-            + ((preco_ice * resPctICE) / ((1 + tma) ** anosCalc));
+        const fluxoEV=gerarFluxoVeiculo(preco_ev,custoAnualEV,resPctEV,anos);
+        const fluxoICE=gerarFluxoVeiculo(preco_ice,custoAnualICE,resPctICE,anos);
+        const tirEV=calcularTIR(fluxoEV);
+        const tirICE=calcularTIR(fluxoICE);
 
-        // === FLUXOS INDIVIDUAIS (nominais) ===
-        const fluxoEV = gerarFluxoVeiculo(preco_ev, custoAnualEV, resPctEV, anosCalc);
-        const fluxoICE = gerarFluxoVeiculo(preco_ice, custoAnualICE, resPctICE, anosCalc);
-
-        // === TIR e PAYBACK DESCONTADO ===
-        const tirEV = calcularTIR(fluxoEV);
-        const tirICE = calcularTIR(fluxoICE);
-        const paybackDesc = calcularPaybackDescontado(fluxoEV, fluxoICE, tma, vplEV, vplICE, tirEV, tirICE);
-
-        // === EXIBIÇÃO ===
-        document.getElementById('resEV').textContent = moneyBR4(custoKmEV);
-        document.getElementById('resICE').textContent = moneyBR4(custoKmICE);
-        document.getElementById('custoEV').textContent = moneyBR(custoAnualEV);
-        document.getElementById('custoICE').textContent = moneyBR(custoAnualICE);
-        document.getElementById('vpl_ev').textContent = moneyBR(vplEV);
-        document.getElementById('tir_ev').textContent = isNaN(tirEV) ? "—" : (tirEV * 100).toFixed(2) + "%";
-        document.getElementById('vpl_ice').textContent = moneyBR(vplICE);
-        document.getElementById('tir_ice').textContent = isNaN(tirICE) ? "—" : (tirICE * 100).toFixed(2) + "%";
-        document.getElementById('payback').textContent =
-            isNaN(paybackDesc) ? "Sem payback" : paybackDesc.toFixed(2) + " anos";
-
-        // === CONCLUSÃO (sem usar variável inexistente) ===
-        const conclusaoBox = document.getElementById("conclusaoBox");
-        let conclusaoTexto = "", corFundo = "";
-        if (!isNaN(vplEV) && !isNaN(vplICE)) {
-            const diff = Math.abs(vplEV - vplICE);
-            const media = (Math.abs(vplEV) + Math.abs(vplICE)) / 2;
-            const diffPct = media > 0 ? (diff / media) * 100 : 0;
-
-            if (vplEV > vplICE && diffPct > 5) {
-                conclusaoTexto = "🌱 Vale a pena optar pelo carro elétrico. Ele apresenta menor custo total ao longo dos anos nas condições analisadas.";
-                corFundo = "rgba(16,185,129,0.6)";
-            } else if (vplEV < vplICE && diffPct > 5) {
-                conclusaoTexto = "⛽ Ainda vale mais a pena manter um carro a combustão. O custo total do elétrico é maior neste cenário.";
-                corFundo = "rgba(239,68,68,0.6)";
-            } else {
-                conclusaoTexto = "⚖️ O resultado é equilibrado. O carro elétrico e o a combustão têm custos muito próximos — a decisão depende mais do uso e das preferências pessoais.";
-                corFundo = "rgba(234,179,8,0.6)";
-            }
-        } else {
-            conclusaoTexto = "⚠️ Não foi possível concluir a comparação. Verifique se todos os dados dos veículos e do cenário foram preenchidos.";
-            corFundo = "rgba(234,179,8,0.6)";
+        const payback=calcularPaybackDescontado(preco_ev,custoAnualEV,resPctEV,preco_ice,custoAnualICE,resPctICE,tma);
+        let paybackFinal = payback;
+        if (isNaN(payback) || payback > anos) {
+            paybackFinal = NaN; // força "Sem payback" no card
         }
-        const emoji = conclusaoTexto.slice(0, 2);
-        const texto = conclusaoTexto.slice(2).trim();
-        conclusaoBox.innerHTML = `<div class="emoji-top">${emoji}</div><div class="texto">${texto}</div>`;
-        conclusaoBox.style.background = corFundo;
+        // preencher séries de VPL por período (gráfico)
+        const serieEV = construirSerieVPL(preco_ev,custoAnualEV,resPctEV,tma,anos);
+        const serieICE= construirSerieVPL(preco_ice,custoAnualICE,resPctICE,tma,anos);
+
+        // atualizar estado único
+        Object.assign(dadosAtuais,{
+            tma, anos,
+            precoEV:preco_ev, precoICE:preco_ice,
+            custoAnualEV, custoAnualICE, resPctEV, resPctICE,
+            fluxoEV, fluxoICE,
+            vplEV, vplICE, tirEV, tirICE, payback: paybackFinal,
+            vplSerieEV:serieEV, vplSerieICE:serieICE,
+            custoKmEV, custoKmICE
+        });
+
+        // DOM + gráficos
+        aplicarResultadosDOM();
+        desenharGraficos();
     }
 
-    // === INICIALIZAÇÃO ===
+    /* =================== INIT =================== */
     async function init(){
-        [dataVeiculos,dataPerfis,dataCenarios]=await Promise.all([
-            getCSV(URLS.VEICULOS),getCSV(URLS.PERFIS),getCSV(URLS.CENARIOS)
-        ]);
-        popularVeiculos();popularPerfis();popularCenarios();
+        [dataVeiculos,dataPerfis,dataCenarios]=await Promise.all([getCSV(URLS.VEICULOS),getCSV(URLS.PERFIS),getCSV(URLS.CENARIOS)]);
+        popularVeiculos(); popularPerfis(); popularCenarios();
 
         document.getElementById('selEV').addEventListener('change',e=>{
-            const m=e.target.value;selecionadoEV=dataVeiculos.find(v=>v.modelo===m);
-            atualizarInfoVeiculo(selecionadoEV,'infoEV','precoEV','imgEV',true);
+            const m=e.target.value; selecionadoEV=dataVeiculos.find(v=>v.modelo===m);
+            setInfoVeiculo(selecionadoEV,'infoEV','precoEV','imgEV',true);
         });
         document.getElementById('selICE').addEventListener('change',e=>{
-            const m=e.target.value;selecionadoICE=dataVeiculos.find(v=>v.modelo===m);
-            atualizarInfoVeiculo(selecionadoICE,'infoICE','precoICE','imgICE',false);
+            const m=e.target.value; selecionadoICE=dataVeiculos.find(v=>v.modelo===m);
+            setInfoVeiculo(selecionadoICE,'infoICE','precoICE','imgICE',false);
         });
-
-        // registra o calcular ao final da init (garante DOM e dados prontos)
         document.getElementById('btnCalcular').addEventListener('click',calcular);
     }
     init().catch(err=>{
         console.error(err);
         alert('Erro ao carregar dados: '+err);
-        // Mesmo se falhar o fetch, mantém o botão funcional para debug
         document.getElementById('btnCalcular').addEventListener('click',calcular);
     });
+
+    /* =================== REGRAS DE DIGITAÇÃO (com alertas e correções automáticas) =================== */
+    function bloquearEntradaInvalida() {
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(inp => {
+            inp.addEventListener('keydown', e => {
+                const permitido = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'];
+                const key = e.key;
+
+// Bloquear letras e caracteres especiais
+                if (/[^0-9,]/.test(key) && !permitido.includes(key)) {
+                    e.preventDefault();
+                    if (/[a-zA-Z]/.test(key)) alert("⚠️ Digite apenas números e vírgula (,) — letras não são permitidas.");
+                    else if (key === '.') alert("⚠️ Use vírgula (,) em vez de ponto (.) para decimais.");
+                    else if (/[^0-9,]/.test(key)) alert("⚠️ Caracteres especiais não são permitidos.");
+                    return;
+                }
+
+// Impedir duas vírgulas
+                if (key === ',' && inp.value.includes(',')) {
+                    e.preventDefault();
+                    return;
+                }
+            });
+
+// Corrigir automaticamente entradas após colar ou digitar
+            inp.addEventListener('input', e => {
+                let v = e.target.value;
+
+// remove caracteres inválidos
+                if (/[a-zA-Z!@#$%^&*()_+\-={}\[\]:;"'<>,.?/\\|`~]/.test(v)) {
+                    alert("⚠️ Digite apenas números e vírgula (,) — caracteres especiais não são permitidos.");
+                }
+
+                v = v.replace(/[^0-9,]/g, ''); // mantém só números e vírgula
+                const partes = v.split(',');
+                if (partes.length > 2) v = partes[0] + ',' + partes[1]; // limita 1 vírgula
+                if (v.startsWith(',')) v = '0' + v; // se começar com vírgula, vira 0,5 etc.
+                if (v === ',') v = '0,'; // se for apenas vírgula, prefixa 0
+                if (v === '') v = ''; // mantém vazio se apagar tudo
+
+                e.target.value = v;
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', bloquearEntradaInvalida);
 </script>
 </body>
 </html>
