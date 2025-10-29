@@ -20,15 +20,16 @@
             font-family:"Segoe UI",Tahoma,sans-serif;
             background:var(--grad-bg);color:#fff;
             display:flex;flex-direction:column;
-            justify-content:center;align-items:flex-start;
-            padding-left:24px;
+            justify-content:center;align-items:center;
+            padding:24px;
         }
 
         /* =========================================================
            CABEÇALHO
            ========================================================= */
         .header {
-            width:940px;
+            width:100%;
+            max-width:1400px;
             background:rgba(255,255,255,0.2);
             border-radius:10px;
             padding:8px 18px;margin-bottom:10px;
@@ -42,10 +43,11 @@
            ========================================================= */
         .dashboard {
             display:grid;
-            grid-template-columns:1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr; /* 3 colunas */
             grid-template-rows:auto auto;
             gap:8px;
-            width:940px;
+            width:100%;
+            max-width:1400px;
         }
 
         /* =========================================================
@@ -151,11 +153,60 @@
             background:linear-gradient(135deg,#6b73ff 0%,#8b5cf6 100%);
             border-radius:12px;text-align:center;padding:12px 10px;
             color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.25);
-            height:80px;display:flex;flex-direction:column;justify-content:center;
+            height:73px;display:flex;flex-direction:column;justify-content:center;
         }
         .result-box h4{margin:0;font-size:0.9rem;font-weight:600;}
         .result-box .value{font-weight:bold;font-size:1.05rem;margin-top:5px;}
         .result-payback{grid-column:1/span 2;margin-top:6px;}
+
+        /* =========================================================
+           NOVA COLUNA - PAINEL RESERVADO DIVIDIDO (VISUAL)
+           ========================================================= */
+        .card-reservado {
+            grid-column: 3/4;
+            grid-row: 1 / span 3;
+            display: grid;
+            grid-template-rows: 0.5fr 1fr 1fr 1fr; /* 1 menor + 3 iguais */
+            gap: 8px;
+        }
+        .card-reservado .subcard {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid var(--borda);
+            border-radius: 12px;
+            padding: 10px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            text-align:center;
+        }
+
+        /* =========================================================
+           ESTILO DO CARD DE CONCLUSÃO (EMOJI GRANDE + TEXTO)
+           ========================================================= */
+        #conclusaoBox {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 600;
+            padding: 14px;
+        }
+        #conclusaoBox .emoji-top {
+            font-size: 2.2rem;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        #conclusaoBox .texto {
+            font-size: 0.9rem;
+            line-height: 1.3rem;
+        }
+
     </style>
 </head>
 
@@ -172,17 +223,16 @@
         <label>Modelo:</label>
         <select id="selEV"><option>Selecione um modelo</option></select>
         <label>💰 Preço (R$):</label>
-        <!-- EDITÁVEL (removido readonly) -->
         <input id="precoEV">
-        <img id="imgEV" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png">
+        <img id="imgEV" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png" alt="EV">
         <div id="infoEV" class="vehicle-info">
             <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">⚡</span>Consumo Urbano<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">⚡</span>Consumo Rodoviário<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">⚡</span>Consumo Urb.<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">⚡</span>Consumo Rod.<br><span class="value">—</span></div>
             <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
             <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
             <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
-            <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png">Pneus<br><span class="value">—</span></div>
+            <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
             <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>
         </div>
     </div>
@@ -193,17 +243,16 @@
         <label>Modelo:</label>
         <select id="selICE"><option>Selecione um modelo</option></select>
         <label>💰 Preço (R$):</label>
-        <!-- EDITÁVEL (removido readonly) -->
         <input id="precoICE">
-        <img id="imgICE" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png">
+        <img id="imgICE" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png" alt="ICE">
         <div id="infoICE" class="vehicle-info">
             <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">⛽</span>Consumo Urbano<br><span class="value">—</span></div>
-            <div class="v-card"><span class="emoji">⛽</span>Consumo Rodoviário<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">⛽</span>Consumo Urb.<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">⛽</span>Consumo Rod.<br><span class="value">—</span></div>
             <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
             <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
             <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
-            <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png">Pneus<br><span class="value">—</span></div>
+            <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
             <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>
         </div>
     </div>
@@ -237,19 +286,33 @@
             <div class="result-col">
                 <div class="result-box"><h4>⚡ R$/KM EV</h4><span class="value" id="resEV">—</span></div>
                 <div class="result-box"><h4>🌿 Custo Anual EV</h4><span class="value" id="custoEV">—</span></div>
-                <div class="result-box"><h4>📉 VPL Diferença</h4><span class="value" id="vpl">—</span></div>
+                <div class="result-box"><h4>📉 VPL EV</h4><span class="value" id="vpl_ev">—</span></div>
+                <div class="result-box"><h4>📈 TIR EV</h4><span class="value" id="tir_ev">—</span></div>
             </div>
             <div class="result-col">
                 <div class="result-box"><h4>⛽ R$/KM ICE</h4><span class="value" id="resICE">—</span></div>
                 <div class="result-box"><h4>🔥 Custo Anual ICE</h4><span class="value" id="custoICE">—</span></div>
-                <div class="result-box"><h4>📈 TIR Diferença</h4><span class="value" id="tir">—</span></div>
+                <div class="result-box"><h4>📉 VPL ICE</h4><span class="value" id="vpl_ice">—</span></div>
+                <div class="result-box"><h4>📈 TIR ICE</h4><span class="value" id="tir_ice">—</span></div>
             </div>
             <div class="result-box result-payback">
                 <h4>⏳ Payback Descontado</h4><span class="value" id="payback">—</span>
             </div>
         </div>
     </div>
+
+    <!-- 🧱 PAINEL RESERVADO (VISUAL APENAS) -->
+    <div class="card-reservado">
+        <div class="subcard" id="conclusaoBox">
+            ✅ Conclusão
+        </div>
+        <div class="subcard" id="grafico1"> 📊 Grafico 1</div>
+        <div class="subcard">📈 Gráfico 2</div>
+        <div class="subcard">📉 Gráfico 3</div>
+    </div>
 </div>
+
+
 
 <script>
     // === LINKS DAS PLANILHAS ===
@@ -286,6 +349,20 @@
         const selICE=document.getElementById('selICE');
         selEV.innerHTML='<option>Selecione um modelo</option>';
         selICE.innerHTML='<option>Selecione um modelo</option>';
+
+        // Garante a estrutura dos cards de info
+        const tpl = (isEV)=>`
+            <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Urb.<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Rod.<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
+            <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
+            <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>`;
+        if(!document.querySelector('#infoEV .v-card')) document.getElementById('infoEV').innerHTML=tpl(true);
+        if(!document.querySelector('#infoICE .v-card')) document.getElementById('infoICE').innerHTML=tpl(false);
+
         dataVeiculos.filter(v=>v.tipo.toUpperCase()==='EV').forEach(v=>{
             const o=document.createElement('option');o.value=v.modelo;o.textContent=v.modelo;selEV.appendChild(o);
         });
@@ -308,8 +385,8 @@
         imgEl.src=v.imagem||'https://i.imgur.com/MLNARfh.png';
         const setVal=(label,val)=>{const card=[...infoEl.querySelectorAll('.v-card')].find(c=>c.textContent.includes(label));if(card)card.querySelector('.value').textContent=val;};
         setVal('Ano',v.ano||'—');
-        setVal('Consumo Urbano',v.consumo_urb?toNumBR(v.consumo_urb).toLocaleString('pt-BR',{minimumFractionDigits:2})+(isEV?' km/kWh':' km/L'):'—');
-        setVal('Consumo Rodoviário',v.consumo_rod?toNumBR(v.consumo_rod).toLocaleString('pt-BR',{minimumFractionDigits:2})+(isEV?' km/kWh':' km/L'):'—');
+        setVal('Consumo Urb.',v.consumo_urb?toNumBR(v.consumo_urb).toLocaleString('pt-BR',{minimumFractionDigits:2})+(isEV?' km/kWh':' km/L'):'—');
+        setVal('Consumo Rod.',v.consumo_rod?toNumBR(v.consumo_rod).toLocaleString('pt-BR',{minimumFractionDigits:2})+(isEV?' km/kWh':' km/L'):'—');
         setVal('Manutenção',v.manutencao_anual?moneyBR(toNumBR(v.manutencao_anual)):'—');
         setVal('Seguro',v.seguro_anual?moneyBR(toNumBR(v.seguro_anual)):'—');
         setVal('IPVA',v.ipva_anual?moneyBR(toNumBR(v.ipva_anual)):'—');
@@ -363,72 +440,211 @@
         if(base){wrap.querySelectorAll('.scenario-btn')[dataCenarios.indexOf(base)].click();}
     }
 
-    // === BLOCO DE CÁLCULOS ===
-    function calcular(){
+    // === FUNÇÕES DE APOIO ===
+    function gerarFluxoVeiculo(preco, custoAnual, residualPct, anos) {
+        const fluxos = [];
+        fluxos.push(-preco); // ano 0
+        for (let t = 1; t <= anos; t++) {
+            const fluxo = -custoAnual + (t === anos ? preco * residualPct : 0);
+            fluxos.push(fluxo);
+        }
+        return fluxos;
+    }
+
+    function gerarFluxoDiferencial(fluxoEV, fluxoICE) {
+        const n = Math.min(fluxoEV.length, fluxoICE.length);
+        const fluxos = [];
+        for (let i = 0; i < n; i++) fluxos.push(fluxoEV[i] - fluxoICE[i]);
+        return fluxos;
+    }
+
+    function calcularTIR(fluxos) {
+        function f(i) { return fluxos.reduce((acc, fc, t) => acc + fc / ((1 + i) ** t), 0); }
+        let low = -0.9, high = 1.0, mid, fLow = f(low), fHigh = f(high);
+        if (fLow * fHigh > 0) return NaN;
+        for (let k = 0; k < 200; k++) {
+            mid = (low + high) / 2;
+            const fMid = f(mid);
+            if (Math.abs(fMid) < 1e-8) break;
+            if (fLow * fMid < 0) { high = mid; fHigh = fMid; }
+            else { low = mid; fLow = fMid; }
+        }
+        return mid;
+    }
+
+    function curvaVPL(fluxos, tma) {
+        const curva = [];
+        let acumulado = 0;
+        for (let t = 0; t < fluxos.length; t++) {
+            acumulado += fluxos[t] / Math.pow(1 + tma, t);
+            curva.push(acumulado);
+        }
+        return curva;
+    }
+
+    function calcularPaybackDescontado(fluxoEV, fluxoICE, tma, vplEV, vplICE, tirEV, tirICE) {
+        let payback = NaN;
+
+        if (vplEV > vplICE && tirEV > tirICE) {
+            const vplEVcurve = curvaVPL(fluxoEV, tma);
+            const vplICEcurve = curvaVPL(fluxoICE, tma);
+
+            let prevDiff = vplEVcurve[0] - vplICEcurve[0];
+            for (let t = 1; t < vplEVcurve.length; t++) {
+                const diff = vplEVcurve[t] - vplICEcurve[t];
+                if (prevDiff < 0 && diff >= 0) {
+                    const inc = diff - prevDiff;
+                    const frac = Math.abs(prevDiff) / inc;
+                    payback = (t - 1) + frac;
+                    break;
+                }
+                prevDiff = diff;
+            }
+        } else if (
+            (vplEV > vplICE && tirEV < tirICE) ||
+            (vplEV < vplICE && tirEV > tirICE)
+        ) {
+            const fluxoDif = gerarFluxoDiferencial(fluxoEV, fluxoICE);
+            let soma = 0;
+            for (let t = 0; t < fluxoDif.length; t++) {
+                const fluxoDesc = fluxoDif[t] / Math.pow(1 + tma, t);
+                const somaAnterior = soma;
+                soma += fluxoDesc;
+                if (somaAnterior < 0 && soma >= 0) {
+                    const frac = Math.abs(somaAnterior) / fluxoDesc;
+                    payback = (t - 1) + frac;
+                    break;
+                }
+            }
+        }
+        return payback;
+    }
+    
+    // === CÁLCULO PRINCIPAL ===
+    function calcular() {
 
         // Proteções
-        if(!selecionadoEV || !selecionadoICE){
+        if (!selecionadoEV || !selecionadoICE) {
             alert("Por favor, selecione os dois modelos de veículos (Elétrico e Combustão) antes de calcular.");
             return;
         }
-        if(!selecionadoPerfil || !selecionadoCenario){
+        if (!selecionadoPerfil || !selecionadoCenario) {
             alert("Por favor, selecione um perfil e um cenário antes de calcular.");
             return;
         }
 
         // Entradas do usuário
-        const tarifaRes=toNumBR(document.getElementById('tarifaRes').value);
-        const tarifaPub=toNumBR(document.getElementById('tarifaPub').value);
-        const precoGas=toNumBR(document.getElementById('precoGas').value);
-        const kmAno=toNumBR(selecionadoPerfil.km_ano);
-        const pctPub=toNumBR(selecionadoPerfil['%_recarga_publica']);
-        const pctRodovia=toNumBR(selecionadoPerfil['%_rodovia']);
+        const tarifaRes = toNumBR(document.getElementById('tarifaRes').value);
+        const tarifaPub = toNumBR(document.getElementById('tarifaPub').value);
+        const precoGas = toNumBR(document.getElementById('precoGas').value);
+        const kmAno = toNumBR(selecionadoPerfil.km_ano);
+        const pctPub = toNumBR(selecionadoPerfil['%_recarga_publica']);
+        const pctRodovia = toNumBR(selecionadoPerfil['%_rodovia']);
 
-        // === PREÇOS EDITÁVEIS (snake_case) ===
-        const preco_ev_str  = document.getElementById('precoEV').value.trim();
+        // TMA e Período
+        const tma_input = document.getElementById('tma').value.trim();
+        const tma = tma_input === "" ? toNumBR(selecionadoCenario.tma) : toNumBR(tma_input) / 100;
+        const anos_input = document.getElementById('anos').value.trim();
+        const anosCalc = anos_input === "" ? toNumBR(selecionadoCenario.periodo) : toNumBR(anos_input);
+
+        // PREÇOS (editáveis)
+        const preco_ev_str = document.getElementById('precoEV').value.trim();
         const preco_ice_str = document.getElementById('precoICE').value.trim();
-
-        const preco_ev  = preco_ev_str === "" ? toNumBR(selecionadoEV.preco_inicial)  : toNumBR(preco_ev_str);
+        const preco_ev = preco_ev_str === "" ? toNumBR(selecionadoEV.preco_inicial) : toNumBR(preco_ev_str);
         const preco_ice = preco_ice_str === "" ? toNumBR(selecionadoICE.preco_inicial) : toNumBR(preco_ice_str);
 
-
         // Dados dos veículos
-        const cuEV=toNumBR(selecionadoEV.consumo_urb);
-        const crEV=toNumBR(selecionadoEV.consumo_rod);
-        const cuICE=toNumBR(selecionadoICE.consumo_urb);
-        const crICE=toNumBR(selecionadoICE.consumo_rod);
+        const cuEV = toNumBR(selecionadoEV.consumo_urb);
+        const crEV = toNumBR(selecionadoEV.consumo_rod);
+        const cuICE = toNumBR(selecionadoICE.consumo_urb);
+        const crICE = toNumBR(selecionadoICE.consumo_rod);
 
-        // Cálculos de consumo médio
-        const consumoMedioEV=(cuEV*(1-pctRodovia))+(crEV*pctRodovia);
-        const consumoMedioICE=(cuICE*(1-pctRodovia))+(crICE*pctRodovia);
+        // Consumo médio ponderado
+        const consumoMedioEV = (cuEV * (1 - pctRodovia)) + (crEV * pctRodovia);
+        const consumoMedioICE = (cuICE * (1 - pctRodovia)) + (crICE * pctRodovia);
 
         // Custo de energia e combustível
-        const custoEnergiaEV=((1-pctPub)*tarifaRes)+(pctPub*tarifaPub);
-        const custoKmEV=consumoMedioEV>0?(custoEnergiaEV/consumoMedioEV):0;
-        const custoKmICE=consumoMedioICE>0?(precoGas/consumoMedioICE):0;
+        const custoEnergiaEV = ((1 - pctPub) * tarifaRes) + (pctPub * tarifaPub);
+        const custoKmEV = consumoMedioEV > 0 ? (custoEnergiaEV / consumoMedioEV) : 0;
+        const custoKmICE = consumoMedioICE > 0 ? (precoGas / consumoMedioICE) : 0;
 
-        // === CUSTO ANUAL EV ===
+        // Custos anuais
         const custoAnualEV = +toNumBR(selecionadoEV.manutencao_anual)
             + toNumBR(selecionadoEV.seguro_anual)
             + toNumBR(selecionadoEV.ipva_anual)
             + toNumBR(selecionadoEV.pneus_ano)
             + (custoKmEV * kmAno);
 
-        // === CUSTO ANUAL ICE ===
         const custoAnualICE = +toNumBR(selecionadoICE.manutencao_anual)
             + toNumBR(selecionadoICE.seguro_anual)
             + toNumBR(selecionadoICE.ipva_anual)
             + toNumBR(selecionadoICE.pneus_ano)
-            + (custoKmICE * kmAno); //combustivel gasto para rodar x km
+            + (custoKmICE * kmAno);
 
-        // Exibe resultados
+        // === VPL (proteção tma=0) ===
+        const resPctEV = toNumBR(selecionadoEV['residual_%']);
+        const resPctICE = toNumBR(selecionadoICE['residual_%']);
+        const fator = (tma === 0)
+            ? anosCalc
+            : (((1 + tma) ** anosCalc - 1) / (tma * ((1 + tma) ** anosCalc)));
+
+        const vplEV =
+            -preco_ev
+            - (custoAnualEV * fator)
+            + ((preco_ev * resPctEV) / ((1 + tma) ** anosCalc));
+
+        const vplICE =
+            -preco_ice
+            - (custoAnualICE * fator)
+            + ((preco_ice * resPctICE) / ((1 + tma) ** anosCalc));
+
+        // === FLUXOS INDIVIDUAIS (nominais) ===
+        const fluxoEV = gerarFluxoVeiculo(preco_ev, custoAnualEV, resPctEV, anosCalc);
+        const fluxoICE = gerarFluxoVeiculo(preco_ice, custoAnualICE, resPctICE, anosCalc);
+
+        // === TIR e PAYBACK DESCONTADO ===
+        const tirEV = calcularTIR(fluxoEV);
+        const tirICE = calcularTIR(fluxoICE);
+        const paybackDesc = calcularPaybackDescontado(fluxoEV, fluxoICE, tma, vplEV, vplICE, tirEV, tirICE);
+
+        // === EXIBIÇÃO ===
         document.getElementById('resEV').textContent = moneyBR4(custoKmEV);
         document.getElementById('resICE').textContent = moneyBR4(custoKmICE);
         document.getElementById('custoEV').textContent = moneyBR(custoAnualEV);
         document.getElementById('custoICE').textContent = moneyBR(custoAnualICE);
+        document.getElementById('vpl_ev').textContent = moneyBR(vplEV);
+        document.getElementById('tir_ev').textContent = isNaN(tirEV) ? "—" : (tirEV * 100).toFixed(2) + "%";
+        document.getElementById('vpl_ice').textContent = moneyBR(vplICE);
+        document.getElementById('tir_ice').textContent = isNaN(tirICE) ? "—" : (tirICE * 100).toFixed(2) + "%";
+        document.getElementById('payback').textContent =
+            isNaN(paybackDesc) ? "Sem payback" : paybackDesc.toFixed(2) + " anos";
 
-        // (opcional para depuração)
-        // console.log("preco_ev:", preco_ev, "preco_ice:", preco_ice, "custoTotalEV:", custoTotalEV, "custoTotalICE:", custoTotalICE);
+        // === CONCLUSÃO (sem usar variável inexistente) ===
+        const conclusaoBox = document.getElementById("conclusaoBox");
+        let conclusaoTexto = "", corFundo = "";
+        if (!isNaN(vplEV) && !isNaN(vplICE)) {
+            const diff = Math.abs(vplEV - vplICE);
+            const media = (Math.abs(vplEV) + Math.abs(vplICE)) / 2;
+            const diffPct = media > 0 ? (diff / media) * 100 : 0;
+
+            if (vplEV > vplICE && diffPct > 5) {
+                conclusaoTexto = "🌱 Vale a pena optar pelo carro elétrico. Ele apresenta menor custo total ao longo dos anos nas condições analisadas.";
+                corFundo = "rgba(16,185,129,0.6)";
+            } else if (vplEV < vplICE && diffPct > 5) {
+                conclusaoTexto = "⛽ Ainda vale mais a pena manter um carro a combustão. O custo total do elétrico é maior neste cenário.";
+                corFundo = "rgba(239,68,68,0.6)";
+            } else {
+                conclusaoTexto = "⚖️ O resultado é equilibrado. O carro elétrico e o a combustão têm custos muito próximos — a decisão depende mais do uso e das preferências pessoais.";
+                corFundo = "rgba(234,179,8,0.6)";
+            }
+        } else {
+            conclusaoTexto = "⚠️ Não foi possível concluir a comparação. Verifique se todos os dados dos veículos e do cenário foram preenchidos.";
+            corFundo = "rgba(234,179,8,0.6)";
+        }
+        const emoji = conclusaoTexto.slice(0, 2);
+        const texto = conclusaoTexto.slice(2).trim();
+        conclusaoBox.innerHTML = `<div class="emoji-top">${emoji}</div><div class="texto">${texto}</div>`;
+        conclusaoBox.style.background = corFundo;
     }
 
     // === INICIALIZAÇÃO ===
@@ -437,6 +653,7 @@
             getCSV(URLS.VEICULOS),getCSV(URLS.PERFIS),getCSV(URLS.CENARIOS)
         ]);
         popularVeiculos();popularPerfis();popularCenarios();
+
         document.getElementById('selEV').addEventListener('change',e=>{
             const m=e.target.value;selecionadoEV=dataVeiculos.find(v=>v.modelo===m);
             atualizarInfoVeiculo(selecionadoEV,'infoEV','precoEV','imgEV',true);
@@ -445,9 +662,16 @@
             const m=e.target.value;selecionadoICE=dataVeiculos.find(v=>v.modelo===m);
             atualizarInfoVeiculo(selecionadoICE,'infoICE','precoICE','imgICE',false);
         });
+
+        // registra o calcular ao final da init (garante DOM e dados prontos)
         document.getElementById('btnCalcular').addEventListener('click',calcular);
     }
-    init().catch(err=>alert('Erro ao carregar dados: '+err));
+    init().catch(err=>{
+        console.error(err);
+        alert('Erro ao carregar dados: '+err);
+        // Mesmo se falhar o fetch, mantém o botão funcional para debug
+        document.getElementById('btnCalcular').addEventListener('click',calcular);
+    });
 </script>
 </body>
 </html>
