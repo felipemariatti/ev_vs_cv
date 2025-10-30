@@ -6,131 +6,294 @@
     <title>Dashboard EV vs ICE - VERSÃO FINAL</title>
 
     <style>
-        /* ====== VARIÁVEIS E CONFIG GLOBAL (inalterado) ====== */
-        :root{
-            --grad-bg: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-            --grad-btn: linear-gradient(135deg,#10b981 0%,#059669 100%);
+        :root {
+            --grad-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --grad-btn: linear-gradient(135deg, #10b981 0%, #059669 100%);
             --borda: rgba(255,255,255,0.25);
         }
-        *{margin:0;padding:0;box-sizing:border-box;}
-        html,body{height:100%;overflow:hidden;}
-        body{
-            font-family:"Segoe UI",Tahoma,sans-serif;
-            background:var(--grad-bg);color:#fff;
-            display:flex;flex-direction:column;justify-content:center;align-items:center;
-            padding:24px;
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* ====== CABEÇALHO ====== */
-        .header{
-            width:100%;max-width:1400px;background:rgba(255,255,255,0.2);
-            border-radius:10px;padding:8px 18px;margin-bottom:10px;
-            display:flex;justify-content:space-between;align-items:center;
-            box-shadow:0 3px 10px rgba(0,0,0,0.2);
+        html, body {
+            height: auto;
+            overflow: hidden; /* global */
+            overflow-y: auto; /* interno na dashboard */
         }
-        .header h1{font-size:1.2rem;}
+
+        body {
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: var(--grad-bg);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0; /* evita empurrar o conteúdo pra baixo */
+            min-height: 100vh;
+        }
+        /* ====== CABEÇALHO ====== */
+        .header {
+            width: 100%;
+            max-width: 1400px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 8px 18px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .header h1 {
+            font-size: 1.2rem;
+        }
 
         /* ====== GRID PRINCIPAL ====== */
-        .dashboard{
+        .dashboard {
             display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto;
-            gap:8px;width:100%;max-width:1400px;
+            gap:5px;width:100%;max-width:1400px;
+        }
+
+        /* ====== RESPONSIVO ====== */
+        @media (max-width: 1100px) {
+            .dashboard { grid-template-columns: 1fr; grid-auto-rows: auto; }
+            .result-card { grid-column: auto; grid-row: auto; }
+            .card-reservado { grid-column: auto; grid-row: auto; }
         }
 
         /* ====== CARDS PADRÃO ====== */
-        .card{
-            background:rgba(255,255,255,0.15);border:1px solid var(--borda);
-            border-radius:12px;padding:8px;backdrop-filter:blur(6px);
-            box-shadow:0 3px 8px rgba(0,0,0,0.15);
+        .card {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid var(--borda);
+            border-radius: 12px;
+            padding: 8px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
         }
-        .card h3{
-            font-size:0.9rem;font-weight:700;border-bottom:1.5px solid rgba(255,255,255,0.3);
-            padding-bottom:3px;margin-bottom:6px;
+        .card h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-bottom: 1.5px solid rgba(255,255,255,0.3);
+            padding-bottom: 3px;
+            margin-bottom: 6px;
         }
 
         /* ====== FORM ====== */
-        label{font-size:0.75rem;font-weight:600;color:#fff;}
-        input,select{
-            width:100%;padding:5px 7px;border-radius:8px;
-            border:1.5px solid rgba(255,255,255,0.5);
-            background:rgba(255,255,255,0.4);color:#111;font-size:0.85rem;
+        label { font-size: 0.75rem; font-weight: 600; color: #fff; }
+        input, select {
+            width: 100%;
+            padding: 5px 7px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.4);
+            color: #111;
+            font-size: 0.85rem;
         }
 
         /* ====== VEÍCULOS ====== */
-        .vehicle-img{width:100%;height:120px;object-fit:contain;border-radius:8px;background:#fff;margin:6px 0;}
-        .vehicle-info{
-            display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
-            gap:6px;min-height:85px;
+        .vehicle-img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #fff;
+            margin: 6px 0;
         }
-        .v-card{
-            background:rgba(255,255,255,0.5);border-radius:8px;text-align:center;padding:6px;color:#111;font-size:0.7rem;
-            height:70px;display:flex;flex-direction:column;justify-content:center;
+        .vehicle-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 6px;
+            min-height: 85px;
         }
-        .v-card img{width:20px;height:20px;margin:0 auto 2px;display:block;}
-        .v-card .emoji{display:block;font-size:1.1rem;}
-        .v-card .value{font-weight:bold;}
+        .v-card {
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            text-align: center;
+            padding: 6px;
+            color: #111;
+            font-size: 0.7rem;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .v-card img {
+            width: 20px;
+            height: 20px;
+            margin: 0 auto 2px;
+            display: block;
+        }
+        .v-card .emoji { display: block; font-size: 1.1rem; }
+        .v-card .value { font-weight: bold; }
 
         /* ====== PERFIL ====== */
-        .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-        .profile-pill{
-            background:rgba(255,255,255,0.4);
-            border:1.5px solid rgba(255,255,255,0.5);
-            border-radius:10px;padding:8px;display:flex;align-items:center;gap:10px;
-            color:#111;cursor:pointer;transition:0.25s;
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
         }
-        .profile-pill:hover{background:rgba(255,255,255,0.65);}
-        .profile-pill.active{background:var(--grad-btn);color:#fff;border:none;}
-        .profile-emoji{font-size:1.9rem;line-height:1;}
-        .profile-info{display:flex;flex-direction:column;line-height:1.15;}
-        .profile-info .name{font-weight:700;font-size:0.85rem;}
-        .profile-info .details{font-size:0.72rem;}
+        .profile-pill {
+            background: rgba(255,255,255,0.4);
+            border: 1.5px solid rgba(255,255,255,0.5);
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #111;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .profile-pill:hover { background: rgba(255,255,255,0.65); }
+        .profile-pill.active { background: var(--grad-btn); color: #fff; border: none; }
+        .profile-emoji { font-size: 1.9rem; line-height: 1; }
+        .profile-info { display: flex; flex-direction: column; line-height: 1.15; }
+        .profile-info .name { font-weight: 700; font-size: 0.85rem; }
+        .profile-info .details { font-size: 0.72rem; }
 
         /* ====== CENÁRIOS ====== */
-        .scenario-row{display:flex;gap:6px;margin-bottom:6px;}
-        .scenario-btn{
-            flex:1;border-radius:8px;padding:5px 6px;border:1.5px solid rgba(255,255,255,0.5);
-            background:rgba(255,255,255,0.4);color:#111;font-weight:700;font-size:0.75rem;cursor:pointer;transition:0.25s;
-            display:flex;justify-content:center;align-items:center;gap:5px;
+        .scenario-row { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+        .scenario-btn {
+            flex: 1;
+            border-radius: 8px;
+            padding: 5px 6px;
+            border: 1.5px solid rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.4);
+            color: #111;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.25s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
         }
-        .scenario-btn.active{background:var(--grad-btn);color:#fff;border:none;}
-        .inputs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px;}
-        .inputs-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;}
-        .btn-calc{width:100%;background:var(--grad-btn);color:#fff;border:none;border-radius:8px;font-weight:700;padding:8px;cursor:pointer;}
+        .scenario-btn.active { background: var(--grad-btn); color: #fff; border: none; }
+        .inputs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 4px; }
+        .inputs-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 4px; }
+        .btn-calc {
+            width: 100%;
+            background: var(--grad-btn);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 8px;
+            cursor: pointer;
+        }
 
         /* ====== RESULTADOS ====== */
-        .result-card{
-            grid-column:2/3;grid-row:2/span 2;background:rgba(255,255,255,0.15);
-            border:1px solid var(--borda);border-radius:12px;padding:8px;backdrop-filter:blur(6px);
-            box-shadow:0 3px 10px rgba(0,0,0,0.25);display:flex;flex-direction:column;justify-content:flex-start;
+        .result-card {
+            grid-column: 2/3;
+            grid-row: 2/span 2;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid var(--borda);
+            border-radius: 12px;
+            padding: 8px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
-        .result-card h3{font-size:0.9rem;font-weight:700;border-bottom:1.5px solid rgba(255,255,255,0.3);padding-bottom:3px;margin-bottom:8px;}
-        .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-        .result-col{display:flex;flex-direction:column;gap:8px;}
-        .result-box{
-            background:linear-gradient(135deg,#6b73ff 0%,#8b5cf6 100%);
-            border-radius:12px;text-align:center;padding:12px 10px;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.25);
-            height:73px;display:flex;flex-direction:column;justify-content:center;
-        }
-        .result-box h4{margin:0;font-size:0.9rem;font-weight:600;}
-        .result-box .value{font-weight:bold;font-size:1.05rem;margin-top:5px;}
-        .result-payback{grid-column:1/span 2;margin-top:6px;}
 
-        /* ====== COLUNA DIREITA (gráficos) ====== */
-        .card-reservado{
-            grid-column:3/4;grid-row:1 / span 3;display:grid;grid-template-rows:0.5fr 1fr 1fr 1fr;gap:8px;
+        .result-card h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-bottom: 1.5px solid rgba(255,255,255,0.3);
+            padding-bottom: 3px;
+            margin-bottom: 8px;
         }
-        .card-reservado .subcard{
-            background:rgba(255,255,255,0.12);border:1px solid var(--borda);border-radius:12px;padding:10px;backdrop-filter:blur(6px);
-            box-shadow:0 3px 10px rgba(0,0,0,0.25);display:flex;flex-direction:column;justify-content:center;align-items:center;
-            font-weight:700;font-size:1rem;color:#fff;text-align:center;overflow:hidden;position:relative;
+
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .result-col { display: flex; flex-direction: column; gap: 8px; }
+
+        .result-box {
+            background: linear-gradient(135deg,#6b73ff 0%,#8b5cf6 100%);
+            border-radius: 12px;
+            text-align: center;
+            padding: 12px 10px;
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+            height: 73px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result-box h4 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+        .result-box .value { font-weight: bold; font-size: 1.05rem; margin-top: 5px; }
+        .result-payback { grid-column: 1/span 2; margin-top: 6px; }
+
+        /* ====== GRÁFICOS ====== */
+        .card-reservado {
+            grid-column: 3/4;
+            grid-row: 1 / span 3;
+            display: grid;
+            grid-template-rows: 0.5fr 1fr 1fr 1fr;
+            gap: 8px;
+        }
+        .card-reservado .subcard {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid var(--borda);
+            border-radius: 12px;
+            padding: 10px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
         }
 
         /* ====== CONCLUSÃO ====== */
-        #conclusaoBox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:600;padding:14px;}
-        #conclusaoBox .emoji-top{font-size:2.2rem;line-height:1;margin-bottom:4px;}
-        #conclusaoBox .texto{font-size:0.9rem;line-height:1.3rem;}
+        #conclusaoBox {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 600;
+            padding: 14px;
+        }
+        #conclusaoBox .emoji-top {
+            font-size: 2.2rem;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        #conclusaoBox .texto {
+            font-size: 0.9rem;
+            line-height: 1.3rem;
+        }
 
         /* ====== GRÁFICOS ====== */
-        #grafico1,#grafico2,#grafico3{padding:8px!important;}
+        #grafico1, #grafico2, #grafico3 { padding: 8px !important; }
+
+        /* ====== TOAST ====== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffcc00;
+            padding: 8px 14px;
+            border-radius: 6px;
+            color: #111;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 9999;
+        }
     </style>
 </head>
 
@@ -140,7 +303,6 @@
     <span style="font-size:0.8rem;opacity:0.8;">Fluxo de caixa completo</span>
 </div>
 
-
 <div class="dashboard">
     <!-- EV -->
     <div class="card" id="cardEV">
@@ -148,8 +310,8 @@
         <label>Modelo:</label>
         <select id="selEV"><option>Selecione um modelo</option></select>
         <label>💰 Preço (R$):</label>
-        <input id="precoEV">
-        <img id="imgEV" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png" alt="EV">
+        <input id="precoEV" inputmode="decimal" />
+        <img id="imgEV" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png" alt="EV" />
         <div id="infoEV" class="vehicle-info"></div>
     </div>
 
@@ -159,8 +321,8 @@
         <label>Modelo:</label>
         <select id="selICE"><option>Selecione um modelo</option></select>
         <label>💰 Preço (R$):</label>
-        <input id="precoICE">
-        <img id="imgICE" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png" alt="ICE">
+        <input id="precoICE" inputmode="decimal" />
+        <img id="imgICE" class="vehicle-img" src="https://i.imgur.com/MLNARfh.png" alt="ICE" />
         <div id="infoICE" class="vehicle-info"></div>
     </div>
 
@@ -175,13 +337,13 @@
         <h3>🎯 Cenário</h3>
         <div id="cenariosContainer" class="scenario-row"></div>
         <div class="inputs-grid">
-            <div><label>Tarifa Res. (R$/kWh):</label><input id="tarifaRes"></div>
-            <div><label>Tarifa Púb. (R$/kWh):</label><input id="tarifaPub"></div>
-            <div><label>Gasolina (R$/L):</label><input id="precoGas"></div>
+            <div><label>Tarifa Res. (R$/kWh):</label><input id="tarifaRes" inputmode="decimal" /></div>
+            <div><label>Tarifa Púb. (R$/kWh):</label><input id="tarifaPub" inputmode="decimal" /></div>
+            <div><label>Gasolina (R$/L):</label><input id="precoGas" inputmode="decimal" /></div>
         </div>
         <div class="inputs-grid-2">
-            <div><label>Período (anos):</label><input id="anos" type="text" inputmode="decimal" placeholder="ex: 1,5"></div>
-            <div><label>TMA (%):</label><input id="tma"></div>
+            <div><label>Período (anos):</label><input id="anos" type="text" inputmode="decimal" placeholder="ex: 1,5" /></div>
+            <div><label>TMA (%):</label><input id="tma" inputmode="decimal" /></div>
         </div>
         <button class="btn-calc" id="btnCalcular">🚀 CALCULAR</button>
     </div>
@@ -208,7 +370,7 @@
         </div>
     </div>
 
-    <!-- COLUNA DE GRÁFICOS (idêntica) -->
+    <!-- COLUNA DE GRÁFICOS -->
     <div class="card-reservado">
         <div class="subcard" id="conclusaoBox">✅ Conclusão</div>
         <div class="subcard" id="grafico1">📊 Fluxo de Caixa</div>
@@ -229,19 +391,31 @@
     const moneyBR=n=>"R$ "+(Number(n)||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
     const moneyBR4=n=>"R$ "+(Number(n)||0).toLocaleString("pt-BR",{minimumFractionDigits:4,maximumFractionDigits:4});
     const fmtPct = n => (Number(n)||0).toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:0})+"%";
+
     function formatPayback(val){
         if(isNaN(val)) return "Sem payback";
-        if(val<1){const m=Math.max(1,Math.round(val*12));return `${m} mes${m!==1?'es':''}`;}
+        if(val<0.08) return "Sem payback"; // evita “1 mês” quando é irrelevante
+        if(val<1){const m=Math.round(val*12);return `${m} mês${m!==1?'es':''}`;}
         const a=Math.floor(val),m=Math.round((val-a)*12);
-        return `${a} ano${a!==1?'s':''}`+(m>0?` e ${m} mes${m!==1?'es':''}`:"");
+        return `${a} ano${a!==1?'s':''}`+(m>0?` e ${m} mês${m!==1?'es':''}`:"");
     }
+
     async function getCSV(url){
-        const res=await fetch(url); const text=await res.text();
-        const lines=text.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$|/g,'')));
+        const res=await fetch(url);
+        if(!res.ok) throw new Error('Falha ao carregar CSV: '+url);
+        const text=await res.text();
+        const lines=text.trim().split(/\r?\n/).map(
+            l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,''))
+        );
         const headers=lines.shift();
         return lines.map(row=>{
             const o={}; headers.forEach((h,i)=>o[h.trim()]=(row[i]||'').trim()); return o;
         });
+    }
+
+    function showToast(msg){
+        const el=document.createElement('div'); el.className='toast'; el.textContent=msg;
+        document.body.appendChild(el); setTimeout(()=>el.remove(),1800);
     }
 
     /* =================== ESTADO =================== */
@@ -251,16 +425,11 @@
 
     /* objeto único de saídas para reuso */
     const dadosAtuais = {
-        // params
         tma: NaN, anos: 0,
         precoEV:0, precoICE:0, custoAnualEV:0, custoAnualICE:0, resPctEV:0, resPctICE:0,
-        // fluxos
         fluxoEV:[], fluxoICE:[],
-        // métricas
         vplEV:NaN, vplICE:NaN, tirEV:NaN, tirICE:NaN, payback:NaN,
-        // util para gráficos de VPL por período
         vplSerieEV:[], vplSerieICE:[],
-        // custos variáveis
         custoKmEV:0, custoKmICE:0
     };
 
@@ -272,14 +441,15 @@
         selICE.innerHTML='<option>Selecione um modelo</option>';
 
         const tpl=(isEV)=>`
-    <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
-    <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Urb.<br><span class="value">—</span></div>
-    <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Rod.<br><span class="value">—</span></div>
-    <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
-    <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
-    <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
-    <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
-    <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>`;
+        <div class="v-card"><span class="emoji">📅</span>Ano<br><span class="value">—</span></div>
+        <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Urb.<br><span class="value">—</span></div>
+        <div class="v-card"><span class="emoji">${isEV?'⚡':'⛽'}</span>Consumo Rod.<br><span class="value">—</span></div>
+        <div class="v-card"><span class="emoji">🛠️</span>Manutenção<br><span class="value">—</span></div>
+        <div class="v-card"><span class="emoji">🧾</span>Seguro<br><span class="value">—</span></div>
+        <div class="v-card"><span class="emoji">💰</span>IPVA<br><span class="value">—</span></div>
+        <div class="v-card"><img src="https://i.imgur.com/kQOANzQ.png" alt="Pneus">Pneus<br><span class="value">—</span></div>
+        <div class="v-card"><span class="emoji">💵</span>Residual<br><span class="value">—</span></div>`;
+
         if(!document.querySelector('#infoEV .v-card')) document.getElementById('infoEV').innerHTML=tpl(true);
         if(!document.querySelector('#infoICE .v-card')) document.getElementById('infoICE').innerHTML=tpl(false);
 
@@ -290,6 +460,7 @@
             const o=document.createElement('option'); o.value=v.modelo; o.textContent=v.modelo; selICE.appendChild(o);
         }
     }
+
     function setInfoVeiculo(v, infoId, precoId, imgId, isEV){
         const infoEl=document.getElementById(infoId);
         const precoEl=document.getElementById(precoId);
@@ -298,6 +469,12 @@
             precoEl.value=''; imgEl.src='https://i.imgur.com/MLNARfh.png';
             infoEl.querySelectorAll('.value').forEach(e=>e.textContent='—'); return;
         }
+
+        // Padroniza residual_% para fração [0..1] e guarda de volta
+        let residual = toNumBR(v['residual_%']);
+        if(residual>1) residual/=100;
+        v._residual_pct = residual;
+
         precoEl.value = toNumBR(v.preco_inicial).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
         imgEl.src=v.imagem||'https://i.imgur.com/MLNARfh.png';
 
@@ -312,9 +489,9 @@
         setVal('Seguro',v.seguro_anual?moneyBR(toNumBR(v.seguro_anual)):'—');
         setVal('IPVA',v.ipva_anual?moneyBR(toNumBR(v.ipva_anual)):'—');
         setVal('Pneus',v.pneus_ano?moneyBR(toNumBR(v.pneus_ano)):'—');
-        const resPct=v['residual_%']?(toNumBR(v['residual_%'])*100).toFixed(0)+'%':'—';
-        setVal('Residual',resPct);
+        setVal('Residual', (v._residual_pct*100).toFixed(0)+'%');
     }
+
     function popularPerfis(){
         const box=document.getElementById('perfisContainer'); box.innerHTML='';
         dataPerfis.forEach((p,i)=>{
@@ -323,16 +500,17 @@
             const div=document.createElement('div');
             div.className='profile-pill'+(i===0?' active':''); if(i===0) selecionadoPerfil=p;
             div.innerHTML = `
-      <div class="profile-emoji">${emoji}</div>
-      <div class="profile-info">
-        <div class="name">${p.perfil}</div>
-        <div class="details">${toNumBR(p.km_ano).toLocaleString('pt-BR')} km/ano</div>
-        <div class="details">Recarga Pública: ${fmtPct(toNumBR(p['%_recarga_publica'])*100)} • Rodovia: ${fmtPct(toNumBR(p['%_rodovia'])*100)}</div>
-      </div>`;
+          <div class="profile-emoji">${emoji}</div>
+          <div class="profile-info">
+            <div class="name">${p.perfil}</div>
+            <div class="details">${toNumBR(p.km_ano).toLocaleString('pt-BR')} km/ano</div>
+            <div class="details">Recarga Pública: ${fmtPct(toNumBR(p['%_recarga_publica'])*100)} • Rodovia: ${fmtPct(toNumBR(p['%_rodovia'])*100)}</div>
+          </div>`;
             div.onclick=()=>{document.querySelectorAll('.profile-pill').forEach(b=>b.classList.remove('active'));div.classList.add('active');selecionadoPerfil=p;};
             box.appendChild(div);
         });
     }
+
     function popularCenarios(){
         const wrap=document.getElementById('cenariosContainer'); wrap.innerHTML='';
         dataCenarios.forEach(c=>{
@@ -343,11 +521,16 @@
             btn.onclick=()=>{
                 document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
                 btn.classList.add('active'); selecionadoCenario=c;
+
+                // normaliza TMA (CSV pode vir como 0,12 ou 12)
+                let tmaVal = toNumBR(c.tma);
+                if(tmaVal>1) tmaVal/=100;
+
                 document.getElementById('tarifaRes').value=c.tarifa_residencial_kwh;
                 document.getElementById('tarifaPub').value=c.tarifa_publica_kwh;
                 document.getElementById('precoGas').value=c.preco_gasolina;
-                document.getElementById('tma').value=(toNumBR(c.tma)*100).toLocaleString('pt-BR',{minimumFractionDigits:0});
-                document.getElementById('anos').value=toNumBR(c.periodo);
+                document.getElementById('tma').value=(tmaVal*100).toLocaleString('pt-BR',{minimumFractionDigits:0});
+                document.getElementById('anos').value=toNumBR(c.periodo).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:2});
             };
             wrap.appendChild(btn);
         });
@@ -361,10 +544,21 @@
         for(let t=1;t<=anos;t++) f.push(-custoAnual+(t===anos?preco*residualPct:0));
         return f;
     }
+
+    /**
+     * Calcula TIR por bissecção com busca adaptativa de intervalo.
+     * @param {number[]} fluxos
+     * @returns {number} TIR decimal (0.12 = 12%)
+     */
     function calcularTIR(fluxos){
         function f(i){return fluxos.reduce((acc,fc,t)=>acc+fc/((1+i)**t),0);}
-        let low=-0.9, high=1.0, mid, fLow=f(low), fHigh=f(high);
-        if(fLow*fHigh>0) return NaN;
+        let low=-0.9, high=1.0, fLow=f(low), fHigh=f(high);
+        let expand=0;
+        while(fLow*fHigh>0 && high<10){
+            low=high; high+=0.5; fLow=f(low); fHigh=f(high);
+            if(++expand>30) return NaN;
+        }
+        let mid=0;
         for(let k=0;k<200;k++){
             mid=(low+high)/2; const fMid=f(mid);
             if(Math.abs(fMid)<1e-8) break;
@@ -372,24 +566,31 @@
         }
         return mid;
     }
+
+    /**
+     * Payback descontado via VPL diferencial por ano com fração.
+     */
     function calcularPaybackDescontado(preco_ev,custoAnual_ev,residual_ev,preco_ice,custoAnual_ice,residual_ice,tma){
+        if(tma<1e-6) tma=1e-6;
         let payback=NaN, maxAnos=30;
+        let difAnt = (-preco_ev) - (-preco_ice); // VPL dif no t=0
+
         for(let ano=1; ano<=maxAnos; ano++){
             const fator=(((1+tma)**ano-1)/(tma*((1+tma)**ano)));
             const vplEV=-preco_ev-(custoAnual_ev*fator)+((preco_ev*residual_ev)/((1+tma)**ano));
             const vplICE=-preco_ice-(custoAnual_ice*fator)+((preco_ice*residual_ice)/((1+tma)**ano));
             const dif=vplEV-vplICE;
+
             if(dif>0){
                 if(ano===1){
-                    const difAnt=(-preco_ev)-(-preco_ice);
-                    const fracao=Math.abs(difAnt)/(dif-difAnt);
-                    payback=fracao; // < 1 ano
+                    const fracao = Math.abs(difAnt)/(dif-difAnt);
+                    payback = fracao;
                 }else{
                     const fatorAnt=(((1+tma)**(ano-1)-1)/(tma*((1+tma)**(ano-1))));
                     const vplEV_ant=-preco_ev-(custoAnual_ev*fatorAnt)+((preco_ev*residual_ev)/((1+tma)**(ano-1)));
                     const vplICE_ant=-preco_ice-(custoAnual_ice*fatorAnt)+((preco_ice*residual_ice)/((1+tma)**(ano-1)));
-                    const difAnt=vplEV_ant-vplICE_ant;
-                    const fracao=Math.abs(difAnt)/(dif-difAnt);
+                    const difAnt2=vplEV_ant-vplICE_ant;
+                    const fracao = Math.abs(difAnt2)/(dif-difAnt2);
                     payback=(ano-1)+fracao;
                 }
                 break;
@@ -397,7 +598,7 @@
         }
         return payback;
     }
-    /* série de VPL por período — usa mesma fórmula do card */
+
     function construirSerieVPL(preco,custoAnual,residualPct,tma,anos){
         const serie=[-preco];
         for(let a=1;a<=anos;a++){
@@ -439,246 +640,127 @@
         conclusaoBox.style.background=cor;
     }
 
-    /* =================== GRÁFICOS (usando dadosAtuais) =================== */
+    /* =================== GRÁFICOS =================== */
     function garantirCanvas(){
         if(graficosInicializados) return;
         document.getElementById('grafico1').innerHTML = `
-    <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">📊 Fluxo de Caixa EV × ICE</h4>
-    <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasFluxo"></canvas></div>`;
+        <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">📊 Fluxo de Caixa EV × ICE</h4>
+        <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasFluxo"></canvas></div>`;
         document.getElementById('grafico2').innerHTML = `
-    <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">⏳ Payback Descontado</h4>
-    <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasPayback"></canvas></div>`;
+        <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">⏳ Série de VPL</h4>
+        <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasPayback"></canvas></div>`;
         document.getElementById('grafico3').innerHTML = `
-    <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">💰 Custo por km</h4>
-    <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasCustoKm"></canvas></div>`;
+        <h4 style="margin:0 0 6px 0;font-size:0.8rem;text-align:center;font-weight:700;">💰 Custo por km • Anual • Total</h4>
+        <div style="width:100%;height:calc(100% - 30px);position:relative;"><canvas id="canvasCustoKm"></canvas></div>`;
         graficosInicializados=true;
-    }
-    function desenharGraficos() {
-        garantirCanvas();
-        const d = dadosAtuais;
 
-        // Fluxo
+        // cria instâncias uma vez
         const ctxFluxo = document.getElementById('canvasFluxo').getContext('2d');
-        const labels = Array.from({length: d.anos + 1}, (_, i) => `Ano ${i}`);
-        if (chartFluxo) chartFluxo.destroy();
+        const ctxPay   = document.getElementById('canvasPayback').getContext('2d');
+        const ctxCusto = document.getElementById('canvasCustoKm').getContext('2d');
+
         chartFluxo = new Chart(ctxFluxo, {
             type: 'bar',
-            data: {
-                labels, datasets: [
-                    {
-                        label: '⚡ EV',
-                        data: d.fluxoEV,
-                        backgroundColor: 'rgba(16,185,129,0.8)',
-                        borderColor: 'rgb(16,185,129)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: '🚗 ICE',
-                        data: d.fluxoICE,
-                        backgroundColor: 'rgba(239,68,68,0.8)',
-                        borderColor: 'rgb(239,68,68)',
-                        borderWidth: 1
-                    }
-                ]
-            },
+            data: { labels: [], datasets: [
+                    {label:'⚡ EV', data:[], backgroundColor:'rgba(16,185,129,0.8)', borderColor:'rgb(16,185,129)', borderWidth:1},
+                    {label:'🚗 ICE',data:[], backgroundColor:'rgba(239,68,68,0.8)', borderColor:'rgb(239,68,68)', borderWidth:1}
+                ]},
             options: {
-                responsive: true, maintainAspectRatio: true, aspectRatio: 2,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {color: '#fff', font: {size: 9}, boxWidth: 10, padding: 5}
-                    },
-                    tooltip: {callbacks: {label: c => c.dataset.label + ': ' + moneyBR(c.parsed.y)}}
+                responsive:true, maintainAspectRatio:true, aspectRatio:2,
+                plugins:{
+                    legend:{display:true,position:'top',labels:{color:'#fff',font:{size:9},boxWidth:10,padding:5}},
+                    tooltip:{callbacks:{label:c=>c.dataset.label+': '+moneyBR(c.parsed.y)}}
                 },
-                scales: {
-                    x: {ticks: {color: '#fff', font: {size: 8}, maxRotation: 0}, grid: {display: false}},
-                    y: {
-                        ticks: {color: '#fff', font: {size: 8}, callback: v => 'R$ ' + (v / 1000).toFixed(0) + 'k'},
-                        grid: {color: 'rgba(255,255,255,0.1)'}
-                    }
+                scales:{
+                    x:{ticks:{color:'#fff',font:{size:8},maxRotation:0},grid:{display:false}},
+                    y:{ticks:{color:'#fff',font:{size:8},callback:v=>'R$ '+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,0.1)'}}
                 }
             }
         });
 
-        // Série VPL (usa mesma fórmula do card: d.vplSerieEV/ICE)
-        const ctxPayback = document.getElementById('canvasPayback').getContext('2d');
-        if (chartPayback) chartPayback.destroy();
-        chartPayback = new Chart(ctxPayback, {
-            type: 'line',
-            data: {
-                labels, datasets: [
-                    {
-                        label: 'VPL EV',
-                        data: d.vplSerieEV,
-                        borderColor: 'rgb(16,185,129)',
-                        backgroundColor: 'rgba(16,185,129,0.1)',
-                        borderWidth: 2,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'VPL ICE',
-                        data: d.vplSerieICE,
-                        borderColor: 'rgb(239,68,68)',
-                        backgroundColor: 'rgba(239,68,68,0.1)',
-                        borderWidth: 2,
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: true, aspectRatio: 2,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {color: '#fff', font: {size: 9}, boxWidth: 10, padding: 5}
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: c => c.dataset.label + ': ' + moneyBR(c.parsed.y),
-                            footer: (ctx) => !isNaN(d.payback) && ctx[0].dataIndex <= Math.ceil(d.payback) ? `\nPayback em ${formatPayback(d.payback)}` : ''
-                        }
-                    }
+        chartPayback = new Chart(ctxPay, {
+            type:'line',
+            data:{ labels:[], datasets:[
+                    {label:'VPL EV', data:[], borderColor:'rgb(16,185,129)', backgroundColor:'rgba(16,185,129,0.1)', borderWidth:2, tension:0.3},
+                    {label:'VPL ICE',data:[], borderColor:'rgb(239,68,68)', backgroundColor:'rgba(239,68,68,0.1)', borderWidth:2, tension:0.3}
+                ]},
+            options:{
+                responsive:true, maintainAspectRatio:true, aspectRatio:2,
+                plugins:{
+                    legend:{display:true,position:'top',labels:{color:'#fff',font:{size:9},boxWidth:10,padding:5}},
+                    tooltip:{callbacks:{
+                            label:c=>c.dataset.label+': '+moneyBR(c.parsed.y),
+                            footer:(ctx)=>!isNaN(dadosAtuais.payback)&&ctx[0].dataIndex<=Math.ceil(dadosAtuais.payback)?`\nPayback em ${formatPayback(dadosAtuais.payback)}`:''
+                        }}
                 },
-                scales: {
-                    x: {
-                        ticks: {color: '#fff', font: {size: 8}, maxRotation: 0},
-                        grid: {color: 'rgba(255,255,255,0.1)'}
-                    },
-                    y: {
-                        ticks: {color: '#fff', font: {size: 8}, callback: v => 'R$ ' + (v / 1000).toFixed(0) + 'k'},
-                        grid: {color: 'rgba(255,255,255,0.1)'}
-                    }
+                scales:{
+                    x:{ticks:{color:'#fff',font:{size:8},maxRotation:0},grid:{color:'rgba(255,255,255,0.1)'}},
+                    y:{ticks:{color:'#fff',font:{size:8},callback:v=>'R$ '+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,0.1)'}}
                 }
             }
         });
 
-// ====== GRÁFICO 3 - CUSTOS COMPARATIVOS (DUAS ESCALAS MELHOR VISÍVEIS) ======
-        const ctxCustoKm = document.getElementById('canvasCustoKm').getContext('2d');
-        if (chartCustoKm) chartCustoKm.destroy();
+        chartCustoKm = new Chart(ctxCusto, {
+            type:'bar',
+            data:{ labels:['⚡ EV','⛽ ICE'], datasets:[
+                    {label:'💰 Custo por km (Eixo Esquerdo)', data:[0,0], backgroundColor:'rgba(255,255,255,0.8)', borderColor:'#ffffff', borderWidth:1.5, yAxisID:'yKm'},
+                    {label:'📆 Custo Anual (Eixo Direito)',   data:[0,0], backgroundColor:'rgba(59,130,246,0.8)', borderColor:'rgb(37,99,235)', borderWidth:1.5, yAxisID:'yReais'},
+                    {label:'🧾 Custo Total (Eixo Direito)',    data:[0,0], backgroundColor:'rgba(234,179,8,0.85)', borderColor:'rgb(202,138,4)', borderWidth:1.5, yAxisID:'yReais'}
+                ]},
+            options:{
+                responsive:true, maintainAspectRatio:true, aspectRatio:2,
+                plugins:{
+                    legend:{position:'bottom',labels:{color:'#fff',font:{size:9,weight:'bold'},padding:10}},
+                    tooltip:{callbacks:{label:ctx=>{
+                                const label=ctx.dataset.label||''; const val=ctx.parsed.y;
+                                return ctx.dataset.yAxisID==='yKm' ? `${label}: ${moneyBR4(val)} /km` : `${label}: ${moneyBR(val)}`;
+                            }}},
+                    title:{display:true,text:'Comparativo de custos',color:'#fff',font:{size:10,weight:'bold'}}
+                },
+                scales:{
+                    x:{ticks:{color:'#fff',font:{size:9,weight:'bold'}},grid:{display:false}},
+                    yKm:{position:'left',title:{display:true,text:'💰 R$/km',color:'#ffffff',font:{size:10,weight:'bold'}},
+                        ticks:{color:'#ffffff',font:{size:9,weight:'600'},callback:v=>'R$ '+Number(v).toFixed(3)},grid:{color:'rgba(255,255,255,0.2)',lineWidth:0.5}},
+                    yReais:{position:'right',title:{display:true,text:'📆 / 🧾 Custos (R$)',color:'#93c5fd',font:{size:10,weight:'bold'}},
+                        ticks:{color:'#93c5fd',font:{size:9,weight:'600'},callback:v=>'R$ '+(v/1000).toFixed(0)+'k'},grid:{drawOnChartArea:false}}
+                }
+            }
+        });
+    }
 
-// cálculos
+    function atualizarGraficos(){
+        const d = dadosAtuais;
+        const labels = Array.from({length: d.anos + 1}, (_, i) => `Ano ${i}`);
+
+        // Fluxo
+        chartFluxo.data.labels = labels;
+        chartFluxo.data.datasets[0].data = d.fluxoEV;
+        chartFluxo.data.datasets[1].data = d.fluxoICE;
+        chartFluxo.update();
+
+        // Série VPL
+        chartPayback.data.labels = labels;
+        chartPayback.data.datasets[0].data = d.vplSerieEV;
+        chartPayback.data.datasets[1].data = d.vplSerieICE;
+        chartPayback.update();
+
+        // Custos
         const custoTotalEV = d.custoAnualEV * d.anos + d.precoEV - (d.precoEV * d.resPctEV);
         const custoTotalICE = d.custoAnualICE * d.anos + d.precoICE - (d.precoICE * d.resPctICE);
-        const diffTotal = ((custoTotalICE - custoTotalEV) / custoTotalICE * 100).toFixed(1);
-
-// labels e valores
-        const labels3 = ['⚡ EV', '⛽ ICE'];
-        const datasetKm = [d.custoKmEV, d.custoKmICE];
-        const datasetAnual = [d.custoAnualEV, d.custoAnualICE];
-        const datasetTotal = [custoTotalEV, custoTotalICE];
-
-// gráfico com eixos duplos e alto contraste
-        chartCustoKm = new Chart(ctxCustoKm, {
-            type: 'bar',
-            data: {
-                labels: labels3,
-                datasets: [
-                    {
-                        label: '💰 Custo por km (Eixo Esquerdo)',
-                        data: datasetKm,
-                        backgroundColor: 'rgba(255,255,255,0.8)',
-                        borderColor: '#ffffff',
-                        borderWidth: 1.5,
-                        yAxisID: 'yKm'
-                    },
-                    {
-                        label: '📆 Custo Anual (Eixo Direito)',
-                        data: datasetAnual,
-                        backgroundColor: 'rgba(59,130,246,0.8)',
-                        borderColor: 'rgb(37,99,235)',
-                        borderWidth: 1.5,
-                        yAxisID: 'yReais'
-                    },
-                    {
-                        label: '🧾 Custo Total (Eixo Direito)',
-                        data: datasetTotal,
-                        backgroundColor: 'rgba(234,179,8,0.85)',
-                        borderColor: 'rgb(202,138,4)',
-                        borderWidth: 1.5,
-                        yAxisID: 'yReais'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 2,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#fff',
-                            font: { size: 9, weight: 'bold' },
-                            padding: 10
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => {
-                                const label = ctx.dataset.label || '';
-                                const val = ctx.parsed.y;
-                                if (ctx.dataset.yAxisID === 'yKm') {
-                                    return `${label}: ${moneyBR4(val)} /km`;
-                                } else {
-                                    return `${label}: ${moneyBR(val)}`;
-                                }
-                            }
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: `EV é ${diffTotal}% mais barato no custo total`,
-                        color: '#fff',
-                        font: { size: 10, weight: 'bold' }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: '#fff', font: { size: 9, weight: 'bold' } },
-                        grid: { display: false }
-                    },
-                    yKm: {
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: '💰 R$/km (Escala Esquerda)',
-                            color: '#ffffff',
-                            font: { size: 10, weight: 'bold' }
-                        },
-                        ticks: {
-                            color: '#ffffff',
-                            font: { size: 9, weight: '600' },
-                            callback: v => 'R$ ' + v.toFixed(3)
-                        },
-                        grid: { color: 'rgba(255,255,255,0.2)', lineWidth: 0.5 }
-                    },
-                    yReais: {
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: '📆 / 🧾 Custos (R$) — Escala Direita',
-                            color: '#93c5fd',
-                            font: { size: 10, weight: 'bold' }
-                        },
-                        ticks: {
-                            color: '#93c5fd',
-                            font: { size: 9, weight: '600' },
-                            callback: v => 'R$ ' + (v / 1000).toFixed(0) + 'k'
-                        },
-                        grid: { drawOnChartArea: false }
-                    }
-                }
-            }
-        });
-
-
+        chartCustoKm.data.datasets[0].data = [d.custoKmEV, d.custoKmICE];
+        chartCustoKm.data.datasets[1].data = [d.custoAnualEV, d.custoAnualICE];
+        chartCustoKm.data.datasets[2].data = [custoTotalEV, custoTotalICE];
+        chartCustoKm.options.plugins.title.text =
+            (custoTotalICE>0)
+                ? `EV é ${(((custoTotalICE - custoTotalEV) / custoTotalICE) * 100).toFixed(1)}% mais barato no custo total`
+                : 'Comparativo de custos';
+        chartCustoKm.update();
     }
+
     /* =================== PIPE DE CÁLCULO =================== */
     function calcular(){
-        if(!selecionadoEV||!selecionadoICE){alert("Selecione os dois modelos (Elétrico e Combustão).");return;}
-        if(!selecionadoPerfil||!selecionadoCenario){alert("Selecione um perfil e um cenário.");return;}
+        if(!selecionadoEV||!selecionadoICE){showToast("Selecione os dois modelos (Elétrico e Combustão).");return;}
+        if(!selecionadoPerfil||!selecionadoCenario){showToast("Selecione um perfil e um cenário.");return;}
 
         const tarifaRes=toNumBR(document.getElementById('tarifaRes').value);
         const tarifaPub=toNumBR(document.getElementById('tarifaPub').value);
@@ -687,9 +769,11 @@
         const pctPub=toNumBR(selecionadoPerfil['%_recarga_publica']);
         const pctRodovia=toNumBR(selecionadoPerfil['%_rodovia']);
 
+        // TMA (normaliza)
         const tma_in=document.getElementById('tma').value.trim();
         let tma = tma_in==="" ? toNumBR(selecionadoCenario.tma) : toNumBR(tma_in)/100;
-        if(tma<=0||isNaN(tma)){alert("⚠️ TMA inválida! Informe um valor > 0.");return;}
+        if(tma>0 && tma<1e-6) tma = 1e-6;
+        if(tma<=0||isNaN(tma)){showToast("⚠️ TMA inválida! Informe um valor > 0.");return;}
 
         const anos_in=document.getElementById('anos').value.trim();
         const anos= anos_in==="" ? toNumBR(selecionadoCenario.periodo) : toNumBR(anos_in);
@@ -721,28 +805,38 @@
             + toNumBR(selecionadoICE.pneus_ano)
             + (custoKmICE*kmAno);
 
-        const resPctEV=toNumBR(selecionadoEV['residual_%']);
-        const resPctICE=toNumBR(selecionadoICE['residual_%']);
+        // Residual padronizado
+        const resPctEV = typeof selecionadoEV._residual_pct === 'number'
+            ? selecionadoEV._residual_pct
+            : (()=>{
+                let r = toNumBR(selecionadoEV['residual_%']); return r>1? r/100 : r;
+            })();
 
+        const resPctICE = typeof selecionadoICE._residual_pct === 'number'
+            ? selecionadoICE._residual_pct
+            : (()=>{
+                let r = toNumBR(selecionadoICE['residual_%']); return r>1? r/100 : r;
+            })();
+
+        // VPL
         const fator=(((1+tma)**anos-1)/(tma*((1+tma)**anos)));
         const vplEV = -preco_ev - (custoAnualEV*fator) + ((preco_ev*resPctEV)/((1+tma)**anos));
         const vplICE= -preco_ice- (custoAnualICE*fator)+ ((preco_ice*resPctICE)/((1+tma)**anos));
 
+        // Fluxos + TIR
         const fluxoEV=gerarFluxoVeiculo(preco_ev,custoAnualEV,resPctEV,anos);
         const fluxoICE=gerarFluxoVeiculo(preco_ice,custoAnualICE,resPctICE,anos);
         const tirEV=calcularTIR(fluxoEV);
         const tirICE=calcularTIR(fluxoICE);
 
+        // Payback
         const payback=calcularPaybackDescontado(preco_ev,custoAnualEV,resPctEV,preco_ice,custoAnualICE,resPctICE,tma);
-        let paybackFinal = payback;
-        if (isNaN(payback) || payback > anos) {
-            paybackFinal = NaN; // força "Sem payback" no card
-        }
-        // preencher séries de VPL por período (gráfico)
+        const paybackFinal = (isNaN(payback) || payback > anos) ? NaN : payback;
+
+        // Séries
         const serieEV = construirSerieVPL(preco_ev,custoAnualEV,resPctEV,tma,anos);
         const serieICE= construirSerieVPL(preco_ice,custoAnualICE,resPctICE,tma,anos);
 
-        // atualizar estado único
         Object.assign(dadosAtuais,{
             tma, anos,
             precoEV:preco_ev, precoICE:preco_ice,
@@ -753,63 +847,79 @@
             custoKmEV, custoKmICE
         });
 
-        // DOM + gráficos
         aplicarResultadosDOM();
-        desenharGraficos();
+        garantirCanvas();
+        atualizarGraficos();
     }
 
     /* =================== INIT =================== */
     async function init(){
-        [dataVeiculos,dataPerfis,dataCenarios]=await Promise.all([getCSV(URLS.VEICULOS),getCSV(URLS.PERFIS),getCSV(URLS.CENARIOS)]);
-        popularVeiculos(); popularPerfis(); popularCenarios();
+        // loading rápido
+        const loading = document.createElement('div');
+        loading.className='toast'; loading.textContent='Carregando dados...';
+        document.body.appendChild(loading);
 
-        document.getElementById('selEV').addEventListener('change',e=>{
-            const m=e.target.value; selecionadoEV=dataVeiculos.find(v=>v.modelo===m);
-            setInfoVeiculo(selecionadoEV,'infoEV','precoEV','imgEV',true);
-        });
-        document.getElementById('selICE').addEventListener('change',e=>{
-            const m=e.target.value; selecionadoICE=dataVeiculos.find(v=>v.modelo===m);
-            setInfoVeiculo(selecionadoICE,'infoICE','precoICE','imgICE',false);
-        });
-        document.getElementById('btnCalcular').addEventListener('click',calcular);
+        try{
+            [dataVeiculos,dataPerfis,dataCenarios]=await Promise.all([
+                getCSV(URLS.VEICULOS),getCSV(URLS.PERFIS),getCSV(URLS.CENARIOS)
+            ]);
+
+            // Normaliza residual_% no dataset (0..1)
+            dataVeiculos.forEach(v=>{
+                let r = toNumBR(v['residual_%']); if(r>1) r/=100; v._residual_pct=r;
+            });
+
+            popularVeiculos(); popularPerfis(); popularCenarios();
+
+            document.getElementById('selEV').addEventListener('change',e=>{
+                const m=e.target.value; selecionadoEV=dataVeiculos.find(v=>v.modelo===m);
+                setInfoVeiculo(selecionadoEV,'infoEV','precoEV','imgEV',true);
+            });
+            document.getElementById('selICE').addEventListener('change',e=>{
+                const m=e.target.value; selecionadoICE=dataVeiculos.find(v=>v.modelo===m);
+                setInfoVeiculo(selecionadoICE,'infoICE','precoICE','imgICE',false);
+            });
+            document.getElementById('btnCalcular').addEventListener('click',calcular);
+        }catch(err){
+            console.error(err);
+            showToast('Erro ao carregar dados.');
+            document.getElementById('btnCalcular').addEventListener('click',calcular);
+        }finally{
+            setTimeout(()=>loading.remove(),500);
+        }
     }
-    init().catch(err=>{
-        console.error(err);
-        alert('Erro ao carregar dados: '+err);
-        document.getElementById('btnCalcular').addEventListener('click',calcular);
-    });
+    init();
 
-    /* =================== REGRAS DE DIGITAÇÃO (com alertas e correções automáticas) =================== */
+    /* =================== REGRAS DE DIGITAÇÃO (toasts em vez de alerts) =================== */
     function bloquearEntradaInvalida() {
         const inputs = document.querySelectorAll('input');
         inputs.forEach(inp => {
             inp.addEventListener('keydown', e => {
-                const permitido = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'];
+                const permitido = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
                 const key = e.key;
 
-// Bloquear letras e caracteres especiais
+                // Bloquear letras e chars especiais fora dígitos e vírgula
                 if (/[^0-9,]/.test(key) && !permitido.includes(key)) {
                     e.preventDefault();
-                    if (/[a-zA-Z]/.test(key)) alert("⚠️ Digite apenas números e vírgula (,) — letras não são permitidas.");
-                    else if (key === '.') alert("⚠️ Use vírgula (,) em vez de ponto (.) para decimais.");
-                    else if (/[^0-9,]/.test(key)) alert("⚠️ Caracteres especiais não são permitidos.");
+                    if (/[a-zA-Z]/.test(key)) showToast("Digite apenas números e vírgula (,).");
+                    else if (key === '.') showToast("Use vírgula (,) em vez de ponto (.) para decimais.");
+                    else if (/[^0-9,]/.test(key)) showToast("Caracteres especiais não são permitidos.");
                     return;
                 }
 
-// Impedir duas vírgulas
+                // Impedir duas vírgulas
                 if (key === ',' && inp.value.includes(',')) {
                     e.preventDefault();
                     return;
                 }
             });
 
-// Corrigir automaticamente entradas após colar ou digitar
             inp.addEventListener('input', e => {
                 let v = e.target.value;
 
-// remove caracteres inválidos
-                if (/[a-zA-Z!@#$%^&*()_+\-={}\[\]:;"'<>,.?/\\|`~]/.test(v)) {
-                    alert("⚠️ Digite apenas números e vírgula (,) — caracteres especiais não são permitidos.");
+                // alerta visual leve se colar chars inválidos
+                if (/[a-zA-Z!@#$%^&*()_+\-={}\[\]:;"'<>\.?/\\|`~]/.test(v)) {
+                    showToast("Apenas números e vírgula (,).");
                 }
 
                 v = v.replace(/[^0-9,]/g, ''); // mantém só números e vírgula
@@ -817,13 +927,11 @@
                 if (partes.length > 2) v = partes[0] + ',' + partes[1]; // limita 1 vírgula
                 if (v.startsWith(',')) v = '0' + v; // se começar com vírgula, vira 0,5 etc.
                 if (v === ',') v = '0,'; // se for apenas vírgula, prefixa 0
-                if (v === '') v = ''; // mantém vazio se apagar tudo
 
                 e.target.value = v;
             });
         });
     }
-
     document.addEventListener('DOMContentLoaded', bloquearEntradaInvalida);
 </script>
 </body>
