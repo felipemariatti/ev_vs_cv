@@ -19,9 +19,11 @@
         }
 
         html, body {
-            height: auto;
-            overflow: hidden; /* global */
-            overflow-y: auto; /* interno na dashboard */
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
         }
 
         body {
@@ -32,8 +34,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 0; /* evita empurrar o conteúdo pra baixo */
             min-height: 100vh;
+            overflow-x: hidden;
+            padding: 0;
+            margin-bottom: -2px !important;
+            transform: translateY(-2px);
         }
         /* ====== CABEÇALHO ====== */
         .header {
@@ -41,21 +46,42 @@
             max-width: 1400px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
-            padding: 8px 18px;
-            margin-bottom: 5px;
+            padding: 2px 16px;
+            margin-bottom: 4px; /* 👈 antes era 5px */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 0px 1px rgba(0,0,0,0.15); /* 👈 mais suave */
         }
         .header h1 {
             font-size: 1.2rem;
         }
+        .uni-left img,
+        .uni-right img {
+            height: 52px;
+            width: auto;
+            display: block;
+            object-fit: contain;
+            background: transparent;
+            filter: drop-shadow(0 0px 1px rgba(0,0,0,0.35));
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .uni-left img:hover,
+        .uni-right img:hover {
+            transform: scale(1.05);
+        }
 
         /* ====== GRID PRINCIPAL ====== */
         .dashboard {
-            display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto;
-            gap:5px;width:100%;max-width:1400px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 3.5px; /* antes 5px */
+            width: 100%;
+            max-width: 1400px;
+            margin-bottom: 0;
+            padding-bottom: 0;
         }
 
         /* ====== RESPONSIVO ====== */
@@ -69,10 +95,12 @@
         .card {
             background: rgba(255,255,255,0.15);
             border: 1px solid var(--borda);
-            border-radius: 12px;
-            padding: 8px;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            border-radius: 10px; /* antes 12px */
+            padding: 6px; /* antes 8px */
+            backdrop-filter: blur(5px);
+            box-shadow: 0 1.5px 4px rgba(0,0,0,0.18); /* sombra menor */
+            padding-top: 6px;
+            padding-bottom: 6px;
         }
         .card h3 {
             font-size: 0.9rem;
@@ -134,13 +162,13 @@
         .profile-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
+            gap: 8px;
         }
         .profile-pill {
             background: rgba(255,255,255,0.4);
             border: 1.5px solid rgba(255,255,255,0.5);
             border-radius: 10px;
-            padding: 8px;
+            padding: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -160,7 +188,7 @@
         .scenario-btn {
             flex: 1;
             border-radius: 8px;
-            padding: 5px 6px;
+            padding: 7px 6px;
             border: 1.5px solid rgba(255,255,255,0.5);
             background: rgba(255,255,255,0.4);
             color: #111;
@@ -183,7 +211,7 @@
             border: none;
             border-radius: 8px;
             font-weight: 700;
-            padding: 8px;
+            padding: 9px;
             cursor: pointer;
         }
 
@@ -194,12 +222,14 @@
             background: rgba(255,255,255,0.15);
             border: 1px solid var(--borda);
             border-radius: 12px;
-            padding: 8px;
+            padding: 6px;
             backdrop-filter: blur(6px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+            box-shadow: 0 1.5px 4px rgba(0,0,0,0.18);
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            padding-top: 6px;
+            padding-bottom: 6px;
         }
 
         .result-card h3 {
@@ -235,16 +265,16 @@
             grid-column: 3/4;
             grid-row: 1 / span 3;
             display: grid;
-            grid-template-rows: 0.5fr 1fr 1fr 1fr;
-            gap: 8px;
+            grid-template-rows: 0.48fr 1fr 1fr 1fr;
+            gap: 4px;
         }
         .card-reservado .subcard {
             background: rgba(255,255,255,0.12);
             border: 1px solid var(--borda);
             border-radius: 12px;
-            padding: 10px;
+            padding: 100px;
             backdrop-filter: blur(6px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+            box-shadow: 0 1.5px 4px rgba(0,0,0,0.18);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -255,6 +285,8 @@
             text-align: center;
             overflow: hidden;
             position: relative;
+            padding-top: 6px;
+            padding-bottom: 6px;
         }
 
         /* ====== CONCLUSÃO ====== */
@@ -294,13 +326,150 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             z-index: 9999;
         }
+
+        /* ====== LOGO ====== */
+        .uni-info img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            background: transparent;
+            border: none;
+            filter: drop-shadow(0 0px 1px rgba(0,0,0,0.1));
+            transition: transform 0.2s ease-in-out;
+            display: block;          /* remove espaço embaixo */
+            vertical-align: middle;  /* alinha bem com o texto */
+            margin-bottom: 0;
+        }
+
+        /* =========================================================
+   📱 MODO RESPONSIVO PARA CELULARES
+   ========================================================= */
+        @media (max-width: 768px) {
+            /* ======== Estrutura geral ======== */
+            body {
+                padding: 6px;
+                transform: none;
+            }
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 6px;
+                padding: 8px;
+            }
+            .header h1 {
+                font-size: 1rem;
+                line-height: 1.3;
+            }
+            .uni-left img, .uni-right img {
+                height: 40px;
+            }
+
+            /* ======== Dashboard empilhada ======== */
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 8px;
+                max-width: 100%;
+                padding: 0 4px;
+            }
+
+            /* ======== Cards ======== */
+            .card, .result-card, .card-reservado .subcard {
+                padding: 10px;
+                border-radius: 10px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            }
+
+            .result-card {
+                grid-column: auto;
+                grid-row: auto;
+            }
+            .card-reservado {
+                grid-column: auto;
+                grid-row: auto;
+                grid-template-rows: none;
+            }
+
+            /* ======== Texto e botões ======== */
+            label {
+                font-size: 0.8rem;
+            }
+            input, select, button {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+            .btn-calc {
+                font-size: 1rem;
+                padding: 12px;
+            }
+
+            /* ======== Perfil ======== */
+            .profile-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .profile-pill {
+                min-height: 70px;
+                font-size: 0.9rem;
+            }
+
+            /* ======== Cenário ======== */
+            .scenario-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .scenario-btn {
+                width: 100%;
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+
+            /* ======== Resultados ======== */
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            .result-box {
+                height: auto;
+                padding: 10px;
+            }
+            .result-box h4 {
+                font-size: 0.9rem;
+            }
+            .result-box .value {
+                font-size: 1rem;
+            }
+
+            /* ======== Conclusão ======== */
+            #conclusaoBox {
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+            #conclusaoBox .emoji-top {
+                font-size: 1.8rem;
+            }
+
+            /* ======== Gráficos ======== */
+            #grafico1, #grafico2, #grafico3 {
+                min-height: 220px;
+            }
+        }
+        
     </style>
 </head>
 
 <body>
 <div class="header">
-    <h1>⚡ Análise Econômica: EV vs ICE - VERSÃO FINAL</h1>
-    <span style="font-size:0.8rem;opacity:0.8;">Fluxo de caixa completo</span>
+    <div class="uni-info">
+        <a href="https://www.ufsm.br/unidades-universitarias/cachoeira-do-sul" target="_blank" title="Visitar o site da UFSM">
+            <img src="https://www.ufsm.br/app/themes/ufsm/images/brasao.svg" alt="Logo UFSM">
+        </a>
+    </div>
+    <h1 class="titulo-dash">Análise Econômica Comparativa: Veículos Elétricos vs Veículos de Combustão Interna</h1>
+    <div class="uni-info">
+        <a href="https://www.ufsm.br/unidades-universitarias/cachoeira-do-sul" target="_blank" title="Visitar o site da UFSM">
+            <img src="https://www.ufsm.br/app/themes/ufsm/images/brasao.svg" alt="Logo UFSM">
+        </a>
+    </div>
 </div>
 
 <div class="dashboard">
