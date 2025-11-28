@@ -342,7 +342,7 @@
         }
 
         /* =========================================================
-   📱 MODO RESPONSIVO PARA CELULARES
+   📱 MODO PARA CELULARES
    ========================================================= */
         @media (max-width: 768px) {
             /* ======== Estrutura geral ======== */
@@ -716,9 +716,7 @@
     }
 
     /**
-     * Calcula TIR por bissecção com busca adaptativa de intervalo.
-     * @param {number[]} fluxos
-     * @returns {number} TIR decimal (0.12 = 12%)
+     * Calcula TIR por bissecção
      */
     function calcularTIR(fluxos){
         function f(i){return fluxos.reduce((acc,fc,t)=>acc+fc/((1+i)**t),0);}
@@ -738,7 +736,7 @@
     }
 
     /**
-     * Payback descontado via VPL diferencial por ano com fração.
+     * Payback descontado via VPL diferencial por ano.
      */
     function calcularPaybackDescontado(preco_ev,custoAnual_ev,residual_ev,preco_ice,custoAnual_ice,residual_ice,tma){
         if(tma<1e-6) tma=1e-6;
@@ -927,7 +925,7 @@
         chartCustoKm.update();
     }
 
-    /* =================== PIPE DE CÁLCULO =================== */
+    /* =================== CÁLCULO =================== */
     function calcular(){
         if(!selecionadoEV||!selecionadoICE){showToast("Selecione os dois modelos (Elétrico e Combustão).");return;}
         if(!selecionadoPerfil||!selecionadoCenario){showToast("Selecione um perfil e um cenário.");return;}
@@ -975,7 +973,7 @@
             + toNumBR(selecionadoICE.pneus_ano)
             + (custoKmICE*kmAno);
 
-        // Residual padronizado
+        // Residual
         const resPctEV = typeof selecionadoEV._residual_pct === 'number'
             ? selecionadoEV._residual_pct
             : (()=>{
